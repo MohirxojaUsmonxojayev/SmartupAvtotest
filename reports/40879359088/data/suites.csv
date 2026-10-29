@@ -1,0 +1,2 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","21975","Xtrade: login → active session → dashboard → filial → logout","tests.xtrade","2026-10-29","passed","2026-10-29","","test_login","",""
