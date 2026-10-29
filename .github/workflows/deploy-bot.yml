@@ -1,0 +1,28 @@
+name: Deploy bot (Deno Deploy)
+
+# telegram-bot/ o'zgarsa yoki qo'lda — botni Deno Deploy'dagi MAVJUD loyihaga deploy qiladi.
+# URL, env o'zgaruvchilar va Telegram webhook o'zgarmaydi (bir xil loyihaga deploy).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "telegram-bot/**"
+      - ".github/workflows/deploy-bot.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: ${{ vars.DENO_PROJECT }}        # repo Variable: Deno loyiha nomi
+          entrypoint: telegram-bot/main.ts
+        env:
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
