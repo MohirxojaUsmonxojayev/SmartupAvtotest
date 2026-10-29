@@ -101,6 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: read
     concurrency:
       group: gh-pages-publish
       cancel-in-progress: false
@@ -133,6 +134,22 @@ jobs:
           publish_dir: ./allure-report
           destination_dir: reports/${{ github.run_id }}
           keep_files: true
+
+      - name: Wait for GitHub Pages build
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          # gh-pages push Pages rebuild'ni trigger qiladi (~30-90s). Link tayyor
+          # bo'lgandan keyingina Telegramga yuboramiz — aks holda user 404 ko'radi.
+          sleep 15
+          for i in $(seq 1 25); do
+            STATUS=$(gh api "/repos/$REPO/pages/builds/latest" --jq '.status' 2>/dev/null || echo "")
+            echo "Pages build (urinish $i): $STATUS"
+            [ "$STATUS" = "built" ] && break
+            sleep 6
+          done
 
       - name: Notify Telegram
         if: ${{ always() }}

@@ -85,7 +85,13 @@ def browser() -> Generator[Browser, Any, None]:
 
 @pytest.fixture
 def context(browser: Browser, request) -> Generator[BrowserContext, Any, None]:
-    ctx = browser.new_context(no_viewport=True)
+    # Headless'da keng viewport majburiy — aks holda Smartup responsive header
+    # desktop elementlarni (org-switcher) yashiradi va mobil hamburger chiqadi.
+    # Headed'da esa --start-maximized bilan no_viewport ishlatamiz.
+    if _is_headless():
+        ctx = browser.new_context(viewport={"width": 1920, "height": 1080})
+    else:
+        ctx = browser.new_context(no_viewport=True)
     os.makedirs(TRACE_DIR, exist_ok=True)
     ctx.tracing.start(screenshots=True, snapshots=True, sources=True)
 
