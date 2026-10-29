@@ -1,0 +1,23 @@
+# Barcha avtotest loyihalaridan birlashtirilgan kutubxonalar (eng yuqori versiyalar)
+# Transitive (ichki) bog'liqliklarni pip avtomatik yuklaydi.
+
+# --- Playwright / Web ---
+playwright==1.63.0
+pytest==9.1.1
+pytest-asyncio==1.3.0
+pytest-base-url==2.1.0
+pytest-playwright==0.7.2
+
+# --- Mobile (Appium + Selenium) ---
+Appium-Python-Client==5.3.1
+selenium==4.46.0
+
+# --- Reporting ---
+allure-pytest==2.16.0
+
+# --- Utils / Data ---
+python-dotenv==1.2.2
+Faker==37.12.0
+openpyxl==3.1.5
+python-slugify==8.0.4
+requests==2.34.2

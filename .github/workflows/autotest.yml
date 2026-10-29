@@ -1,0 +1,162 @@
+name: Autotest
+
+# Ishga tushirish:
+#  • repository_dispatch (type: autotest) — Telegram bot shu orqali yuboradi.
+#    Parol client_payload ichida ketadi => Actions UI'da KO'RINMAYDI (public repo xavfsiz).
+#  • workflow_dispatch — qo'lda, faqat DEFAULT login/parol bilan (parol inputi yo'q).
+#
+# run-name server + login'ni ko'rsatadi — bot per-login konfliktni shu nom orqali aniqlaydi
+# (login test-akkaunt identifikatori, parol emas — bu yerda ko'rinishi xavfsiz).
+run-name: "Autotest · ${{ github.event.inputs.server || github.event.client_payload.server }} · ${{ github.event.client_payload.login || 'default' }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      server:
+        description: "Server (default login/parol bilan)"
+        required: true
+        default: online
+        type: choice
+        options: [online, xtrade]
+      chat_id:
+        description: "Natija yuboriladigan Telegram chat_id (bo'sh = default secret)"
+        required: false
+        default: ""
+        type: string
+  repository_dispatch:
+    types: [autotest]
+
+jobs:
+  # ==================================================================================================================
+  # 1) TEST — har run alohida (parallel). Konflikt mantig'i bot tomonida.
+  # ==================================================================================================================
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      result: ${{ steps.pytest.outputs.result }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Maxfiy qiymatlarni yashirish (log)
+        env:
+          IN_PASSWORD: ${{ github.event.client_payload.password }}
+          ONLINE_PASSWORD: ${{ secrets.ONLINE_PASSWORD }}
+          XTRADE_PASSWORD: ${{ secrets.XTRADE_PASSWORD }}
+        run: |
+          for v in "$IN_PASSWORD" "$ONLINE_PASSWORD" "$XTRADE_PASSWORD"; do
+            [ -n "$v" ] && echo "::add-mask::$v" || true
+          done
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Playwright chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run tests
+        id: pytest
+        env:
+          HEADLESS: "1"
+          IN_SERVER: ${{ github.event.inputs.server || github.event.client_payload.server }}
+          IN_LOGIN: ${{ github.event.client_payload.login }}
+          IN_PASSWORD: ${{ github.event.client_payload.password }}
+          # DEFAULT login/parollar (GitHub Secrets'dan) — config/credentials.py env'dan o'qiydi
+          ONLINE_LOGIN: ${{ secrets.ONLINE_LOGIN }}
+          ONLINE_PASSWORD: ${{ secrets.ONLINE_PASSWORD }}
+          XTRADE_LOGIN: ${{ secrets.XTRADE_LOGIN }}
+          XTRADE_PASSWORD: ${{ secrets.XTRADE_PASSWORD }}
+        run: |
+          set +e
+          ARGS=("tests/${IN_SERVER}" "--server" "${IN_SERVER}" "--alluredir=allure-results" "-v")
+          [ -n "$IN_LOGIN" ]    && ARGS+=("--email" "$IN_LOGIN")
+          [ -n "$IN_PASSWORD" ] && ARGS+=("--password" "$IN_PASSWORD")
+          python -m pytest "${ARGS[@]}"
+          code=$?
+          if [ "$code" -eq 0 ]; then echo "result=success" >> "$GITHUB_OUTPUT"; else echo "result=failure" >> "$GITHUB_OUTPUT"; fi
+          exit 0
+
+      - name: Upload allure-results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+          retention-days: 7
+
+  # ==================================================================================================================
+  # 2) PUBLISH — Allure hisobotini GitHub Pages'ga joylaydi + Telegramga natija+link yuboradi.
+  #    gh-pages publish'ini ketma-ket qilish uchun alohida concurrency (parallel test'lar bir-birini urmaydi).
+  # ==================================================================================================================
+  publish:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: gh-pages-publish
+      cancel-in-progress: false
+    steps:
+      - name: Download allure-results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline --silent
+
+      - name: Generate Allure report
+        run: allure generate allure-results -o allure-report --clean
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          destination_dir: reports/${{ github.run_id }}
+          keep_files: true
+
+      - name: Notify Telegram
+        if: ${{ always() }}
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_DEFAULT_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          IN_CHAT: ${{ github.event.inputs.chat_id || github.event.client_payload.chat_id }}
+          IN_SERVER: ${{ github.event.inputs.server || github.event.client_payload.server }}
+          IN_LOGIN: ${{ github.event.client_payload.login }}
+          RESULT: ${{ needs.test.outputs.result }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$TG_TOKEN" ]; then echo "TELEGRAM_BOT_TOKEN yo'q — o'tkazib yuborildi"; exit 0; fi
+          CHAT="${IN_CHAT:-$TG_DEFAULT_CHAT}"
+          LOGIN_TXT="${IN_LOGIN:-default}"
+          ALLURE_URL="https://${OWNER,,}.github.io/${REPO}/reports/${RUN_ID}/"
+          if [ "$RESULT" = "success" ]; then VERDICT="✅ MUVAFFAQIYATLI"; else VERDICT="❌ XATOLIK BOR"; fi
+          TEXT=$(printf '🧪 <b>Autotest tugadi</b> — %s\n🌐 Server: <b>%s</b>\n👤 Login: <code>%s</code>\n📊 Allure: %s\n🔗 Run: %s' \
+            "$VERDICT" "$IN_SERVER" "$LOGIN_TXT" "$ALLURE_URL" "$RUN_URL")
+          curl -sS -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${CHAT}" \
+            --data "parse_mode=HTML" \
+            --data "disable_web_page_preview=true" \
+            --data-urlencode "text=${TEXT}" || echo "Telegram yuborilmadi"

@@ -1,0 +1,29 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Environment variables
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# Local agent state
+.claude/
+
+# Playwright / test artifacts
+test-results/
+playwright-report/
+.playwright-mcp/
+
+# Allure
+allure-results/
+allure-report/
