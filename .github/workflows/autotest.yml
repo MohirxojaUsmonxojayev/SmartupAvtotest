@@ -5,8 +5,7 @@ name: Autotest
 #    Parol client_payload ichida ketadi => Actions UI'da KO'RINMAYDI (public repo xavfsiz).
 #  • workflow_dispatch — qo'lda, faqat DEFAULT login/parol bilan (parol inputi yo'q).
 #
-# run-name server + login'ni ko'rsatadi — bot per-login konfliktni shu nom orqali aniqlaydi
-# (login test-akkaunt identifikatori, parol emas — bu yerda ko'rinishi xavfsiz).
+# run-name server + login'ni ko'rsatadi — bot per-login konfliktni shu nom orqali aniqlaydi.
 run-name: "Autotest · ${{ github.event.inputs.server || github.event.client_payload.server }} · ${{ github.event.client_payload.login || 'default' }}"
 
 on:
@@ -26,15 +25,23 @@ on:
   repository_dispatch:
     types: [autotest]
 
+env:
+  # Progress/natija xabarlari uchun umumiy qiymatlar (barcha job/step'larda mavjud)
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  TG_CHAT: ${{ github.event.inputs.chat_id || github.event.client_payload.chat_id || secrets.TELEGRAM_CHAT_ID }}
+  SRV: ${{ github.event.inputs.server || github.event.client_payload.server }}
+  LOGIN: ${{ github.event.client_payload.login }}
+
 jobs:
   # ==================================================================================================================
-  # 1) TEST — har run alohida (parallel). Konflikt mantig'i bot tomonida.
+  # 1) TEST — jonli progress bilan (bitta xabar bosqichma-bosqich tahrirlanadi).
   # ==================================================================================================================
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
       result: ${{ steps.pytest.outputs.result }}
+      progress_msg_id: ${{ steps.prog.outputs.msg_id }}
     steps:
       - uses: actions/checkout@v4
 
@@ -53,13 +60,47 @@ jobs:
           python-version: "3.13"
           cache: "pip"
 
+      - name: Progress — boshlandi
+        id: prog
+        run: |
+          L="${LOGIN:-default}"
+          MSG=$(printf '%s\n' \
+            "🧪 <b>Autotest boshlandi</b>" \
+            "🌐 ${SRV} · 👤 <code>${L}</code>" \
+            "" \
+            "⏳ Muhit tayyorlanmoqda…" | python scripts/tg_notify.py send)
+          echo "PROGRESS_MSG_ID=$MSG" >> "$GITHUB_ENV"
+          echo "msg_id=$MSG" >> "$GITHUB_OUTPUT"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Progress — kutubxonalar
+        if: ${{ always() }}
+        run: |
+          L="${LOGIN:-default}"
+          printf '%s\n' \
+            "🧪 <b>Autotest</b>" \
+            "🌐 ${SRV} · 👤 <code>${L}</code>" \
+            "" \
+            "✅ Kutubxonalar o'rnatildi" \
+            "🌐 Brauzer o'rnatilmoqda…" | python scripts/tg_notify.py edit "$PROGRESS_MSG_ID"
+
       - name: Install Playwright chromium
         run: python -m playwright install --with-deps chromium
+
+      - name: Progress — test ketyapti
+        if: ${{ always() }}
+        run: |
+          L="${LOGIN:-default}"
+          printf '%s\n' \
+            "🧪 <b>Autotest</b>" \
+            "🌐 ${SRV} · 👤 <code>${L}</code>" \
+            "" \
+            "✅ Brauzer tayyor" \
+            "🏃 Test ketyapti…" | python scripts/tg_notify.py edit "$PROGRESS_MSG_ID"
 
       - name: Run tests
         id: pytest
@@ -83,6 +124,17 @@ jobs:
           if [ "$code" -eq 0 ]; then echo "result=success" >> "$GITHUB_OUTPUT"; else echo "result=failure" >> "$GITHUB_OUTPUT"; fi
           exit 0
 
+      - name: Progress — hisobot
+        if: ${{ always() }}
+        run: |
+          L="${LOGIN:-default}"
+          printf '%s\n' \
+            "🧪 <b>Autotest</b>" \
+            "🌐 ${SRV} · 👤 <code>${L}</code>" \
+            "" \
+            "✅ Test tugadi" \
+            "📊 Hisobot (Allure) tayyorlanmoqda…" | python scripts/tg_notify.py edit "$PROGRESS_MSG_ID"
+
       - name: Upload allure-results
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -92,13 +144,11 @@ jobs:
           retention-days: 7
 
   # ==================================================================================================================
-  # 2) PUBLISH — Allure hisobotini GitHub Pages'ga joylaydi + Telegramga natija+link yuboradi.
-  #    gh-pages publish'ini ketma-ket qilish uchun alohida concurrency (parallel test'lar bir-birini urmaydi).
+  # 2) PUBLISH — Allure -> GitHub Pages, batafsil natija bilan progress xabarini yakunlaydi.
   # ==================================================================================================================
   publish:
     needs: test
-    # Bekor qilingan (to'xtatilgan) run'da ISHLAMAYDI — aks holda yarim natija bilan
-    # xato xabari + 404 Allure link yuboriladi. Faqat run tugaganda (pass/fail) ishlaydi.
+    # Bekor qilingan (to'xtatilgan) run'da ISHLAMAYDI — yarim natija + 404 yubormaslik uchun.
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
@@ -108,11 +158,17 @@ jobs:
       group: gh-pages-publish
       cancel-in-progress: false
     steps:
+      - uses: actions/checkout@v4          # scripts/ uchun
+
       - name: Download allure-results
         uses: actions/download-artifact@v4
         with:
           name: allure-results
           path: allure-results
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
       - uses: actions/setup-java@v4
         with:
@@ -144,8 +200,6 @@ jobs:
           REPO: ${{ github.event.repository.name }}
           RUN_ID: ${{ github.run_id }}
         run: |
-          # gh-pages push Pages rebuild'ni trigger qiladi. Link'ni HAQIQATAN HTTP 200
-          # bo'lgunча pollimiz — shunda Telegramga yuborilganda darhol ochiladi (404 yo'q).
           OWNER_LC=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')
           URL="https://${OWNER_LC}.github.io/${REPO}/reports/${RUN_ID}/"
           echo "Kutilayotgan link: $URL"
@@ -156,29 +210,26 @@ jobs:
             sleep 6
           done
 
-      - name: Notify Telegram
+      - name: Yakuniy natija (Telegram)
         if: ${{ always() }}
         env:
-          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TG_DEFAULT_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
-          IN_CHAT: ${{ github.event.inputs.chat_id || github.event.client_payload.chat_id }}
-          IN_SERVER: ${{ github.event.inputs.server || github.event.client_payload.server }}
-          IN_LOGIN: ${{ github.event.client_payload.login }}
+          MSG_ID: ${{ needs.test.outputs.progress_msg_id }}
           RESULT: ${{ needs.test.outputs.result }}
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
           RUN_ID: ${{ github.run_id }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          if [ -z "$TG_TOKEN" ]; then echo "TELEGRAM_BOT_TOKEN yo'q — o'tkazib yuborildi"; exit 0; fi
-          CHAT="${IN_CHAT:-$TG_DEFAULT_CHAT}"
-          LOGIN_TXT="${IN_LOGIN:-default}"
-          ALLURE_URL="https://${OWNER,,}.github.io/${REPO}/reports/${RUN_ID}/"
+          OWNER_LC=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')
+          ALLURE_URL="https://${OWNER_LC}.github.io/${REPO}/reports/${RUN_ID}/"
+          L="${LOGIN:-default}"
           if [ "$RESULT" = "success" ]; then VERDICT="✅ MUVAFFAQIYATLI"; else VERDICT="❌ XATOLIK BOR"; fi
-          TEXT=$(printf '🧪 <b>Autotest tugadi</b> — %s\n🌐 Server: <b>%s</b>\n👤 Login: <code>%s</code>\n📊 Allure: %s\n🔗 Run: %s' \
-            "$VERDICT" "$IN_SERVER" "$LOGIN_TXT" "$ALLURE_URL" "$RUN_URL")
-          curl -sS -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${CHAT}" \
-            --data "parse_mode=HTML" \
-            --data "disable_web_page_preview=true" \
-            --data-urlencode "text=${TEXT}" || echo "Telegram yuborilmadi"
+          SUMMARY=$(python scripts/ci_summary.py allure-results)
+          printf '%s\n' \
+            "🧪 <b>Autotest tugadi</b> — ${VERDICT}" \
+            "🌐 ${SRV} · 👤 <code>${L}</code>" \
+            "" \
+            "${SUMMARY}" \
+            "" \
+            "📊 Allure: ${ALLURE_URL}" \
+            "🔗 Run: ${RUN_URL}" | python scripts/tg_notify.py edit "$MSG_ID"
