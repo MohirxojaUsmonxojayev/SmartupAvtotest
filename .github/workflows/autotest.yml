@@ -41,7 +41,6 @@ jobs:
     timeout-minutes: 350
     outputs:
       result: ${{ steps.pytest.outputs.result }}
-      progress_msg_id: ${{ steps.prog.outputs.msg_id }}
     steps:
       - uses: actions/checkout@v4
 
@@ -61,7 +60,6 @@ jobs:
           cache: "pip"
 
       - name: Progress — boshlandi
-        id: prog
         run: |
           L="${LOGIN:-default}"
           MSG=$(printf '%s\n' \
@@ -70,7 +68,6 @@ jobs:
             "" \
             "⏳ Muhit tayyorlanmoqda…" | python scripts/tg_notify.py send)
           echo "PROGRESS_MSG_ID=$MSG" >> "$GITHUB_ENV"
-          echo "msg_id=$MSG" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: |
@@ -213,7 +210,6 @@ jobs:
       - name: Yakuniy natija (Telegram)
         if: ${{ always() }}
         env:
-          MSG_ID: ${{ needs.test.outputs.progress_msg_id }}
           RESULT: ${{ needs.test.outputs.result }}
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
@@ -232,4 +228,4 @@ jobs:
             "${SUMMARY}" \
             "" \
             "📊 Allure: ${ALLURE_URL}" \
-            "🔗 Run: ${RUN_URL}" | python scripts/tg_notify.py edit "$MSG_ID"
+            "🔗 Run: ${RUN_URL}" | python scripts/tg_notify.py send
