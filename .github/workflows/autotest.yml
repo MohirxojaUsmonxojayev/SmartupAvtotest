@@ -135,19 +135,22 @@ jobs:
           destination_dir: reports/${{ github.run_id }}
           keep_files: true
 
-      - name: Wait for GitHub Pages build
+      - name: Wait for Allure link (Pages tayyor bo'lsin)
         if: ${{ always() }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          # gh-pages push Pages rebuild'ni trigger qiladi (~30-90s). Link tayyor
-          # bo'lgandan keyingina Telegramga yuboramiz — aks holda user 404 ko'radi.
-          sleep 15
-          for i in $(seq 1 25); do
-            STATUS=$(gh api "/repos/$REPO/pages/builds/latest" --jq '.status' 2>/dev/null || echo "")
-            echo "Pages build (urinish $i): $STATUS"
-            [ "$STATUS" = "built" ] && break
+          # gh-pages push Pages rebuild'ni trigger qiladi. Link'ni HAQIQATAN HTTP 200
+          # bo'lgunча pollimiz — shunda Telegramga yuborilganda darhol ochiladi (404 yo'q).
+          OWNER_LC=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')
+          URL="https://${OWNER_LC}.github.io/${REPO}/reports/${RUN_ID}/"
+          echo "Kutilayotgan link: $URL"
+          for i in $(seq 1 40); do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo 000)
+            echo "urinish $i: HTTP $CODE"
+            [ "$CODE" = "200" ] && { echo "Allure link tayyor"; break; }
             sleep 6
           done
 

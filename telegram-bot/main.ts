@@ -113,6 +113,13 @@ const runsUrl = () => `https://github.com/${GH_REPO}/actions`;
 // ---------------------------------------------------------------------------------------------------------------------
 // Keyboards
 // ---------------------------------------------------------------------------------------------------------------------
+// Doimiy (persistent) tugma — har safar /run yozmaslik uchun. Chat ostida turadi.
+const runKeyboard = () => ({
+  keyboard: [[{ text: "🚀 Run test" }]],
+  resize_keyboard: true,
+  is_persistent: true,
+});
+
 const serverKeyboard = () => ({
   inline_keyboard: [[
     { text: "🟢 online", callback_data: "srv:online" },
@@ -157,6 +164,7 @@ async function startRun(chat: string, server: string, login: string, password: s
       chat,
       `🚀 <b>Run boshlandi</b> (GitHub Actions)\n🌐 Server: <b>${server}</b>\n👤 Login: <code>${login || "default"}</code>\n` +
         `🔗 ${runsUrl()}\n\nTugagach natija + Allure link shu yerga keladi.`,
+      runKeyboard(),
     );
   } else {
     await send(chat, `❌ Dispatch xatosi. GITHUB_TOKEN/ GITHUB_REPO sozlamalarini tekshiring.`);
@@ -191,12 +199,19 @@ async function onMessage(msg: any) {
   }
 
   const cmd = text.split(/\s+/)[0].split("@")[0].toLowerCase();
-  if (cmd === "/start" || cmd === "/run") {
+  if (cmd === "/start") {
+    // Doimiy "🚀 Run test" tugmasini o'rnatamiz (bir marta — keyin chat ostida turaveradi).
+    await send(
+      chat,
+      "🧪 <b>Smartup Autotest bot</b>\n\nTest ishga tushirish: pastdagi <b>🚀 Run test</b> tugmasi (yoki /run).",
+      runKeyboard(),
+    );
+  } else if (cmd === "/run" || text === "🚀 Run test") {
     await send(chat, "🧪 Qaysi serverda test run qilamiz?", serverKeyboard());
   } else if (cmd === "/id") {
     await send(chat, `Chat ID: <code>${chat}</code>`);
   } else if (cmd === "/help") {
-    await send(chat, "/run — test ishga tushirish\n/id — chat id\nTestlar GitHub Actions'da ishlaydi, natija + Allure link shu yerga keladi.");
+    await send(chat, "🚀 Run test (yoki /run) — test ishga tushirish\n/id — chat id\nTestlar GitHub Actions'da ishlaydi, natija + Allure link shu yerga keladi.");
   }
 }
 
@@ -239,20 +254,30 @@ async function onCallback(cb: any) {
 
   // Konflikt: to'xtatib qaytadan
   if (data.startsWith("rst:")) {
-    const [, runIdStr, server, login] = data.split(":");
-    const runId = Number(runIdStr);
+    const parts = data.split(":");
+    const runId = Number(parts[1]);
+    const server = parts[2];
+    const login = parts[3] ?? "";   // bo'sh = default
+    // Eski run'ni to'xtatamiz (allaqachon tugagan bo'lsa — zararsiz, e'tiborsiz qoldiramiz).
     if (runId) await cancelRun(runId);
-    await send(chat, `♻️ Eski run to'xtatildi.`);
+
     if (login) {
-      // Custom login edi — parolni qayta so'raymiz (parol hech qayerda saqlanmaydi)
+      // Custom login edi — parolni qayta so'raymiz (parol hech qayerda saqlanmaydi).
       await send(
         chat,
-        `✍️ ${server} uchun login va parolni qayta yuboring:\n<code>login parol</code>\n\n${REPLY_MARKER(server)}`,
+        `♻️ Eski run to'xtatildi. ${server} uchun login va parolni qayta yuboring:\n<code>login parol</code>\n\n${REPLY_MARKER(server)}`,
         { force_reply: true, input_field_placeholder: "login parol" },
       );
     } else {
-      // Default edi — darhol qayta dispatch
-      await startRun(chat, server, "", "");
+      // Default edi — konfliktni qayta tekshirmay to'g'ridan-to'g'ri dispatch (loop bo'lmasin).
+      const ok = await dispatch(server, "", "", chat);
+      await send(
+        chat,
+        ok
+          ? `♻️ <b>Qaytadan boshlandi</b> (default)\n🌐 Server: <b>${server}</b>\n🔗 ${runsUrl()}`
+          : `❌ Dispatch xatosi.`,
+        runKeyboard(),
+      );
     }
     return;
   }
