@@ -97,7 +97,9 @@ jobs:
   # ==================================================================================================================
   publish:
     needs: test
-    if: ${{ always() }}
+    # Bekor qilingan (to'xtatilgan) run'da ISHLAMAYDI — aks holda yarim natija bilan
+    # xato xabari + 404 Allure link yuboriladi. Faqat run tugaganda (pass/fail) ishlaydi.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
