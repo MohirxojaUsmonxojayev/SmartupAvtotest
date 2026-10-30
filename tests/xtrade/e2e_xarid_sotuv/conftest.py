@@ -21,8 +21,9 @@ def _headless() -> bool:
 
 @pytest.fixture(scope="session")
 def rdate() -> str:
-    """Yugurish sanasi <DDMM> — yozuv nomlarida QA-E2E-...-<DDMM>."""
-    return datetime.datetime.now().strftime("%d%m")
+    """Yugurish belgisi <DDMMHHMM> — har run UNIQUE (kod/nom to'qnashmasligi uchun).
+    (Ssenariyда <DDMM> edi; avtomatlashtirishda takror run'lar bir xil kod yaratmasligi uchun vaqt qo'shildi.)"""
+    return datetime.datetime.now().strftime("%d%m%H%M")
 
 
 @pytest.fixture(scope="session")

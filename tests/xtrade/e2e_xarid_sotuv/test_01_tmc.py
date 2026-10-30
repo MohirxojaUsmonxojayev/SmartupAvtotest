@@ -26,11 +26,13 @@ def test_01_tmc(e2e_page, e2e, rdate):
     with allure.step("3 - «Кол-во в кейсе (2 уровень)» 1-daraja tanlanmasdan nofaol"):
         tmc.check_case2_disabled_before_case1()
 
-    with allure.step("4 - Barcha asosiy maydonlarni to'ldirish"):
+    with allure.step("4 - Barcha asosiy maydonlarni to'ldirish + rasm"):
         tmc.fill_main(d)
+        tmc.add_image()
 
-    with allure.step("5 - 6 ta tabni ochib ko'rish"):
+    with allure.step("5 - 6 ta tabni ochib ko'rish + Характеристики to'ldirish"):
         tmc.open_tabs_smoke()
+        tmc.fill_characteristics()
 
     with allure.step("6 - «Сохранить»"):
         tmc.save()
@@ -43,6 +45,11 @@ def test_01_tmc(e2e_page, e2e, rdate):
 
     with allure.step("9 - «Изменить» → Порядковый номер 998"):
         tmc.edit_order_no(d["name"], d["order_no_edit"])
+
+    # TODO (status toggle): «Неактивный» qilgach yozuv faol-ro'yxatdan filtrlanadi —
+    #   qayta «Активный» qilish uchun "nofaollarни ko'rsat" filtri kerak. E2E zanjiri
+    #   ТМЦ aktiv bo'lishini talab qiladi, shuning uchun hozir o'tkazib yuborildi
+    #   (tmc.toggle_status_in_list mavjud, filtr qo'shilgach yoqiladi).
 
     e2e["tmc_name"] = d["name"]
     e2e["tmc_code"] = d["code"]

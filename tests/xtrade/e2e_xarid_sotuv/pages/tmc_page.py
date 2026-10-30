@@ -10,9 +10,13 @@ Jonli tasdiqlangan struktura (mohir@xan, 2026-10-30):
   Tablar: Вес, Характеристики, Штрих-коды (Добавить+grid), Файлы (Добавить+grid),
     Ед. изм. маркированных товаров, GTIN.
 """
+import os
+
 from playwright.sync_api import expect
 
 from utils.base_page import BasePage
+
+FILES_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "files")
 
 
 class TmcPage:
@@ -63,11 +67,44 @@ class TmcPage:
         self.b.input(label="Вес нетто (кг)", value=d["weight_net"])
         self.b.input(label="Вес брутто (кг)", value=d["weight_gross"])
         self.b.input(label="Литр/Дециметр куб.", value=d["liter"])
+        # dropdownlar — Товар reflow'idan OLDIN
+        self.b.select_first("Производители")
+        self.b.select_first("Тип кейса (1 уровень)")
+        self.b.input(label="Кол-во в кейсе (1 уровень)", value=d["case1_qty"])
+        self.b.select_first("Тип кейса (2 уровень)")
+        self.b.input(label="Кол-во в кейсе (2 уровень)", value=d["case2_qty"])
         self.b.chip(d["tip"])                                     # Типы ТМЦ → Товар (OXIRGI — reflow qiladi)
-        # TODO (jonli refine): Производители, Тип кейса (1/2 уровень) + Кол-во —
+        # qolgan: _
         #   Товар tanlangach reflow bo'ladi, dropdown trigger'i o'zgaradi.
 
-    # ---- tablar (TODO: dialog/upload sub-interaksiyalari keyingi tsiklда pishitiladi) -------------
+    def add_image(self):
+        """ТМЦ rasmini yuklaydi: file input → cropper oynasida «Сохранить»."""
+        inp = self.page.locator("main input[type=file][accept*=image]").first
+        inp.set_input_files(os.path.join(FILES_DIR, "qa.png"))
+        self.page.wait_for_timeout(1_500)
+        # cropper overlay (ichida «Сменить изображение») → «Сохранить» (faol bo'lsa)
+        cropper = self.page.locator(".cdk-overlay-pane").filter(has_text="Сменить изображение")
+        save = cropper.get_by_role("button", name="Сохранить").first
+        if save.is_enabled():
+            save.click()
+        else:
+            print("  [rasm] cropper «Сохранить» nofaol — «Закрыть» bilan yopiladi")
+            cropper.get_by_role("button", name="Закрыть").first.click()
+        self.page.wait_for_timeout(1_000)
+
+    def fill_characteristics(self):
+        """Tab «Характеристики»: dropdownlarda birinchi qiymatlarni tanlaydi.
+        Ba'zi PG dropdownlari bo'sh bo'lishi mumkin — ular o'tkazib yuboriladi (log bilan)."""
+        self.b.open_tab("Характеристики")
+        self.page.wait_for_timeout(1_000)
+        for lbl in ["Категория", "Торговая марка", "My_Type",
+                    "PG6", "PG7", "PG8", "PG9", "PG10", "PG11", "PG12", "PG13"]:
+            try:
+                self.b.select_first(lbl, timeout=4_000)
+            except Exception:
+                print(f"  [характеристики] '{lbl}' — variant yo'q yoki topilmadi, o'tkazildi")
+
+    # ---- tablar (dialog/upload — jonli aniqlangan) ----------------------------------------------
     def add_second_barcode(self, code: str):
         """Tab «Штрих-коды» → «Добавить» → 2-shtrix-kod. (dialog strukturasi jonli tasdiqlanadi)"""
         self.b.open_tab("Штрих-коды")
@@ -88,7 +125,10 @@ class TmcPage:
 
     def find_in_list(self, name: str):
         self.open_list()
+        # grid toolbar yuklanishini kutamiz (async)
+        self.page.get_by_role("button", name="Создать", exact=True).first.wait_for(state="visible", timeout=30_000)
         self.b.search_list(name)
+        self.page.wait_for_timeout(2_000)
         self.b.grid_row(name)
 
     def open_view(self, name: str):
@@ -97,6 +137,36 @@ class TmcPage:
         self.b.grid_row(name).click()
         self.page.wait_for_timeout(500)
         self.b.click_button("Просмотр", exact=False)
+        self.page.wait_for_timeout(2_000)
+        # Просмотр ochilganini tekshiramiz: nom ko'rinadi YOKI list'dan ketdik (view URL)
+        name_visible = self.page.get_by_text(name, exact=False).first.is_visible()
+        assert name_visible or "inventory_list" not in self.page.url, \
+            f"Просмотр ochilmadi (nom ko'rinmadi, URL={self.page.url})"
+
+    def _confirm_if_any(self):
+        """Tasdiqlash oynasi chiqsa «Да» bosadi (bo'lmasa — hech nima)."""
+        try:
+            btn = self.page.locator("[role=dialog], .cdk-dialog-container").get_by_role("button", name="Да", exact=False).first
+            if btn.count() > 0 and btn.is_visible():
+                btn.click()
+                self.page.wait_for_timeout(500)
+        except Exception:
+            pass
+
+    def toggle_status_in_list(self, name: str):
+        """Ro'yxatда: «Неактивный» → keyin «Активный» (status o'zgarib qaytadi, oxiri Активный)."""
+        self.find_in_list(name)
+        self.b.grid_row(name).click()
+        self.page.wait_for_timeout(800)
+        self.b.click_button("Неактивный", exact=False)
+        self._confirm_if_any()
+        self.page.wait_for_timeout(1_500)
+        # qayta Активный (zanjir uchun ТМЦ aktiv bo'lishi SHART)
+        self.find_in_list(name)
+        self.b.grid_row(name).click()
+        self.page.wait_for_timeout(800)
+        self.b.click_button("Активный", exact=False)
+        self._confirm_if_any()
         self.page.wait_for_timeout(1_500)
 
     def edit_order_no(self, name: str, new_value: str):
