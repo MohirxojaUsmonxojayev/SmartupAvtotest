@@ -1,0 +1,13 @@
+{
+  "form_slug": "room",
+  "state": "add-loader",
+  "viewport": "desktop-1920x1080",
+  "url_pattern": "https://app3.greenwhite.uz/xtrade/#/<session>/anor/mrf/room+add",
+  "screenshot": "room__add-loader__desktop-20260626.png",
+  "created_at": "2026-06-26",
+  "browser": "Playwright Chromium",
+  "notes": [
+    "Captured during debug of delayed Room add page loader.",
+    "Session token and credentials intentionally omitted."
+  ]
+}

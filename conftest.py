@@ -5,7 +5,9 @@ Server tanlash:
   - tests/online/ va tests/xtrade/ papkalaridagi conftest `server` fixture'ni majburlaydi.
   - Aks holda `--server=online|xtrade` CLI opsiyasi ishlatiladi (default: online).
 """
+import json
 import os
+import random
 import sys
 from typing import Any, Generator
 
@@ -171,3 +173,105 @@ def auth(page: Page, server: dict) -> Generator[Session, Any, None]:
         logout(page, server)
     except Exception:
         pass
+
+
+# ======================================================================================================================
+# SOFT ASSERT — bitta testda ko'p tekshiruv (har xatoga screenshot), oxirida assert
+# ======================================================================================================================
+
+@pytest.fixture
+def soft(page: Page):
+    from utils.soft_assert import SoftAssert
+    sa = SoftAssert(page)
+    yield sa
+    sa.assert_all()
+
+
+# ======================================================================================================================
+# TEST MA'LUMOTLARI — tasodifiy generator + JSON store (testlar orasida ma'lumot almashish)
+# ======================================================================================================================
+
+DATA_DIR = "test-results/data"
+
+
+@pytest.fixture
+def random_code() -> str:
+    """Har test uchun tasodifiy 4 xonali kod (yaratiladigan entity'lar unikal bo'lsin)."""
+    return str(random.randint(1000, 9999))
+
+
+@pytest.fixture
+def save_data(request):
+    """JSON faylga ma'lumot saqlash. Fayl nomi serverga qarab ajratiladi."""
+    os.makedirs(DATA_DIR, exist_ok=True)
+    server = request.config.getoption("--server")
+
+    def _save(key, value, file_name=None):
+        path = os.path.join(DATA_DIR, f"{file_name or f'data_store_{server}'}.json")
+        data = {}
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    data = {}
+        data[key] = value
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
+    return _save
+
+
+@pytest.fixture
+def load_data(request):
+    """JSON fayldan ma'lumot o'qish. Fayl nomi serverga qarab ajratiladi."""
+    server = request.config.getoption("--server")
+
+    def _load(key, file_name=None):
+        path = os.path.join(DATA_DIR, f"{file_name or f'data_store_{server}'}.json")
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                try:
+                    return json.load(f).get(key)
+                except json.JSONDecodeError:
+                    return None
+        return None
+
+    return _load
+
+
+@pytest.fixture
+def test_data(random_code) -> dict:
+    """Dinamik test ma'lumotlari — har test boshida tasodifiy kod bilan shakllanadi."""
+    cod = random_code
+    data = {
+        # Filial
+        "filial_name":            f"Filial_{cod}",
+        "filial_legal_full_name": f"Filial_legal_name_{cod}",
+        "filial_code":            f"Code_{cod}",
+        "filial_telephone":       f"99890{cod}",
+        "filial_email":           f"filial_{cod}@smartup.test",
+        "filial_address":         f"Filial_address_{cod}",
+        "filial_tin":             f"1{cod}",
+        "filial_currency":        "Узбекский сум",
+        "filial_timezone":        "(+05:00) Ташкент",
+        # Jismoniy shaxs
+        "natural_person_surname": f"NP_Surname_{cod}",
+        "natural_person_name":    f"NP_Name_{cod}",
+        "natural_person_code":    f"NP_code_{cod}",
+        "natural_person_tin":     f"2{cod}",
+        "natural_person_email":   f"np_{cod}@smartup.test",
+        # User
+        "user_login":    f"user_login_{cod}",
+        "user_password": f"User_password_{cod}",
+        "user_code":     f"User_code_{cod}",
+        # Room / robot
+        "room_code": f"Room_code_{cod}",
+        "room_name": f"Room_name_{cod}",
+        "robot_code": f"Robot_code_{cod}",
+        "robot_name": f"Robot_name_{cod}",
+        # Yuridik shaxs guruhi / restriction
+        "legal_person_group_name": f"legal_group_{cod}",
+        "restriction_name":        f"restriction_{cod}",
+    }
+    return {"data": data, "code": cod}

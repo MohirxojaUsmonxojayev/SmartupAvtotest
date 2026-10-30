@@ -1,0 +1,57 @@
+[
+  {
+    "label": "Название",
+    "tag": "input",
+    "type": "text",
+    "placeholder": "",
+    "ng_model": "d.name",
+    "value": "",
+    "checked": false,
+    "readonly": false,
+    "disabled": false
+  },
+  {
+    "label": "Юридическое лицо",
+    "tag": "input",
+    "type": "text",
+    "placeholder": "Поиск...",
+    "ng_model": "d.person_name",
+    "value": "",
+    "checked": false,
+    "readonly": false,
+    "disabled": false
+  },
+  {
+    "label": "Базовая валюта",
+    "tag": "input",
+    "type": "text",
+    "placeholder": "Поиск...",
+    "ng_model": "d.base_currency_name",
+    "value": "",
+    "checked": false,
+    "readonly": false,
+    "disabled": false
+  },
+  {
+    "label": "Часовой пояс",
+    "tag": "input",
+    "type": "text",
+    "placeholder": "Поиск...",
+    "ng_model": "d.timezone_name",
+    "value": "",
+    "checked": false,
+    "readonly": false,
+    "disabled": false
+  },
+  {
+    "label": "Порядковый номер",
+    "tag": "input",
+    "type": "text",
+    "placeholder": "",
+    "ng_model": "d.order_no",
+    "value": "",
+    "checked": false,
+    "readonly": false,
+    "disabled": false
+  }
+]

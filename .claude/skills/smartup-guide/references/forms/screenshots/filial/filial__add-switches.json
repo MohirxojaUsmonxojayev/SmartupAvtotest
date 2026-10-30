@@ -1,0 +1,56 @@
+[
+  {
+    "label": "Статус",
+    "type": "checkbox",
+    "ng_model": "d.state",
+    "checked": true,
+    "disabled": false,
+    "visible": true,
+    "group_text": "Статус Активный"
+  },
+  {
+    "label": "НДС",
+    "type": "checkbox",
+    "ng_model": "d.vat_enabled",
+    "checked": false,
+    "disabled": false,
+    "visible": true,
+    "group_text": "НДС Не является плательщиком НДС"
+  },
+  {
+    "label": "Акциз",
+    "type": "checkbox",
+    "ng_model": "d.excise_enabled",
+    "checked": false,
+    "disabled": false,
+    "visible": true,
+    "group_text": "Акциз Не является плательщиком акцизов"
+  },
+  {
+    "label": "Тип отзыва",
+    "type": "radio",
+    "ng_model": "a.feedback.type",
+    "checked": false,
+    "disabled": false,
+    "visible": false,
+    "group_text": "Тип отзыва Предложение Комментарий"
+  },
+  {
+    "label": "Тип отзыва",
+    "type": "radio",
+    "ng_model": "a.feedback.type",
+    "checked": false,
+    "disabled": false,
+    "visible": false,
+    "group_text": "Тип отзыва Предложение Комментарий"
+  },
+  {
+    "label": "Анонимно",
+    "type": "checkbox",
+    "ng_model": "a.feedback.anonymous",
+    "checked": false,
+    "disabled": false,
+    "visible": false,
+    "group_text": "Анонимно Отправить Закрыть"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "form_slug": "price-type",
+  "state": "add-default",
+  "viewport": "desktop-mcp-default",
+  "url_pattern": "https://app3.greenwhite.uz/xtrade/#/<session>/anor/mkr/price_type+add",
+  "screenshot": "price-type__add-default__desktop-mcp-20260626.png",
+  "created_at": "2026-06-26",
+  "browser": "MCP Playwright",
+  "notes": [
+    "Used for label-based BasePage helper verification.",
+    "Session token and credentials intentionally omitted."
+  ]
+}

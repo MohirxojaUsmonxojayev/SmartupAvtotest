@@ -16,8 +16,9 @@ __pycache__/
 .idea/
 .vscode/
 
-# Local agent state
-.claude/
+# Local agent state (skills — commit qilinadi, Cowork/Claude ishlatadi)
+.claude/*
+!.claude/skills/
 
 # Playwright / test artifacts
 test-results/
