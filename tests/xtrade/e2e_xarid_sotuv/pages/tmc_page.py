@@ -106,10 +106,42 @@ class TmcPage:
 
     # ---- tablar (dialog/upload — jonli aniqlangan) ----------------------------------------------
     def add_second_barcode(self, code: str):
-        """Tab «Штрих-коды» → «Добавить» → 2-shtrix-kod. (dialog strukturasi jonli tasdiqlanadi)"""
+        """Tab «Штрих-коды» → «Добавить» → dialog «Добавление штрих-кода» → kod → «Сохранить и закрыть»."""
         self.b.open_tab("Штрих-коды")
-        self.b.click_button("Добавить", exact=False)
-        # TODO: dialogda kod kiritish — jonli aniqlanadi
+        self.page.wait_for_timeout(500)
+        self.page.locator("main").get_by_role("button", name="Добавить").last.click()
+        dlg = self.page.locator("[role=dialog][aria-modal]").first
+        dlg.locator("input[type=text]").first.fill(code)
+        dlg.get_by_role("button", name="Сохранить и закрыть", exact=False).click()
+        self._wait_dialog_closed()
+
+    def add_file(self):
+        """Tab «Файлы» → «Добавить» → dialog: .pdf yuklab «Сохранить и закрыть»."""
+        self.b.open_tab("Файлы")
+        self.page.wait_for_timeout(500)
+        self.page.locator("main").get_by_role("button", name="Добавить").last.click()
+        dlg = self.page.locator("[role=dialog][aria-modal]").first
+        dlg.locator("input[type=file]").first.set_input_files(os.path.join(FILES_DIR, "qa.pdf"))
+        self.page.wait_for_timeout(1_000)
+        dlg.get_by_role("button", name="Сохранить и закрыть", exact=False).click()
+        self._wait_dialog_closed()
+        # dialog hali ochiq bo'lsa (fayl rad etilgan bo'lishi mumkin) — «Закрыть» bilan tashlab ketamiz
+        open_dlg = self.page.locator("[role=dialog][aria-modal]")
+        if open_dlg.count() > 0 and open_dlg.first.is_visible():
+            print("  [fayl] dialog yopilmadi — «Закрыть» bilan o'tkazildi")
+            try:
+                open_dlg.first.get_by_role("button", name="Закрыть").first.click()
+            except Exception:
+                pass
+            self._wait_dialog_closed()
+
+    def _wait_dialog_closed(self, timeout: int = 10_000):
+        """Modal dialog yopilishini kutadi (keyingi forma save'i to'silmasligi uchun)."""
+        try:
+            self.page.locator("[role=dialog][aria-modal]").first.wait_for(state="hidden", timeout=timeout)
+        except Exception:
+            pass
+        self.page.wait_for_timeout(500)
 
     def open_tabs_smoke(self):
         """Har tabni ochib ko'rish (xatosiz ochilishini tekshirish)."""
@@ -120,6 +152,14 @@ class TmcPage:
 
     # ---- saqlash / tekshirish -------------------------------------------------------------------
     def save(self):
+        # ochiq modal dialog qolsa yopamiz (forma «Сохранить»ini to'smasligi uchun)
+        dlg = self.page.locator("[role=dialog][aria-modal]")
+        if dlg.count() > 0 and dlg.first.is_visible():
+            try:
+                dlg.first.get_by_role("button", name="Закрыть").first.click(timeout=3_000)
+            except Exception:
+                pass
+            self.page.wait_for_timeout(500)
         self.b.save()
         self.page.wait_for_timeout(2_000)
 
@@ -154,15 +194,16 @@ class TmcPage:
             pass
 
     def toggle_status_in_list(self, name: str):
-        """Ro'yxatда: «Неактивный» → keyin «Активный» (status o'zgarib qaytadi, oxiri Активный)."""
+        """Ro'yxatда: «Неактивный» → keyin «Активный» (oxiri Активный — zanjir uchun SHART).
+        Orasida QAYTA-QIDIRUV YO'Q: nofaol qilgач qator faol-ro'yxatdan filtrlanadi, shuning uchun
+        o'sha qatorni darhol qayta bosib aktivlaymiz (reload bo'lmaguncha ko'rinib turadi)."""
         self.find_in_list(name)
         self.b.grid_row(name).click()
         self.page.wait_for_timeout(800)
         self.b.click_button("Неактивный", exact=False)
         self._confirm_if_any()
         self.page.wait_for_timeout(1_500)
-        # qayta Активный (zanjir uchun ТМЦ aktiv bo'lishi SHART)
-        self.find_in_list(name)
+        # o'sha qatorni qayta bosib Активный (qayta qidirmaymiz)
         self.b.grid_row(name).click()
         self.page.wait_for_timeout(800)
         self.b.click_button("Активный", exact=False)
