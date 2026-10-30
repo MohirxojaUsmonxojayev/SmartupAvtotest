@@ -1,0 +1,1050 @@
+{
+  "module": "Торговый маркетинг",
+  "module_code": "TM",
+  "generated": "2026-09-28",
+  "environment": {
+    "base_url": "https://app3.greenwhite.uz",
+    "app_prefix": "/xtrade/a2",
+    "old_app_prefix": "/xtrade/#/!<hash>",
+    "api_prefix": "/xtrade/b",
+    "user": "mohir@xan (test)",
+    "filial": "Toshkent",
+    "test_date": "2026-09-28"
+  },
+  "action_vocabulary": {
+    "nav": "Yuqori menyu orqali o'tish. target = \"Menyu > [Bo'lim >] Band\", value = route (bo'sh bo'lsa — menyu orqali).",
+    "open_url": "page.goto(BASE_URL + target).",
+    "menu_plus": "Menyu bandi yonidagi «+»: button[aria-label=\"<value>\"] (menyu ochilgandan keyin ko'rinadi).",
+    "click": "Ko'rinadigan matn bo'yicha tugma/havola. value = \"confirm:<matn>|<tugma>\" bo'lsa, keyin tasdiqlash oynasida <tugma> bosiladi.",
+    "row_click": "Ro'yxatda matni target ga mos .smt-data-row ichidagi .text-start katakni bosish (amal tugmalari chiqadi).",
+    "row_action": "Bosilgan qator ostidagi amal tugmasi (target = tugma matni).",
+    "fill": "Yorlig'i target bo'lgan input/textarea ga value yozish.",
+    "fill_date": "Sana maydoni: bosish, Ctrl+A, value (dd.mm.yyyy) yozish, Escape.",
+    "select": "smt-select / smt-data-select: bosish, value yozish, ArrowDown, Enter (variantlar .cdk-overlay-pane da).",
+    "multiselect": "smt-multi-data-select: har bir value uchun select, oxirida Escape.",
+    "remove_tag": "Teg yonidagi «×».",
+    "toggle": "[role=switch] (yoki label[smt-checkbox] [role=checkbox]) holatini value (on/off) ga keltirish.",
+    "radio": "Guruh target ichida value matnli radio.",
+    "grid_fill": "Jadval: target = \"<qator matni> | <ustun sarlavhasi>\", katakka value yozish (Подбор panelida ham).",
+    "pick": "«Подбор» → panelda target qatori, value = \"ustun=miqdor\" → «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+    "tab": "[role=tab] yoki wizard qadami, matni target.",
+    "confirm": "[role=dialog] da target matni borligini tekshirib, value tugmasini bosish (odatda «Да»).",
+    "dialog_close": "Ochiq xato/axborot oynasini target tugmasi bilan yopish.",
+    "sequence": "Bir nechta atomar amal ketma-ket: «ops» ro'yxatidagi har bir element — yuqoridagi action'lardan biri.",
+    "assert_text": "target joyida value matni borligini tekshirish.",
+    "assert_row": "Ro'yxatda value ustun qiymatlari (| bilan ajratilgan) bor qator mavjud.",
+    "assert_field": "Ko'rish/tahrir sahifasida target yorlig'i yonidagi qiymat = value.",
+    "assert_columns": "smt-cell-header matnlari value ro'yxatini o'z ichiga oladi.",
+    "assert_buttons": "Ko'rinadigan tugmalar value ro'yxatiga mos.",
+    "assert_api": "page.waitForResponse: URL target ga mos (masalan \"**:save\"), status = value.",
+    "assert_no_request": "Amal paytida target ga mos so'rov yuborilmagan.",
+    "assert_download": "page.waitForEvent('download'); fayl turi = value.",
+    "assert_url": "URL target ni o'z ichiga oladi.",
+    "observe": "Vizual/natijaviy tekshiruv: qadamning «expected» matni bo'yicha assertion yoziladi.",
+    "wait": "Kutish (sekund).",
+    "manual": "Avtomatlashtirish qiyin yoki bir necha sahifadan iborat qadam — description bo'yicha qo'lda yoki alohida helper bilan."
+  },
+  "selectors": {
+    "top_menu_item": "nav a, nav button — matn bo'yicha (masalan «Склад», «Торговый маркетинг»)",
+    "menu_plus_button": "button[aria-label=\"<Band> (создание)\"]",
+    "page_root": "main",
+    "page_title": "main h1, main .page-title (birinchi matn qatori)",
+    "header_button": "main button:has-text(\"<matn>\")",
+    "grid_row": ".smt-data-row",
+    "grid_row_cell": ".smt-data-row .text-start",
+    "grid_header": "smt-cell-header",
+    "grid_counter": "main — «N/M» ko'rinishidagi hisoblagich matni",
+    "select_trigger": "smt-select-trigger, smt-data-select, smt-multi-data-select",
+    "overlay_options": ".cdk-overlay-pane [role=option], .cdk-overlay-pane li",
+    "dropdown_menu_item": "[role=menuitem]",
+    "switch": "[role=switch]",
+    "checkbox": "label[smt-checkbox] [role=checkbox]",
+    "tab": "[role=tab]",
+    "dialog": "[role=dialog]",
+    "dialog_yes": "[role=dialog] button:has-text(\"Да\"), [role=dialog] button:has-text(\"да\")",
+    "invalid_field": ".ng-invalid.ng-touched, [aria-invalid=true]",
+    "toast": "Vaqtinchalik xabar (2–3 s) — matni bo'yicha darhol tekshiring",
+    "report_iframe": "Просмотр tabidagi iframe (Сформировать dan keyin)"
+  },
+  "routes": {
+    "setting_list": "/xtrade/a2/trade/tmcgf/setting_list",
+    "setting_add": "/xtrade/a2/trade/tmcgf/setting+add",
+    "setting_view": "/xtrade/a2/trade/tmcgf/setting_view?setting_id=<ID>",
+    "setting_edit": "/xtrade/a2/trade/tmcgf/setting+edit?setting_id=<ID>",
+    "setting_person": "/xtrade/a2/trade/tmcgf/setting_person_list?setting_id=<ID>&person_type_id=<ID>&mode=attached",
+    "merch_list": "/xtrade/a2/trade/tvt/visit/merchandising_list",
+    "merch_view": "/xtrade/a2/trade/tvt/visit/merchandising_view?merchandising_id=<ID>",
+    "merch_edit": "/xtrade/a2/trade/tvt/visit/merchandising+edit?merchandising_id=<ID>",
+    "robot_list": "/xtrade/a2/anor/mkpi/robot_plan_list",
+    "robot_add": "/xtrade/a2/anor/mkpi/robot_plan+add",
+    "robot_view": "/xtrade/a2/anor/mkpi/robot_plan_view?plan_id=<ID>&…",
+    "room_list": "/xtrade/a2/anor/mkpi/room_plan_list",
+    "room_add": "/xtrade/a2/anor/mkpi/room_plan+add",
+    "room_view": "/xtrade/a2/anor/mkpi/room_plan_view?room_id=<ID>&plan_date=<dd.mm.yyyy>&…",
+    "rp_list": "/xtrade/a2/anor/mkpi/room_product_plan_list",
+    "rp_add": "/xtrade/a2/anor/mkpi/room_product_plan+add",
+    "rpt_list": "/xtrade/a2/anor/mkpi/room_product_type_plan_list",
+    "rpt_add": "/xtrade/a2/anor/mkpi/room_product_type_plan+add",
+    "cl_list": "/xtrade/a2/anor/mkpi/client_plan_list",
+    "cl_add": "/xtrade/a2/anor/mkpi/client_plan+add",
+    "cp_list": "/xtrade/a2/anor/mkpi/client_product_plan_list",
+    "cp_add": "/xtrade/a2/anor/mkpi/client_product_plan+add",
+    "cpt_list": "/xtrade/a2/anor/mkpi/client_product_type_plan_list",
+    "cpt_add": "/xtrade/a2/anor/mkpi/client_product_type_plan+add",
+    "ctpt_list": "/xtrade/a2/anor/mkpi/client_type_product_type_plan_list",
+    "ctpt_add": "/xtrade/a2/anor/mkpi/client_type_product_type_plan+add?group_mode=true&client_type=L",
+    "tpl": "/xtrade/a2/anor/mkpi/plan_template",
+    "tpl_set": "/xtrade/a2/anor/mkpi/plan_template_settings?kpi_kind=R",
+    "bon_list": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+    "bon_add": "/xtrade/a2/trade/tkpi/bonus_setting+add",
+    "bon_view": "/xtrade/a2/trade/tkpi/bonus_setting_view?bonus_setting_id=<ID>",
+    "dash": "/xtrade/a2/anor/mkpi/kpi_dashboard",
+    "pt_list": "/xtrade/a2/trade/tmcg/person_type_list",
+    "pt_add": "/xtrade/a2/anor/mr/person/person_type+add?person_group_id=2383",
+    "pt_edit": "/xtrade/a2/anor/mr/person/person_type+edit?person_group_id=2383&person_type_id=<ID>",
+    "pt_bind": "/xtrade/a2/anor/mr/person/legal_person_type_bind_list?person_group_id=2383&person_type_id=<ID>",
+    "mml_list": "/xtrade/a2/anor/mcg/mml_list",
+    "mml_add": "/xtrade/a2/anor/mcg/mml+add",
+    "mml_pt": "/xtrade/a2/anor/mcg/mml_person_type_list?mml_id=<ID>",
+    "as_list": "/xtrade/a2/trade/tmcg/assortment_list",
+    "as_add": "/xtrade/a2/trade/tmcg/assortment+add",
+    "pg_list": "/xtrade/a2/trade/tmcg/planogram_sample_list",
+    "pg_attach": "/xtrade/a2/trade/tmcg/planogram_sample_list+attach",
+    "pg_view": "/xtrade/a2/trade/tmcg/planogram_sample_view?sample_id=<ID>",
+    "pos_list": "/xtrade/a2/trade/tmcg/display_list",
+    "rr_list": "/xtrade/a2/trade/tmcg/refuse_reason_list",
+    "rr_add": "/xtrade/a2/trade/tmcg/refuse_reason+add",
+    "rr_view": "/xtrade/a2/trade/tmcg/refuse_reason_view?reason_id=<ID>",
+    "cmp_list": "/xtrade/a2/trade/tmcg/competitor_list",
+    "qt_list": "/xtrade/a2/trade/rep/tvt/quiz/template_list",
+    "qt_add": "/xtrade/a2/trade/rep/tvt/quiz/template+add",
+    "qt_report": "/xtrade/a2/trade/rep/tvt/quiz/report?template_id=<ID>",
+    "ci_list": "/xtrade/a2/trade/tmcg/competitor_inventory_list",
+    "st_list": "/xtrade/a2/trade/tmcg/status_list",
+    "rep_shelf_share": "/xtrade/a2/trade/tmcg/rep/shelf_share",
+    "rep_assortment": "/xtrade/a2/trade/tmcg/rep/assortment",
+    "rep_planogram": "/xtrade/a2/trade/tmcg/rep/planogram",
+    "rep_shelf_price": "/xtrade/a2/trade/tmcg/rep/shelf_price",
+    "rep_display": "/xtrade/a2/trade/tmcg/rep/display",
+    "rep_score": "/xtrade/a2/trade/tmcg/rep/score",
+    "rep_unavailable": "/xtrade/a2/trade/tmcg/rep/unavailable_inventories",
+    "rep_price_cmp": "/xtrade/a2/trade/tmcg/rep/price_comparison",
+    "rep_merch": "/xtrade/a2/trade/rep/tmcg/merchandising",
+    "rep_photo": "/xtrade/a2/trade/rep/tvt/photo",
+    "rep_competitors": "/xtrade/a2/trade/tmcg/rep/competitors",
+    "rep_status": "/xtrade/a2/trade/tmcg/rep/status",
+    "rep_mbi": "/xtrade/a2/trade/rep/mbi/tmcg/shelf_share"
+  },
+  "test_cases": [
+    {
+      "id": "TC-TM-REP-SHS-001",
+      "section": "Отчеты",
+      "form": "Отчет по доле на полке",
+      "title": "Hisobotni shakllantirish (HTML)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcg/rep/shelf_share",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по доле на полке",
+          "value": "/xtrade/a2/trade/tmcg/rep/shelf_share",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по доле на полке» ni bosing.",
+          "expected": "Parametrlar: Начало периода *, Конец периода *, Статус * (Новый), Пользователи, Рабочие зоны, Настройки, Отображать только последние данные, Характеристика контрагента * (Группа), Типы контрагента, Контрагенты."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "«Просмотр» tabida hisobot (iframe): Время визита, Руководитель, Пользователь, Рабочая зона, Контрагент, Код контрагента, Характеристика контрагента, Итог (Кол-во лиц по факту, Кол-во лиц у конкурента, Результат %, Фактический балл, Плановый балл)."
+        },
+        {
+          "n": 4,
+          "action": "assert_api",
+          "target": "GET /xtrade/b/trade/tmcg/rep/shelf_share:run?rt=htmla&begin_date=01.10.2025&… ",
+          "value": "200",
+          "description": "Tarmoqdagi so'rovni tekshiring: GET /xtrade/b/trade/tmcg/rep/shelf_share:run?rt=htmla&begin_date=01.10.2025&… .",
+          "expected": "GET /xtrade/b/trade/tmcg/rep/shelf_share:run?rt=htmla&begin_date=01.10.2025&…  → 200."
+        }
+      ],
+      "expected_result": "Hisobot 200 bilan ochiladi, sarlavhalar rus tilida.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Sana maydoni nomi ba'zi hisobotlarda «Дата начала периода *»."
+      }
+    },
+    {
+      "id": "TC-TM-REP-ASS-001",
+      "section": "Отчеты",
+      "form": "Отчет по ассортиментам",
+      "title": "Hisobotni shakllantirish (HTML)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcg/rep/assortment",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по ассортиментам",
+          "value": "/xtrade/a2/trade/tmcg/rep/assortment",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по ассортиментам» ni bosing.",
+          "expected": "Parametrlar: Начало/Конец периода *, Статус *, Пользователи, Рабочие зоны, Настройки, Вид отчета (Горизонтально / Вертикально) …."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "«Просмотр» tabida hisobot (iframe): Время визита, Менеджер, Пользователь, Рабочая зона, Контрагент, Код контрагента, Характеристика контрагента, TMS-1, TMS-2, Итого, Результат, Цель, Процент выполнения, Фактический балл, Плановый балл; qatorlar: 27.10.2025 Client-1 Yashnobod (да, да, 2, 2, 100), 07.07.2026 Client-2/Yashnobod …."
+        },
+        {
+          "n": 4,
+          "action": "assert_api",
+          "target": "GET /xtrade/b/trade/tmcg/rep/assortment:run?rt=htmla&begin_date=01.10.2025&… ",
+          "value": "200",
+          "description": "Tarmoqdagi so'rovni tekshiring: GET /xtrade/b/trade/tmcg/rep/assortment:run?rt=htmla&begin_date=01.10.2025&… .",
+          "expected": "GET /xtrade/b/trade/tmcg/rep/assortment:run?rt=htmla&begin_date=01.10.2025&…  → 200."
+        }
+      ],
+      "expected_result": "Hisobot 200 bilan ochiladi, sarlavhalar rus tilida.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Sana maydoni nomi ba'zi hisobotlarda «Дата начала периода *»."
+      }
+    },
+    {
+      "id": "TC-TM-REP-PLG-001",
+      "section": "Отчеты",
+      "form": "Отчет по планограмме",
+      "title": "Hisobotni shakllantirish (HTML)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcg/rep/planogram",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по планограмме",
+          "value": "/xtrade/a2/trade/tmcg/rep/planogram",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по планограмме» ni bosing.",
+          "expected": "Parametrlar: Начало/Конец периода *, Статус *, Вид отчета …."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "«Просмотр» tabida hisobot (iframe): Время визита, Менеджер, Пользователь, Рабочая зона, Контрагент, Код контрагента, Характеристика контрагента, Планограмма, Итого, Фото с экрана, Результат, План, Процент выполнения, Фактический балл, Плановый балл."
+        },
+        {
+          "n": 4,
+          "action": "assert_api",
+          "target": "GET /xtrade/b/trade/tmcg/rep/planogram:run?rt=htmla&begin_date=01.10.2025&… ",
+          "value": "200",
+          "description": "Tarmoqdagi so'rovni tekshiring: GET /xtrade/b/trade/tmcg/rep/planogram:run?rt=htmla&begin_date=01.10.2025&… .",
+          "expected": "GET /xtrade/b/trade/tmcg/rep/planogram:run?rt=htmla&begin_date=01.10.2025&…  → 200."
+        }
+      ],
+      "expected_result": "Hisobot 200 bilan ochiladi, sarlavhalar rus tilida.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Sana maydoni nomi ba'zi hisobotlarda «Дата начала периода *»."
+      }
+    },
+    {
+      "id": "TC-TM-REP-SHP-001",
+      "section": "Отчеты",
+      "form": "Отчет по ценам на полке",
+      "title": "Hisobotni shakllantirish (HTML)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcg/rep/shelf_price",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по ценам на полке",
+          "value": "/xtrade/a2/trade/tmcg/rep/shelf_price",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по ценам на полке» ni bosing.",
+          "expected": "Parametrlar: Начало/Конец периода *, Статус *, Отображать цену, Отображать причину несоответствия …."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "«Просмотр» tabida hisobot (iframe): Время визита, Менеджер, Пользователь, Рабочая зона, Контрагент, Код контрагента, Характеристика контрагента, Итого, Результат, Цель, Процент выполнения, Фактический балл, Плановый балл."
+        },
+        {
+          "n": 4,
+          "action": "assert_api",
+          "target": "GET /xtrade/b/trade/tmcg/rep/shelf_price:run?rt=htmla&begin_date=01.10.2025&… ",
+          "value": "200",
+          "description": "Tarmoqdagi so'rovni tekshiring: GET /xtrade/b/trade/tmcg/rep/shelf_price:run?rt=htmla&begin_date=01.10.2025&… .",
+          "expected": "GET /xtrade/b/trade/tmcg/rep/shelf_price:run?rt=htmla&begin_date=01.10.2025&…  → 200."
+        }
+      ],
+      "expected_result": "Hisobot 200 bilan ochiladi, sarlavhalar rus tilida.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Sana maydoni nomi ba'zi hisobotlarda «Дата начала периода *»."
+      }
+    },
+    {
+      "id": "TC-TM-REP-DSP-001",
+      "section": "Отчеты",
+      "form": "Отчет по POS-материалам",
+      "title": "Hisobotni shakllantirish (HTML)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcg/rep/display",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по POS-материалам",
+          "value": "/xtrade/a2/trade/tmcg/rep/display",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по POS-материалам» ni bosing.",
+          "expected": "Parametrlar: Начало/Конец периода *, Статус * …."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "«Просмотр» tabida hisobot (iframe): Время визита, Менеджер, Пользователь, Рабочая зона, Контрагент, Код контрагента, Характеристика контрагента, Итого, Результат, Процент выполнения, Фактический балл, Плановый балл."
+        },
+        {
+          "n": 4,
+          "action": "assert_api",
+          "target": "GET /xtrade/b/trade/tmcg/rep/display:run?rt=htmla&begin_date=01.10.2025&… ",
+          "value": "200",
+          "description": "Tarmoqdagi so'rovni tekshiring: GET /xtrade/b/trade/tmcg/rep/display:run?rt=htmla&begin_date=01.10.2025&… .",
+          "expected": "GET /xtrade/b/trade/tmcg/rep/display:run?rt=htmla&begin_date=01.10.2025&…  → 200."
+        }
+      ],
+      "expected_result": "Hisobot 200 bilan ochiladi, sarlavhalar rus tilida.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Sana maydoni nomi ba'zi hisobotlarda «Дата начала периода *»."
+      }
+    },
+    {
+      "id": "TC-TM-REP-SCR-001",
+      "section": "Отчеты",
+      "form": "Сводный отчет по мерчандайзингу",
+      "title": "Hisobotni shakllantirish (HTML)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcg/rep/score",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Сводный отчет по мерчандайзингу",
+          "value": "/xtrade/a2/trade/tmcg/rep/score",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Сводный отчет по мерчандайзингу» ni bosing.",
+          "expected": "Parametrlar: Начало/Конец периода *, Организации, Руководители, Характеристика контрагента * …."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "«Просмотр» tabida hisobot (iframe): Время визита, Характеристика контрагента, Контрагент, Код контрагента, Менеджер, Пользователь, Ассортимент, Планограмма, Доля полки, Ценник, POS-материалы, Суммарный (Результат / Макс. результат)."
+        },
+        {
+          "n": 4,
+          "action": "assert_api",
+          "target": "GET /xtrade/b/trade/tmcg/rep/score:run?rt=htmla&begin_date=01.10.2025&… ",
+          "value": "200",
+          "description": "Tarmoqdagi so'rovni tekshiring: GET /xtrade/b/trade/tmcg/rep/score:run?rt=htmla&begin_date=01.10.2025&… .",
+          "expected": "GET /xtrade/b/trade/tmcg/rep/score:run?rt=htmla&begin_date=01.10.2025&…  → 200."
+        }
+      ],
+      "expected_result": "Hisobot 200 bilan ochiladi, sarlavhalar rus tilida.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Sana maydoni nomi ba'zi hisobotlarda «Дата начала периода *»."
+      }
+    },
+    {
+      "id": "TC-TM-REP-PRC-001",
+      "section": "Отчеты",
+      "form": "Отчет анализа цен",
+      "title": "Hisobotni shakllantirish (HTML)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcg/rep/price_comparison",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет анализа цен",
+          "value": "/xtrade/a2/trade/tmcg/rep/price_comparison",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет анализа цен» ni bosing.",
+          "expected": "Parametrlar: Начало/Конец периода *, Организации *, Характеристика контрагента *, ТМЦ, Продукция конкурентов …."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "«Просмотр» tabida hisobot (iframe): «Отчет о сравнении цен — Период 01.10.2025-<bugun>»."
+        },
+        {
+          "n": 4,
+          "action": "assert_api",
+          "target": "GET /xtrade/b/trade/tmcg/rep/price_comparison:run?rt=htmla&begin_date=01.10.2025&… ",
+          "value": "200",
+          "description": "Tarmoqdagi so'rovni tekshiring: GET /xtrade/b/trade/tmcg/rep/price_comparison:run?rt=htmla&begin_date=01.10.2025&… .",
+          "expected": "GET /xtrade/b/trade/tmcg/rep/price_comparison:run?rt=htmla&begin_date=01.10.2025&…  → 200."
+        }
+      ],
+      "expected_result": "Hisobot 200 bilan ochiladi, sarlavhalar rus tilida.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Sana maydoni nomi ba'zi hisobotlarda «Дата начала периода *»."
+      }
+    },
+    {
+      "id": "TC-TM-REP-CMP-001",
+      "section": "Отчеты",
+      "form": "Отчет по ценникам конкурентов",
+      "title": "Hisobotni shakllantirish (HTML)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcg/rep/competitors",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по ценникам конкурентов",
+          "value": "/xtrade/a2/trade/tmcg/rep/competitors",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по ценникам конкурентов» ni bosing.",
+          "expected": "Parametrlar: Дата начала / окончания периода *."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "«Просмотр» tabida hisobot (iframe): Дата визита, Торговый агент, Рабочая зона, ИД клиента, Клиент, ТМЦ конкурента, Ценник."
+        },
+        {
+          "n": 4,
+          "action": "assert_api",
+          "target": "GET /xtrade/b/trade/tmcg/rep/competitors:run?rt=htmla&begin_date=01.10.2025&… ",
+          "value": "200",
+          "description": "Tarmoqdagi so'rovni tekshiring: GET /xtrade/b/trade/tmcg/rep/competitors:run?rt=htmla&begin_date=01.10.2025&… .",
+          "expected": "GET /xtrade/b/trade/tmcg/rep/competitors:run?rt=htmla&begin_date=01.10.2025&…  → 200."
+        }
+      ],
+      "expected_result": "Hisobot 200 bilan ochiladi, sarlavhalar rus tilida.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Sana maydoni nomi ba'zi hisobotlarda «Дата начала периода *»."
+      }
+    },
+    {
+      "id": "TC-TM-REP-STS-001",
+      "section": "Отчеты",
+      "form": "Отчет по статусам мерчандайзинга",
+      "title": "Hisobotni shakllantirish (HTML)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcg/rep/status",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по статусам мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcg/rep/status",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по статусам мерчандайзинга» ni bosing.",
+          "expected": "Parametrlar: Начало/Конец периода *, Организации *, Статус *, Характеристики клиентов * …."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "«Просмотр» tabida hisobot (iframe): Дата визита, Менеджер, Пользователь, Контрагент, Код клиента, Подтип клиента, Утверждение, Статус мерчандайзинга."
+        },
+        {
+          "n": 4,
+          "action": "assert_api",
+          "target": "GET /xtrade/b/trade/tmcg/rep/status:run?rt=htmla&begin_date=01.10.2025&… ",
+          "value": "200",
+          "description": "Tarmoqdagi so'rovni tekshiring: GET /xtrade/b/trade/tmcg/rep/status:run?rt=htmla&begin_date=01.10.2025&… .",
+          "expected": "GET /xtrade/b/trade/tmcg/rep/status:run?rt=htmla&begin_date=01.10.2025&…  → 200."
+        }
+      ],
+      "expected_result": "Hisobot 200 bilan ochiladi, sarlavhalar rus tilida.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Sana maydoni nomi ba'zi hisobotlarda «Дата начала периода *»."
+      }
+    },
+    {
+      "id": "TC-TM-REP-SHS-002",
+      "section": "Отчеты",
+      "form": "Отчет по доле на полке",
+      "title": "EXCEL / CSV / XML / HTML formatlari",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по доле на полке",
+          "value": "/xtrade/a2/trade/tmcg/rep/shelf_share",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по доле на полке» ni bosing.",
+          "expected": "«Отчет по доле на полке» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "Amal bajariladi, xato oynasi chiqmaydi."
+        },
+        {
+          "n": 4,
+          "action": "click",
+          "target": "EXCEL",
+          "value": "",
+          "description": "«EXCEL» tugmasini bosing.",
+          "expected": "xlsx yuklanadi (rt=xlsx, 200)."
+        },
+        {
+          "n": 5,
+          "action": "click",
+          "target": "CSV",
+          "value": "",
+          "description": "«CSV» tugmasini bosing.",
+          "expected": "csv (rt=csv, 200; Windows-1251)."
+        },
+        {
+          "n": 6,
+          "action": "click",
+          "target": "XML",
+          "value": "",
+          "description": "«XML» tugmasini bosing.",
+          "expected": "xml (rt=xml, 200)."
+        },
+        {
+          "n": 7,
+          "action": "click",
+          "target": "HTML",
+          "value": "",
+          "description": "«HTML» tugmasini bosing.",
+          "expected": "HTML yangi oynada (rt=htmla)."
+        }
+      ],
+      "expected_result": "4 format ham yuklanadi.",
+      "api_checks": [
+        "…/shelf_share:run?rt=xlsx|csv|xml|htmla → 200"
+      ],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-REP-MER-001",
+      "section": "Отчеты",
+      "form": "Отчет по мерчандайзингу",
+      "title": "Клиенты / Визиты / КПЭ — CSV fayllar",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/rep/tmcg/merchandising",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по мерчандайзингу",
+          "value": "/xtrade/a2/trade/rep/tmcg/merchandising",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по мерчандайзингу» ni bosing.",
+          "expected": "Начало периода *, Конец периода *; tugmalar Клиенты, Визиты, КПЭ."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "01.10.2025",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Клиенты",
+          "value": "",
+          "description": "«Клиенты» tugmasini bosing.",
+          "expected": "CSV (merchandising:clients?rt=csv) 200."
+        },
+        {
+          "n": 4,
+          "action": "click",
+          "target": "Визиты",
+          "value": "",
+          "description": "«Визиты» tugmasini bosing.",
+          "expected": "CSV (merchandising:visits) 200, vizitlar qatorlari bilan."
+        },
+        {
+          "n": 5,
+          "action": "click",
+          "target": "КПЭ",
+          "value": "",
+          "description": "«КПЭ» tugmasini bosing.",
+          "expected": "CSV (merchandising:kpi) 200."
+        }
+      ],
+      "expected_result": "3 fayl yuklanadi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-REP-PHO-001",
+      "section": "Отчеты",
+      "form": "Экспорт фото и видео отчётов по визитам",
+      "title": "Foto/video eksporti (zip)",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/rep/tvt/photo",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Экспорт фото и видео отчётов по визитам",
+          "value": "/xtrade/a2/trade/rep/tvt/photo",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Экспорт фото и видео отчётов по визитам» ni bosing.",
+          "expected": "Parametrlar: Дата начала/окончания периода *, Рабочие зоны, Вид отчёта (Визит, Мерчандайзинг, Вопросы, Фиксация продаж), Все/Фото/Видео, Статусы, Тип лица, Клиент, Пользователи …"
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Дата начала периода *",
+          "value": "01.10.2025",
+          "description": "«Дата начала периода *» maydonini bosing, Ctrl+A, klaviaturada 01.10.2025 yozing, Esc.",
+          "expected": "Maydonda 01.10.2025."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "zip fayl yuklanadi (photo:download_file, application/zip)."
+        }
+      ],
+      "expected_result": "Arxiv yuklanadi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-REP-MBI-001",
+      "section": "Отчеты",
+      "form": "Конструктор отчётов по доле на полке",
+      "title": "Validatsiya: hech narsa tanlanmagan",
+      "type": "Validatsiya",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/rep/mbi/tmcg/shelf_share",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Конструктор отчётов по доле на полке",
+          "value": "/xtrade/a2/trade/rep/mbi/tmcg/shelf_share",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Конструктор отчётов по доле на полке» ni bosing.",
+          "expected": "Chapda maydonlar (Визит, Клиент, ХЮ/ХФ/ХП, Мерчандайзинг, Ассортимент …), Строки / Столбцы / Фильтры / Значения, Предпросмотр."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "HTML",
+          "value": "",
+          "description": "«HTML» tugmasini bosing.",
+          "expected": "Xabar: «H03-TRADE351-001 Выберите как минимум одну строку или столбец»."
+        }
+      ],
+      "expected_result": "Hisobot chiqmaydi, xabar bor.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-REP-MBI-002",
+      "section": "Отчеты",
+      "form": "Конструктор отчётов по доле на полке",
+      "title": "Konstruktorda hisobot tuzish (drag-drop)",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Qisman",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Конструктор отчётов по доле на полке",
+          "value": "/xtrade/a2/trade/rep/mbi/tmcg/shelf_share",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Конструктор отчётов по доле на полке» ni bosing.",
+          "expected": "«Конструктор отчётов по доле на полке» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Клиент» ni «Строки» ga, «Количество лиц» ni «Значения» ga sudrab o'tkazing.",
+          "expected": "Предпросмотр da jadval."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "HTML",
+          "value": "",
+          "description": "«HTML» tugmasini bosing.",
+          "expected": "Hisobot ochiladi."
+        },
+        {
+          "n": 4,
+          "action": "click",
+          "target": "Сохранить шаблон",
+          "value": "",
+          "description": "«Сохранить шаблон» tugmasini bosing.",
+          "expected": "Shablon saqlanadi."
+        }
+      ],
+      "expected_result": "Hisobot tuziladi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Not run",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Drag-drop brauzer panelida sinab bo'lmadi."
+      }
+    },
+    {
+      "id": "TC-TM-REP-GEN-001",
+      "section": "Отчеты",
+      "form": "Barcha hisobotlar",
+      "title": "Validatsiya: boshlanish sanasi tugash sanasidan keyin",
+      "type": "Validatsiya",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Отчеты > Отчет по ассортиментам",
+          "value": "/xtrade/a2/trade/tmcg/rep/assortment",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Отчеты» bo'limidan «Отчет по ассортиментам» ni bosing.",
+          "expected": "«Отчет по ассортиментам» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "fill_date",
+          "target": "Начало периода *",
+          "value": "30.09.2026",
+          "description": "«Начало периода *» maydonini bosing, Ctrl+A, klaviaturada 30.09.2026 yozing, Esc.",
+          "expected": "Maydonda 30.09.2026."
+        },
+        {
+          "n": 3,
+          "action": "fill_date",
+          "target": "Конец периода *",
+          "value": "01.09.2026",
+          "description": "«Конец периода *» maydonini bosing, Ctrl+A, klaviaturada 01.09.2026 yozing, Esc.",
+          "expected": "Maydonda 01.09.2026."
+        },
+        {
+          "n": 4,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» tugmasini bosing.",
+          "expected": "Hisobot chiqmaydi; «Дата начала больше даты окончания» xabari."
+        }
+      ],
+      "expected_result": "Noto'g'ri davr rad etiladi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Not run",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Склад modulida xuddi shunday tekshiruv yo'qligi aniqlangan (BUG-025)."
+      }
+    }
+  ]
+}

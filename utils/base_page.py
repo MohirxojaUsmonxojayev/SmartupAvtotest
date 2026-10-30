@@ -116,6 +116,16 @@ class BasePage:
         expect(option_el).to_be_visible(timeout=timeout)
         option_el.click()
 
+    def select_first(self, label: str, *, timeout: int = 30_000):
+        """smt-data-select dropdown'dan BIRINCHI variantni tanlaydi (matn noma'lum bo'lganda)."""
+        self.control(label).locator("smt-select-trigger, smt-data-select").first.click()
+        overlay = self.page.locator(".cdk-overlay-container")
+        opt = overlay.locator(
+            "[role=option], .cdk-overlay-pane li, .cdk-overlay-pane [class*=option], .cdk-overlay-pane span"
+        ).first
+        expect(opt).to_be_visible(timeout=timeout)
+        opt.click()
+
     # ==================================================================================================================
     # Sana (smt-date-picker)
     # ==================================================================================================================

@@ -40,6 +40,6 @@ ONLINE = {
 # XTRADE  (https://app3.greenwhite.uz/xtrade)
 # ----------------------------------------------------------------------------------------------------------------------
 XTRADE = {
-    "default": _cred("moxir@novatrade", "XTRADE_LOGIN", "XTRADE_PASSWORD"),
+    "default": _cred("mohir@xan", "XTRADE_LOGIN", "XTRADE_PASSWORD"),
     "admin":   _cred("admin@novatrade", "XTRADE_ADMIN_LOGIN", "XTRADE_ADMIN_PASSWORD"),
 }

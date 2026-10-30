@@ -1,0 +1,119 @@
+{
+  "module": "Кадры и зарплата",
+  "module_code": "KDR",
+  "generated": "2026-09-28",
+  "environment": {
+    "base_url": "https://app3.greenwhite.uz",
+    "app_prefix": "/xtrade/a2",
+    "old_app_prefix": "/xtrade/#/!<hash>",
+    "api_prefix": "/xtrade/b",
+    "user": "mohir@xan (test)",
+    "filial": "Toshkent",
+    "test_date": "2026-09-28"
+  },
+  "action_vocabulary": {
+    "nav": "Yuqori menyu orqali o'tish. target = \"Menyu > [Bo'lim >] Band\", value = route (bo'sh bo'lsa — menyu orqali).",
+    "open_url": "page.goto(BASE_URL + target).",
+    "menu_plus": "Menyu bandi yonidagi «+»: button[aria-label=\"<value>\"] (menyu ochilgandan keyin ko'rinadi).",
+    "click": "Ko'rinadigan matn bo'yicha tugma/havola. value = \"confirm:<matn>|<tugma>\" bo'lsa, keyin tasdiqlash oynasida <tugma> bosiladi.",
+    "row_click": "Ro'yxatda matni target ga mos .smt-data-row ichidagi .text-start katakni bosish (amal tugmalari chiqadi).",
+    "row_action": "Bosilgan qator ostidagi amal tugmasi (target = tugma matni).",
+    "fill": "Yorlig'i target bo'lgan input/textarea ga value yozish.",
+    "fill_date": "Sana maydoni: bosish, Ctrl+A, value (dd.mm.yyyy) yozish, Escape.",
+    "select": "smt-select / smt-data-select: bosish, value yozish, ArrowDown, Enter (variantlar .cdk-overlay-pane da).",
+    "multiselect": "smt-multi-data-select: har bir value uchun select, oxirida Escape.",
+    "remove_tag": "Teg yonidagi «×».",
+    "toggle": "[role=switch] (yoki label[smt-checkbox] [role=checkbox]) holatini value (on/off) ga keltirish.",
+    "radio": "Guruh target ichida value matnli radio.",
+    "grid_fill": "Jadval: target = \"<qator matni> | <ustun sarlavhasi>\", katakka value yozish (Подбор panelida ham).",
+    "pick": "«Подбор» → panelda target qatori, value = \"ustun=miqdor\" → «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+    "tab": "[role=tab] yoki wizard qadami, matni target.",
+    "confirm": "[role=dialog] da target matni borligini tekshirib, value tugmasini bosish (odatda «Да»).",
+    "dialog_close": "Ochiq xato/axborot oynasini target tugmasi bilan yopish.",
+    "sequence": "Bir nechta atomar amal ketma-ket: «ops» ro'yxatidagi har bir element — yuqoridagi action'lardan biri.",
+    "assert_text": "target joyida value matni borligini tekshirish.",
+    "assert_row": "Ro'yxatda value ustun qiymatlari (| bilan ajratilgan) bor qator mavjud.",
+    "assert_field": "Ko'rish/tahrir sahifasida target yorlig'i yonidagi qiymat = value.",
+    "assert_columns": "smt-cell-header matnlari value ro'yxatini o'z ichiga oladi.",
+    "assert_buttons": "Ko'rinadigan tugmalar value ro'yxatiga mos.",
+    "assert_api": "page.waitForResponse: URL target ga mos (masalan \"**:save\"), status = value.",
+    "assert_no_request": "Amal paytida target ga mos so'rov yuborilmagan.",
+    "assert_download": "page.waitForEvent('download'); fayl turi = value.",
+    "assert_url": "URL target ni o'z ichiga oladi.",
+    "observe": "Vizual/natijaviy tekshiruv: qadamning «expected» matni bo'yicha assertion yoziladi.",
+    "wait": "Kutish (sekund).",
+    "manual": "Avtomatlashtirish qiyin yoki bir necha sahifadan iborat qadam — description bo'yicha qo'lda yoki alohida helper bilan."
+  },
+  "selectors": {
+    "top_menu_item": "nav a, nav button — matn bo'yicha (masalan «Склад», «Торговый маркетинг»)",
+    "menu_plus_button": "button[aria-label=\"<Band> (создание)\"]",
+    "page_root": "main",
+    "page_title": "main h1, main .page-title (birinchi matn qatori)",
+    "header_button": "main button:has-text(\"<matn>\")",
+    "grid_row": ".smt-data-row",
+    "grid_row_cell": ".smt-data-row .text-start",
+    "grid_header": "smt-cell-header",
+    "grid_counter": "main — «N/M» ko'rinishidagi hisoblagich matni",
+    "select_trigger": "smt-select-trigger, smt-data-select, smt-multi-data-select",
+    "overlay_options": ".cdk-overlay-pane [role=option], .cdk-overlay-pane li",
+    "dropdown_menu_item": "[role=menuitem]",
+    "switch": "[role=switch]",
+    "checkbox": "label[smt-checkbox] [role=checkbox]",
+    "tab": "[role=tab]",
+    "dialog": "[role=dialog]",
+    "dialog_yes": "[role=dialog] button:has-text(\"Да\"), [role=dialog] button:has-text(\"да\")",
+    "invalid_field": ".ng-invalid.ng-touched, [aria-invalid=true]",
+    "toast": "Vaqtinchalik xabar (2–3 s) — matni bo'yicha darhol tekshiring",
+    "report_iframe": "Просмотр tabidagi iframe (Сформировать dan keyin)"
+  },
+  "routes": {
+    "bok": "/xtrade/a2/anor/mpr/book_list",
+    "pay": "/xtrade/a2/anor/mpr/payment_list",
+    "bon": "/xtrade/a2/anor/mpr/bonus_system",
+    "emp": "/xtrade/a2/anor/mhr/employee_list",
+    "acc": "/xtrade/a2/anor/mpr/oper_type_list+accrual",
+    "ded": "/xtrade/a2/anor/mpr/oper_type_list+deduction",
+    "pyt": "/xtrade/a2/anor/mpr/oper_type_list+payout",
+    "rep": "/xtrade/a2/anor/rep/mpr/employee_accruals_and_payments",
+    "div": "/xtrade/a2/anor/mhr/division_list",
+    "job": "/xtrade/a2/anor/mhr/job_list"
+  },
+  "test_cases": [
+    {
+      "id": "TC-KDR-DIV-001",
+      "section": "Отделы",
+      "form": "Отделы",
+      "title": "Smoke: Кадры menyusidan ochish (Справочники bilan bir xil sahifa)",
+      "type": "Smoke",
+      "priority": "P3",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent» (yuqori o'ngda «TRADE / Toshkent»)."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Кадры и зарплата > Отделы",
+          "value": "/xtrade/a2/anor/mhr/division_list",
+          "description": "Yuqori qora menyuda «Кадры и зарплата» ni bosing, ochilgan ro'yxatdan «Отделы» ni bosing.",
+          "expected": "«Отделы» sahifasi ochiladi."
+        }
+      ],
+      "expected_result": "Ochiladi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "To'liq CRUD: 04_Справочники → Отделы (TC-SPR-DIV-*); «Вкл./Выкл.» — SPR-003."
+      }
+    }
+  ]
+}

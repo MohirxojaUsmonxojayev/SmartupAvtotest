@@ -21,7 +21,7 @@ SERVERS = {
         "login_path":     "/a2/auth/login",            # yangi Angular UI (online bilan bir xil)
         "ui":             "new",
         "credentials":    XTRADE,
-        "default_filial": "NovaTrade - Toshkent Filiali",
+        "default_filial": "Toshkent",
     },
 }
 

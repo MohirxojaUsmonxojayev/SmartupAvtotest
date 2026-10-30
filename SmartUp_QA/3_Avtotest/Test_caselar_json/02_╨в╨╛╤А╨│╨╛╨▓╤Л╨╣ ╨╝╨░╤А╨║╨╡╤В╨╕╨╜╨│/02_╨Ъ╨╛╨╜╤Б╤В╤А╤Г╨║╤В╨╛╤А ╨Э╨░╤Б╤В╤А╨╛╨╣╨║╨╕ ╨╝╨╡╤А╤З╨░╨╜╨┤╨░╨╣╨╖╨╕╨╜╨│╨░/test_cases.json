@@ -1,0 +1,1100 @@
+{
+  "module": "Торговый маркетинг",
+  "module_code": "TM",
+  "generated": "2026-09-28",
+  "environment": {
+    "base_url": "https://app3.greenwhite.uz",
+    "app_prefix": "/xtrade/a2",
+    "old_app_prefix": "/xtrade/#/!<hash>",
+    "api_prefix": "/xtrade/b",
+    "user": "mohir@xan (test)",
+    "filial": "Toshkent",
+    "test_date": "2026-09-28"
+  },
+  "action_vocabulary": {
+    "nav": "Yuqori menyu orqali o'tish. target = \"Menyu > [Bo'lim >] Band\", value = route (bo'sh bo'lsa — menyu orqali).",
+    "open_url": "page.goto(BASE_URL + target).",
+    "menu_plus": "Menyu bandi yonidagi «+»: button[aria-label=\"<value>\"] (menyu ochilgandan keyin ko'rinadi).",
+    "click": "Ko'rinadigan matn bo'yicha tugma/havola. value = \"confirm:<matn>|<tugma>\" bo'lsa, keyin tasdiqlash oynasida <tugma> bosiladi.",
+    "row_click": "Ro'yxatda matni target ga mos .smt-data-row ichidagi .text-start katakni bosish (amal tugmalari chiqadi).",
+    "row_action": "Bosilgan qator ostidagi amal tugmasi (target = tugma matni).",
+    "fill": "Yorlig'i target bo'lgan input/textarea ga value yozish.",
+    "fill_date": "Sana maydoni: bosish, Ctrl+A, value (dd.mm.yyyy) yozish, Escape.",
+    "select": "smt-select / smt-data-select: bosish, value yozish, ArrowDown, Enter (variantlar .cdk-overlay-pane da).",
+    "multiselect": "smt-multi-data-select: har bir value uchun select, oxirida Escape.",
+    "remove_tag": "Teg yonidagi «×».",
+    "toggle": "[role=switch] (yoki label[smt-checkbox] [role=checkbox]) holatini value (on/off) ga keltirish.",
+    "radio": "Guruh target ichida value matnli radio.",
+    "grid_fill": "Jadval: target = \"<qator matni> | <ustun sarlavhasi>\", katakka value yozish (Подбор panelida ham).",
+    "pick": "«Подбор» → panelda target qatori, value = \"ustun=miqdor\" → «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+    "tab": "[role=tab] yoki wizard qadami, matni target.",
+    "confirm": "[role=dialog] da target matni borligini tekshirib, value tugmasini bosish (odatda «Да»).",
+    "dialog_close": "Ochiq xato/axborot oynasini target tugmasi bilan yopish.",
+    "sequence": "Bir nechta atomar amal ketma-ket: «ops» ro'yxatidagi har bir element — yuqoridagi action'lardan biri.",
+    "assert_text": "target joyida value matni borligini tekshirish.",
+    "assert_row": "Ro'yxatda value ustun qiymatlari (| bilan ajratilgan) bor qator mavjud.",
+    "assert_field": "Ko'rish/tahrir sahifasida target yorlig'i yonidagi qiymat = value.",
+    "assert_columns": "smt-cell-header matnlari value ro'yxatini o'z ichiga oladi.",
+    "assert_buttons": "Ko'rinadigan tugmalar value ro'yxatiga mos.",
+    "assert_api": "page.waitForResponse: URL target ga mos (masalan \"**:save\"), status = value.",
+    "assert_no_request": "Amal paytida target ga mos so'rov yuborilmagan.",
+    "assert_download": "page.waitForEvent('download'); fayl turi = value.",
+    "assert_url": "URL target ni o'z ichiga oladi.",
+    "observe": "Vizual/natijaviy tekshiruv: qadamning «expected» matni bo'yicha assertion yoziladi.",
+    "wait": "Kutish (sekund).",
+    "manual": "Avtomatlashtirish qiyin yoki bir necha sahifadan iborat qadam — description bo'yicha qo'lda yoki alohida helper bilan."
+  },
+  "selectors": {
+    "top_menu_item": "nav a, nav button — matn bo'yicha (masalan «Склад», «Торговый маркетинг»)",
+    "menu_plus_button": "button[aria-label=\"<Band> (создание)\"]",
+    "page_root": "main",
+    "page_title": "main h1, main .page-title (birinchi matn qatori)",
+    "header_button": "main button:has-text(\"<matn>\")",
+    "grid_row": ".smt-data-row",
+    "grid_row_cell": ".smt-data-row .text-start",
+    "grid_header": "smt-cell-header",
+    "grid_counter": "main — «N/M» ko'rinishidagi hisoblagich matni",
+    "select_trigger": "smt-select-trigger, smt-data-select, smt-multi-data-select",
+    "overlay_options": ".cdk-overlay-pane [role=option], .cdk-overlay-pane li",
+    "dropdown_menu_item": "[role=menuitem]",
+    "switch": "[role=switch]",
+    "checkbox": "label[smt-checkbox] [role=checkbox]",
+    "tab": "[role=tab]",
+    "dialog": "[role=dialog]",
+    "dialog_yes": "[role=dialog] button:has-text(\"Да\"), [role=dialog] button:has-text(\"да\")",
+    "invalid_field": ".ng-invalid.ng-touched, [aria-invalid=true]",
+    "toast": "Vaqtinchalik xabar (2–3 s) — matni bo'yicha darhol tekshiring",
+    "report_iframe": "Просмотр tabidagi iframe (Сформировать dan keyin)"
+  },
+  "routes": {
+    "setting_list": "/xtrade/a2/trade/tmcgf/setting_list",
+    "setting_add": "/xtrade/a2/trade/tmcgf/setting+add",
+    "setting_view": "/xtrade/a2/trade/tmcgf/setting_view?setting_id=<ID>",
+    "setting_edit": "/xtrade/a2/trade/tmcgf/setting+edit?setting_id=<ID>",
+    "setting_person": "/xtrade/a2/trade/tmcgf/setting_person_list?setting_id=<ID>&person_type_id=<ID>&mode=attached",
+    "merch_list": "/xtrade/a2/trade/tvt/visit/merchandising_list",
+    "merch_view": "/xtrade/a2/trade/tvt/visit/merchandising_view?merchandising_id=<ID>",
+    "merch_edit": "/xtrade/a2/trade/tvt/visit/merchandising+edit?merchandising_id=<ID>",
+    "robot_list": "/xtrade/a2/anor/mkpi/robot_plan_list",
+    "robot_add": "/xtrade/a2/anor/mkpi/robot_plan+add",
+    "robot_view": "/xtrade/a2/anor/mkpi/robot_plan_view?plan_id=<ID>&…",
+    "room_list": "/xtrade/a2/anor/mkpi/room_plan_list",
+    "room_add": "/xtrade/a2/anor/mkpi/room_plan+add",
+    "room_view": "/xtrade/a2/anor/mkpi/room_plan_view?room_id=<ID>&plan_date=<dd.mm.yyyy>&…",
+    "rp_list": "/xtrade/a2/anor/mkpi/room_product_plan_list",
+    "rp_add": "/xtrade/a2/anor/mkpi/room_product_plan+add",
+    "rpt_list": "/xtrade/a2/anor/mkpi/room_product_type_plan_list",
+    "rpt_add": "/xtrade/a2/anor/mkpi/room_product_type_plan+add",
+    "cl_list": "/xtrade/a2/anor/mkpi/client_plan_list",
+    "cl_add": "/xtrade/a2/anor/mkpi/client_plan+add",
+    "cp_list": "/xtrade/a2/anor/mkpi/client_product_plan_list",
+    "cp_add": "/xtrade/a2/anor/mkpi/client_product_plan+add",
+    "cpt_list": "/xtrade/a2/anor/mkpi/client_product_type_plan_list",
+    "cpt_add": "/xtrade/a2/anor/mkpi/client_product_type_plan+add",
+    "ctpt_list": "/xtrade/a2/anor/mkpi/client_type_product_type_plan_list",
+    "ctpt_add": "/xtrade/a2/anor/mkpi/client_type_product_type_plan+add?group_mode=true&client_type=L",
+    "tpl": "/xtrade/a2/anor/mkpi/plan_template",
+    "tpl_set": "/xtrade/a2/anor/mkpi/plan_template_settings?kpi_kind=R",
+    "bon_list": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+    "bon_add": "/xtrade/a2/trade/tkpi/bonus_setting+add",
+    "bon_view": "/xtrade/a2/trade/tkpi/bonus_setting_view?bonus_setting_id=<ID>",
+    "dash": "/xtrade/a2/anor/mkpi/kpi_dashboard",
+    "pt_list": "/xtrade/a2/trade/tmcg/person_type_list",
+    "pt_add": "/xtrade/a2/anor/mr/person/person_type+add?person_group_id=2383",
+    "pt_edit": "/xtrade/a2/anor/mr/person/person_type+edit?person_group_id=2383&person_type_id=<ID>",
+    "pt_bind": "/xtrade/a2/anor/mr/person/legal_person_type_bind_list?person_group_id=2383&person_type_id=<ID>",
+    "mml_list": "/xtrade/a2/anor/mcg/mml_list",
+    "mml_add": "/xtrade/a2/anor/mcg/mml+add",
+    "mml_pt": "/xtrade/a2/anor/mcg/mml_person_type_list?mml_id=<ID>",
+    "as_list": "/xtrade/a2/trade/tmcg/assortment_list",
+    "as_add": "/xtrade/a2/trade/tmcg/assortment+add",
+    "pg_list": "/xtrade/a2/trade/tmcg/planogram_sample_list",
+    "pg_attach": "/xtrade/a2/trade/tmcg/planogram_sample_list+attach",
+    "pg_view": "/xtrade/a2/trade/tmcg/planogram_sample_view?sample_id=<ID>",
+    "pos_list": "/xtrade/a2/trade/tmcg/display_list",
+    "rr_list": "/xtrade/a2/trade/tmcg/refuse_reason_list",
+    "rr_add": "/xtrade/a2/trade/tmcg/refuse_reason+add",
+    "rr_view": "/xtrade/a2/trade/tmcg/refuse_reason_view?reason_id=<ID>",
+    "cmp_list": "/xtrade/a2/trade/tmcg/competitor_list",
+    "qt_list": "/xtrade/a2/trade/rep/tvt/quiz/template_list",
+    "qt_add": "/xtrade/a2/trade/rep/tvt/quiz/template+add",
+    "qt_report": "/xtrade/a2/trade/rep/tvt/quiz/report?template_id=<ID>",
+    "ci_list": "/xtrade/a2/trade/tmcg/competitor_inventory_list",
+    "st_list": "/xtrade/a2/trade/tmcg/status_list",
+    "rep_shelf_share": "/xtrade/a2/trade/tmcg/rep/shelf_share",
+    "rep_assortment": "/xtrade/a2/trade/tmcg/rep/assortment",
+    "rep_planogram": "/xtrade/a2/trade/tmcg/rep/planogram",
+    "rep_shelf_price": "/xtrade/a2/trade/tmcg/rep/shelf_price",
+    "rep_display": "/xtrade/a2/trade/tmcg/rep/display",
+    "rep_score": "/xtrade/a2/trade/tmcg/rep/score",
+    "rep_unavailable": "/xtrade/a2/trade/tmcg/rep/unavailable_inventories",
+    "rep_price_cmp": "/xtrade/a2/trade/tmcg/rep/price_comparison",
+    "rep_merch": "/xtrade/a2/trade/rep/tmcg/merchandising",
+    "rep_photo": "/xtrade/a2/trade/rep/tvt/photo",
+    "rep_competitors": "/xtrade/a2/trade/tmcg/rep/competitors",
+    "rep_status": "/xtrade/a2/trade/tmcg/rep/status",
+    "rep_mbi": "/xtrade/a2/trade/rep/mbi/tmcg/shelf_share"
+  },
+  "test_cases": [
+    {
+      "id": "TC-TM-SET-001",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "Ro'yxat ochiladi: ustunlar, tugmalar, qator amallari",
+      "type": "Smoke",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcgf/setting_list",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "assert_columns",
+          "target": "grid",
+          "value": "Код, Название, Подтип характеристики, Метод расчёта, Кол-во клиентов, Статус",
+          "description": "Jadval ustunlari sarlavhalarini tekshiring.",
+          "expected": "Ustunlar: Код, Название, Подтип характеристики, Метод расчёта, Кол-во клиентов, Статус."
+        },
+        {
+          "n": 3,
+          "action": "assert_buttons",
+          "target": "toolbar",
+          "value": "Создать, Закрыть",
+          "description": "Jadval ustidagi tugmalarni tekshiring.",
+          "expected": "«Создать», «Закрыть»."
+        },
+        {
+          "n": 4,
+          "action": "assert_row",
+          "target": "Setting A",
+          "value": "Setting A | A | в баллах | 2 | Активный",
+          "description": "«Setting A» qatorini toping.",
+          "expected": "«Setting A | A | в баллах | 2 | Активный»."
+        },
+        {
+          "n": 5,
+          "action": "row_click",
+          "target": "«Setting A»",
+          "value": "",
+          "description": "Ro'yxatda «Setting A» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Настройка, Удалить, Неактивный, Прикрепить."
+        }
+      ],
+      "expected_result": "Ro'yxat to'g'ri ko'rinadi.",
+      "api_checks": [
+        "POST /xtrade/b/trade/tmcgf/setting_list:table → 200"
+      ],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-SET-002",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "Mavjud sozlamani ko'rish: 4 tab va qiymatlar",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcgf/setting_view?setting_id=<ID>",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«Setting A»",
+          "value": "",
+          "description": "Ro'yxatda «Setting A» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Просмотреть",
+          "value": "",
+          "description": "Qator ostidagi «Просмотреть» tugmasini bosing.",
+          "expected": "«Настройка мерчандайзинга (просмотр)», tablar: Основная информация, Модули мерчандайзинга, Клиенты, История изменений."
+        },
+        {
+          "n": 4,
+          "action": "assert_field",
+          "target": "Название",
+          "value": "Setting A",
+          "description": "«Название» maydoni qiymatini tekshiring.",
+          "expected": "«Название» = Setting A."
+        },
+        {
+          "n": 5,
+          "action": "assert_field",
+          "target": "Подтип характеристики",
+          "value": "A",
+          "description": "«Подтип характеристики» maydoni qiymatini tekshiring.",
+          "expected": "«Подтип характеристики» = A."
+        },
+        {
+          "n": 6,
+          "action": "assert_field",
+          "target": "Метод расчёта результата",
+          "value": "в баллах",
+          "description": "«Метод расчёта результата» maydoni qiymatini tekshiring.",
+          "expected": "«Метод расчёта результата» = в баллах."
+        },
+        {
+          "n": 7,
+          "action": "assert_field",
+          "target": "Кол-во клиентов",
+          "value": "2",
+          "description": "«Кол-во клиентов» maydoni qiymatini tekshiring.",
+          "expected": "«Кол-во клиентов» = 2."
+        },
+        {
+          "n": 8,
+          "action": "tab",
+          "target": "Модули мерчандайзинга",
+          "value": "",
+          "description": "«Модули мерчандайзинга» tabini bosing.",
+          "expected": "Ассортимент | в баллах; «Assort 1» kartasi: TMS-1, TMS-2."
+        },
+        {
+          "n": 9,
+          "action": "tab",
+          "target": "Клиенты",
+          "value": "",
+          "description": "«Клиенты» tabini bosing.",
+          "expected": "2/2: 159756 Client-2/Yashnobod, 159748 Client-1 Yashnobod."
+        },
+        {
+          "n": 10,
+          "action": "tab",
+          "target": "История изменений",
+          "value": "",
+          "description": "«История изменений» tabini bosing.",
+          "expected": "O'zgarishlar yozuvlari (Добавлен / Обновлен) ko'rinadi."
+        }
+      ],
+      "expected_result": "Ma'lumotlar to'g'ri.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Kuzatuv: «Рабочая зона» ko'rinmaydi; «Запрашивать статус мерчандайзинга» = N bo'lsa bo'sh (eski versiya ham shunday)."
+      }
+    },
+    {
+      "id": "TC-TM-SET-003",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "Yaratish: majburiy maydonlar bo'sh — saqlanmaydi",
+      "type": "Validatsiya",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [
+        "validation"
+      ],
+      "route": "/xtrade/a2/trade/tmcgf/setting+add",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "«Настройка мерчандайзинга (создание)»: tablar Настройки, Ассортимент, Планограмма, Доля полки, Цена на полке, POS-материалы."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сохранить",
+          "value": "",
+          "description": "«Сохранить» ni bosing.",
+          "expected": "So'rov ketmaydi; «Название *» (va boshqa majburiy maydonlar) qizil ramka bilan belgilanadi."
+        }
+      ],
+      "expected_result": "Bo'sh forma saqlanmaydi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-SET-004",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "Yaratish: birorta modul yoqilmagan — xato xabari",
+      "type": "Validatsiya",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [
+        "validation"
+      ],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "Yaratish formasi ochiladi."
+        },
+        {
+          "n": 3,
+          "action": "fill",
+          "target": "Название *",
+          "value": "QA-MS-1",
+          "description": "«Название *» maydoniga QA-MS-1 yozing.",
+          "expected": "Maydonda QA-MS-1 ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "select",
+          "target": "Подтип характеристики *",
+          "value": "M",
+          "description": "«Подтип характеристики *» maydonini bosing va ro'yxatdan «M» ni tanlang.",
+          "expected": "Maydonda M ko'rinadi."
+        },
+        {
+          "n": 5,
+          "action": "multiselect",
+          "target": "Рабочая зона *",
+          "value": "Room-Olmazor",
+          "description": "«Рабочая зона *» maydonini bosing, «Room-Olmazor» ni tanlang, Esc bilan ro'yxatni yoping.",
+          "expected": "Maydonda «Room-Olmazor» tegi ko'rinadi."
+        },
+        {
+          "n": 6,
+          "action": "click",
+          "target": "Сохранить",
+          "value": "",
+          "description": "«Сохранить» ni bosing.",
+          "expected": "«Ошибка — H03-TRADE264-003 — Как минимум один модуль мерчандайзинга должен быть включён»; saqlanmaydi."
+        },
+        {
+          "n": 7,
+          "action": "dialog_close",
+          "target": "Закрыть",
+          "value": "",
+          "description": "Oynadagi «Закрыть» ni bosing.",
+          "expected": "Oyna yopiladi."
+        }
+      ],
+      "expected_result": "Modulsiz sozlama saqlanmaydi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-SET-006",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "Yaratish: to'g'ri ma'lumot bilan saqlash",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "«M» podtipi uchun boshqa sozlama yo'q."
+      ],
+      "data": [
+        "Название: QA-MS-1",
+        "Код: QAMS1",
+        "Подтип: M",
+        "Рабочая зона: Room-Olmazor",
+        "Ассортимент: Да, 100 ball, Assort 1"
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "Yaratish formasi ochiladi."
+        },
+        {
+          "n": 3,
+          "action": "fill",
+          "target": "Название *",
+          "value": "QA-MS-1",
+          "description": "«Название *» maydoniga QA-MS-1 yozing.",
+          "expected": "Maydonda QA-MS-1 ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "fill",
+          "target": "Код",
+          "value": "QAMS1",
+          "description": "«Код» maydoniga QAMS1 yozing.",
+          "expected": "Maydonda QAMS1 ko'rinadi."
+        },
+        {
+          "n": 5,
+          "action": "select",
+          "target": "Подтип характеристики *",
+          "value": "M",
+          "description": "«Подтип характеристики *» maydonini bosing va ro'yxatdan «M» ni tanlang.",
+          "expected": "Maydonda M ko'rinadi."
+        },
+        {
+          "n": 6,
+          "action": "multiselect",
+          "target": "Рабочая зона *",
+          "value": "Room-Olmazor",
+          "description": "«Рабочая зона *» maydonini bosing, «Room-Olmazor» ni tanlang, Esc bilan ro'yxatni yoping.",
+          "expected": "Maydonda «Room-Olmazor» tegi ko'rinadi."
+        },
+        {
+          "n": 7,
+          "action": "toggle",
+          "target": "Ассортимент",
+          "value": "on",
+          "description": "«Ассортимент» kalitini (switch) yoqing.",
+          "expected": "«Да»."
+        },
+        {
+          "n": 8,
+          "action": "fill",
+          "target": "Ассортимент → в баллах",
+          "value": "100",
+          "description": "«Ассортимент» yonidagi «в баллах» maydoniga 100 yozing.",
+          "expected": "100."
+        },
+        {
+          "n": 9,
+          "action": "tab",
+          "target": "Ассортимент",
+          "value": "",
+          "description": "«Ассортимент» tabini bosing.",
+          "expected": "«Ассортимент 1» kartasi, «Поиск» maydoni."
+        },
+        {
+          "n": 10,
+          "action": "select",
+          "target": "Ассортимент 1 (Поиск)",
+          "value": "Assort 1",
+          "description": "«Ассортимент 1 (Поиск)» maydonini bosing va ro'yxatdan «Assort 1» ni tanlang.",
+          "expected": "Karta: Assort 1, 100 в баллах; Итоговое кол-во SKU / Цель по кол-во SKU * = 2; Разрешить перевыполнение = Нет; TMS-1, TMS-2."
+        },
+        {
+          "n": 11,
+          "action": "click",
+          "target": "Сохранить",
+          "value": "",
+          "description": "«Сохранить» ni bosing.",
+          "expected": "Ro'yxatga qaytadi (tasdiq so'ralmaydi)."
+        },
+        {
+          "n": 12,
+          "action": "assert_row",
+          "target": "QA-MS-1",
+          "value": "QAMS1 | QA-MS-1 | M | в баллах | 0 | Активный",
+          "description": "Ro'yxatda yangi qatorni tekshiring.",
+          "expected": "«QAMS1 | QA-MS-1 | M | в баллах | 0 | Активный»."
+        }
+      ],
+      "expected_result": "Sozlama saqlanadi.",
+      "api_checks": [
+        "POST /xtrade/b/trade/tmcgf/setting+add:save → 200; payload m_assortment.score=100, assortments[0].assortment_id=401"
+      ],
+      "cleanup": [
+        "TC-TM-SET-011 (o'chirish)."
+      ],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-SET-007",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "Yaratilgan sozlamani ko'rish",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "TC-TM-SET-006 bajarilgan."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«QA-MS-1»",
+          "value": "",
+          "description": "Ro'yxatda «QA-MS-1» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Просмотреть",
+          "value": "",
+          "description": "Qator ostidagi «Просмотреть» tugmasini bosing.",
+          "expected": "Ko'rish sahifasi ochiladi."
+        },
+        {
+          "n": 4,
+          "action": "assert_field",
+          "target": "Название",
+          "value": "QA-MS-1",
+          "description": "«Название» maydoni qiymatini tekshiring.",
+          "expected": "«Название» = QA-MS-1."
+        },
+        {
+          "n": 5,
+          "action": "assert_field",
+          "target": "Код",
+          "value": "QAMS1",
+          "description": "«Код» maydoni qiymatini tekshiring.",
+          "expected": "«Код» = QAMS1."
+        },
+        {
+          "n": 6,
+          "action": "assert_field",
+          "target": "Подтип характеристики",
+          "value": "M",
+          "description": "«Подтип характеристики» maydoni qiymatini tekshiring.",
+          "expected": "«Подтип характеристики» = M."
+        },
+        {
+          "n": 7,
+          "action": "assert_field",
+          "target": "Запрашивать статус мерчандайзинга",
+          "value": "Да",
+          "description": "«Запрашивать статус мерчандайзинга» maydoni qiymatini tekshiring.",
+          "expected": "«Запрашивать статус мерчандайзинга» = Да."
+        },
+        {
+          "n": 8,
+          "action": "tab",
+          "target": "Модули мерчандайзинга",
+          "value": "",
+          "description": "«Модули мерчандайзинга» tabini bosing.",
+          "expected": "Модуль мерчандайзинга = Ассортимент; Метод распределения баллов = Равномерно между наборами ТМЦ; в баллах = 100; Assort 1: Итоговое кол-во SKU 2, Разрешить перевыполнение Нет, Цель 2."
+        },
+        {
+          "n": 9,
+          "action": "tab",
+          "target": "Клиенты",
+          "value": "",
+          "description": "«Клиенты» tabini bosing.",
+          "expected": "0/0 (M podtipida mijoz yo'q)."
+        },
+        {
+          "n": 10,
+          "action": "tab",
+          "target": "История изменений",
+          "value": "",
+          "description": "«История изменений» tabini bosing.",
+          "expected": "«Добавлен» yozuvi."
+        }
+      ],
+      "expected_result": "Kiritilgan qiymatlar ko'rinadi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-SET-008",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "Tahrirlash («Настройка»): nom va tartib raqami saqlanadi",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "TC-TM-SET-006 bajarilgan."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«QA-MS-1»",
+          "value": "",
+          "description": "Ro'yxatda «QA-MS-1» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Настройка",
+          "value": "",
+          "description": "Qator ostidagi «Настройка» tugmasini bosing.",
+          "expected": "«Настройка мерчандайзинга (изменение)», maydonlar to'ldirilgan (Ассортимент = Да, 100)."
+        },
+        {
+          "n": 4,
+          "action": "fill",
+          "target": "Название *",
+          "value": "QA-MS-1 edited",
+          "description": "«Название *» maydoniga QA-MS-1 edited yozing.",
+          "expected": "Maydonda QA-MS-1 edited ko'rinadi."
+        },
+        {
+          "n": 5,
+          "action": "fill",
+          "target": "Порядковый номер",
+          "value": "7",
+          "description": "«Порядковый номер» maydoniga 7 yozing.",
+          "expected": "Maydonda 7 ko'rinadi."
+        },
+        {
+          "n": 6,
+          "action": "click",
+          "target": "Сохранить",
+          "value": "",
+          "description": "«Сохранить» ni bosing.",
+          "expected": "Saqlanadi."
+        },
+        {
+          "n": 7,
+          "action": "row_click",
+          "target": "«QA-MS-1 edited»",
+          "value": "",
+          "description": "Ro'yxatda «QA-MS-1 edited» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 8,
+          "action": "row_action",
+          "target": "Просмотреть",
+          "value": "",
+          "description": "Qator ostidagi «Просмотреть» tugmasini bosing.",
+          "expected": "Ko'rish sahifasi ochiladi."
+        },
+        {
+          "n": 9,
+          "action": "assert_field",
+          "target": "Название",
+          "value": "QA-MS-1 edited",
+          "description": "«Название» maydoni qiymatini tekshiring.",
+          "expected": "«Название» = QA-MS-1 edited."
+        },
+        {
+          "n": 10,
+          "action": "assert_field",
+          "target": "Порядковый номер",
+          "value": "7",
+          "description": "«Порядковый номер» maydoni qiymatini tekshiring.",
+          "expected": "«Порядковый номер» = 7."
+        }
+      ],
+      "expected_result": "O'zgarishlar saqlanadi.",
+      "api_checks": [
+        "POST /xtrade/b/trade/tmcgf/setting+edit:save → 200 (setting_id, order_no=7)"
+      ],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-SET-009",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "«Прикрепить»: mijozlarni biriktirish sahifasi",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tmcgf/setting_person_list?setting_id=<ID>&person_type_id=<ID>&mode=attached",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "TC-TM-SET-006 bajarilgan."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«QA-MS-1 edited»",
+          "value": "",
+          "description": "Ro'yxatda «QA-MS-1 edited» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Прикрепить",
+          "value": "",
+          "description": "Qator ostidagi «Прикрепить» tugmasini bosing.",
+          "expected": "«Прикрепление: QA-MS-1 edited», tablar Прикрепленные / Доступные, ustunlar Код, Клиент, Статус."
+        },
+        {
+          "n": 4,
+          "action": "tab",
+          "target": "Доступные",
+          "value": "",
+          "description": "«Доступные» tabini bosing.",
+          "expected": "M podtipidagi mijozlar ro'yxati (test bazasida 0/0)."
+        }
+      ],
+      "expected_result": "Sahifa ochiladi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Test bazasida M podtipli mijoz yo'q — biriktirish amali tekshirilmadi (Setting A dagi 2 mijozga tegilmadi)."
+      }
+    },
+    {
+      "id": "TC-TM-SET-010",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "Statusni «Неактивный» va qaytadan «Активный» qilish",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "TC-TM-SET-006 bajarilgan."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«QA-MS-1 edited»",
+          "value": "",
+          "description": "Ro'yxatda «QA-MS-1 edited» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Неактивный",
+          "value": "",
+          "description": "Qator ostidagi «Неактивный» tugmasini bosing.",
+          "expected": "Tasdiqlash oynasi."
+        },
+        {
+          "n": 4,
+          "action": "confirm",
+          "target": "Изменить статус",
+          "value": "да",
+          "description": "«Изменить статус» so'rovida «да» ni bosing.",
+          "expected": "Qatorda Статус = Неактивный."
+        },
+        {
+          "n": 5,
+          "action": "row_click",
+          "target": "«QA-MS-1 edited»",
+          "value": "",
+          "description": "Ro'yxatda «QA-MS-1 edited» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Настройка, Удалить, Активный, Прикрепить."
+        }
+      ],
+      "expected_result": "Status o'zgaradi.",
+      "api_checks": [
+        "POST /xtrade/b/trade/tmcgf/setting_list$change_state → 200 (state=P)"
+      ],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-SET-011",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "O'chirish",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "TC-TM-SET-006 bajarilgan."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«QA-MS-1 edited»",
+          "value": "",
+          "description": "Ro'yxatda «QA-MS-1 edited» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Удалить",
+          "value": "",
+          "description": "Qator ostidagi «Удалить» tugmasini bosing.",
+          "expected": "«Удалить QA-MS-1 edited?»"
+        },
+        {
+          "n": 4,
+          "action": "confirm",
+          "target": "Удалить",
+          "value": "да",
+          "description": "«Удалить» so'rovida «да» ni bosing.",
+          "expected": "Qator yo'qoladi; ro'yxatda faqat Setting A."
+        }
+      ],
+      "expected_result": "Sozlama o'chiriladi.",
+      "api_checks": [
+        "POST /xtrade/b/trade/tmcgf/setting_list$delete → 200"
+      ],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-SET-012",
+      "section": "Конструктор: Настройки мерчандайзинга",
+      "form": "Настройки мерчандайзинга",
+      "title": "Barcha modullar yoqilganda tablar mazmuni",
+      "type": "UI",
+      "priority": "P3",
+      "automation": "Qisman",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > Конструктор > Настройки мерчандайзинга",
+          "value": "/xtrade/a2/trade/tmcgf/setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «Конструктор» bo'limidan «Настройки мерчандайзинга» ni bosing.",
+          "expected": "«Настройки мерчандайзинга» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "Yaratish formasi ochiladi."
+        },
+        {
+          "n": 3,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Подключение модулей мерчандайзинга» dagi 5 ta kalitni (Ассортимент, Планограмма, Доля полки, Цена на полке, POS-материалы) yoqing va har birining «в баллах» maydoniga 20 yozing.",
+          "expected": "Hammasi «Да»."
+        },
+        {
+          "n": 4,
+          "action": "tab",
+          "target": "Планограмма",
+          "value": "",
+          "description": "«Планограмма» tabini bosing.",
+          "expected": "«Планограмма 1» kartasi, tanlov maydoni."
+        },
+        {
+          "n": 5,
+          "action": "tab",
+          "target": "Доля полки",
+          "value": "",
+          "description": "«Доля полки» tabini bosing.",
+          "expected": "Установка цели, Объединить в одну группу, Разрешить перевыполнение, Макс. % выполнения."
+        },
+        {
+          "n": 6,
+          "action": "tab",
+          "target": "Цена на полке",
+          "value": "",
+          "description": "«Цена на полке» tabini bosing.",
+          "expected": "Narx modulini sozlash maydonlari (to'plam tanlash)."
+        },
+        {
+          "n": 7,
+          "action": "tab",
+          "target": "POS-материалы",
+          "value": "",
+          "description": "«POS-материалы» tabini bosing.",
+          "expected": "POS-материалы, 20 в баллах."
+        },
+        {
+          "n": 8,
+          "action": "click",
+          "target": "Закрыть",
+          "value": "",
+          "description": "«Закрыть» tugmasini bosing.",
+          "expected": "Saqlanmaydi."
+        }
+      ],
+      "expected_result": "Har bir modul tabida sozlash maydonlari bor.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Kuzatuv",
+        "fail_step": null,
+        "actual": "«Цена на полке» tabi bo'sh (<div></div>) — dizayn bo'yicha shundaymi, tasdiqlash kerak.",
+        "bug": "",
+        "note": ""
+      }
+    }
+  ]
+}

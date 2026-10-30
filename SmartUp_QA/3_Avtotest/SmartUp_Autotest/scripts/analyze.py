@@ -1,0 +1,108 @@
+# -*- coding: utf-8 -*-
+"""Tungi natijalarni saralash: health.jsonl (smoke) + regression.jsonl + access.jsonl + sim.jsonl → candidates.json + SUMMARY.md
+Har muammo: ma'lum bug (28.09 ro'yxati) / kechagi yugurishda ham bor / YANGI.
+Ishlatish: python3 scripts/analyze.py <kun_papkasi> [kecha_papkasi]
+"""
+import os, sys, json, glob, re
+
+DAY = sys.argv[1]
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PREV = sys.argv[2] if len(sys.argv) > 2 else None
+if not PREV:
+    days = sorted(d for d in glob.glob(os.path.join(os.path.dirname(os.path.abspath(DAY)), '20*')) if os.path.abspath(d) != os.path.abspath(DAY))
+    PREV = days[-1] if days else None
+
+def jl(path):
+    try: return [json.loads(l) for l in open(path, encoding='utf-8') if l.strip()]
+    except FileNotFoundError: return []
+
+known = json.load(open(os.path.join(ROOT, 'data', 'known_bugs.json'), encoding='utf-8'))
+def _route_tail(url):
+    """URL dan `/xtrade/a2` dan keyingi yo'lni ajratib, `%2B` ni `+` ga keltiradi.
+
+    30.09: ikkala tomonda (known_bugs.json va natija yozuvi) BIR XIL normalizatsiya
+    bo'lishi shart. Ilgari faqat bug tomoni normallashtirilardi, natija tomoni esa
+    to'liq URL bo'lib qolardi — shuning uchun `+add` va `%2Badd` ko'rinishlari hech
+    qachon mos kelmagan: 61 moslik o'rniga 109 ta bo'lishi kerak edi, ya'ni 48 ta
+    ma'lum bug «YANGI» deb ko'rsatilgan.
+    """
+    m = re.search(r'/xtrade/a2(/[^\s?#]+)', url or '')
+    return m.group(1).split('?')[0].replace('%2B', '+') if m else ''
+
+
+known_by_route = {}
+for b in known:
+    t = _route_tail(b.get('url'))
+    if t: known_by_route.setdefault(t, []).append(b['id'])
+GLOBAL_KNOWN = {'i18n_404': 'har modulda «+add.json 404» (SKL/PRD/SPR/OBR/PRZ/KDR/FIN/GL-…-i18n)'}
+
+def key(module, name, kind, detail=''):
+    return '%s|%s|%s|%s' % (module, name, kind, re.sub(r'\d+', '#', str(detail))[:80])
+
+def issues(folder):
+    out = {}
+    for r in jl(os.path.join(folder, 'health.jsonl')):
+        for i in r.get('issues', []):
+            out[key(r['module'], r['name'], i['kind'], i['detail'])] = dict(source='health', module=r['module'], page=r['name'], route=r['route'], kind=i['kind'], detail=i['detail'], shot=r.get('shot'))
+    for r in jl(os.path.join(folder, 'sim.jsonl')):
+        if r.get('status') == 'FAIL':
+            out[key(r['module'], r['form'], 'sim_fail', r.get('failed_step'))] = dict(source='sim', module=r['module'], page=r['form'], route=r.get('url', ''), kind='sim_fail',
+                detail='%s → %s-qadam «%s»: %s' % (r['id'], r.get('failed_step'), r.get('failed_desc', ''), r.get('error', '')), expected=r.get('failed_expected'), role=r.get('role_used'),
+                source_case=r.get('source_case'), known_bug=r.get('known_bug'), shot=r.get('shot'))
+    for r in jl(os.path.join(folder, 'regression.jsonl')):
+        if r.get('result') == 'Fail':
+            out[key(r['module'], r.get('form') or r.get('section'), 'reg_fail', r['id'])] = dict(source='regression', module=r['module'], page=r.get('form') or r.get('section'), route=r.get('url', ''), kind='reg_fail',
+                detail='%s [%s] %s-qadam «%s»: %s' % (r['id'], r.get('type'), r.get('failed_step'), r.get('failed_desc', ''), r.get('error', '')), expected=r.get('failed_expected'),
+                source_case=r['id'], case_type=r.get('type'), last_result=r.get('last_result'), known_bug=r.get('last_bug') if r.get('type') == 'Bug' or r.get('last_result') == 'Fail' else None, shot=r.get('shot'))
+    for r in jl(os.path.join(folder, 'access.jsonl')):
+        if r.get('result') in ('ERROR', 'EXCEPTION') or r.get('mismatch'):
+            out[key(r['module'], r['name'], 'access_' + r['result'], r['role'])] = dict(source='access', module=r['module'], page=r['name'], route=r['route'], kind='access_' + r['result'].lower(),
+                detail='%s: %s %s' % (r['role'], r.get('mismatch') or r['result'], r.get('detail', '')), role=r['role'])
+    return out
+
+today = issues(DAY)
+prev = issues(PREV) if PREV else {}
+cands = []
+for k, v in today.items():
+    kb = known_by_route.get(_route_tail(v.get('route')), [])
+    if v['kind'] in GLOBAL_KNOWN: v['status'] = 'ma\'lum'; v['known'] = GLOBAL_KNOWN[v['kind']]
+    elif v.get('known_bug'): v['status'] = 'ma\'lum'; v['known'] = v['known_bug']
+    elif kb: v['status'] = 'ehtimol ma\'lum'; v['known'] = ', '.join(kb)
+    elif k in prev: v['status'] = 'kecha ham bor'
+    else: v['status'] = 'YANGI'
+    cands.append(v)
+fixed = [dict(v, status='kechagi, bugun yo\'q (tuzatilgan?)') for k, v in prev.items() if k not in today]
+
+H = jl(os.path.join(DAY, 'health.jsonl')); A = jl(os.path.join(DAY, 'access.jsonl')); SIM = jl(os.path.join(DAY, 'sim.jsonl'))
+try: auth = json.load(open(os.path.join(DAY, 'auth.json')))
+except Exception: auth = {}
+try: done = json.load(open(os.path.join(DAY, 'DONE.json')))
+except Exception: done = None
+rel = jl(os.path.join(DAY, 'relogin.jsonl'))
+R = jl(os.path.join(DAY, 'regression.jsonl'))
+reg_fixed = [r for r in R if r.get('result') == 'Pass' and (r.get('type') == 'Bug' or r.get('last_result') == 'Fail')]
+summ = dict(day=os.path.basename(os.path.abspath(DAY)), prev=os.path.basename(PREV) if PREV else None, done=done, auth=auth, relogins=len(rel),
+            health=dict(total=len(H), ok=sum(1 for r in H if r.get('status') == 'OK'), bug=sum(1 for r in H if r.get('status') == 'BUG'), error=sum(1 for r in H if r.get('status') == 'ERROR'), skip=sum(1 for r in H if r.get('status') == 'SKIP')),
+            access={role: dict(ok=sum(1 for r in A if r['role'] == role and r['result'] == 'OK'), denied=sum(1 for r in A if r['role'] == role and r['result'] == 'DENIED'), error=sum(1 for r in A if r['role'] == role and r['result'] not in ('OK', 'DENIED'))) for role in sorted({r['role'] for r in A})},
+            regression=dict(total=len(R), passed=sum(1 for r in R if r.get('result') == 'Pass'), fail=sum(1 for r in R if r.get('result') == 'Fail'), skip=sum(1 for r in R if r.get('result') == 'Skip'),
+                            new_fail=sum(1 for r in R if r.get('result') == 'Fail' and r.get('type') != 'Bug' and r.get('last_result') == 'Pass'), bug_fixed=len(reg_fixed)),
+            sim=dict(total=len(SIM), ok=sum(1 for r in SIM if r.get('status') == 'OK'), fail=sum(1 for r in SIM if r.get('status') == 'FAIL'), admin_fallback=sum(1 for r in SIM if r.get('role_used') != r.get('role_planned'))),
+            candidates=dict(total=len(cands), new=sum(1 for c in cands if c['status'] == 'YANGI'), repeat=sum(1 for c in cands if c['status'] == 'kecha ham bor'), known=sum(1 for c in cands if 'ma\'lum' in c['status'])), fixed=len(fixed))
+json.dump(dict(summary=summ, candidates=cands, fixed=fixed), open(os.path.join(DAY, 'candidates.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+
+L = ['# Tungi avtotest — %s' % summ['day'], '',
+     'Yugurish: %s · Login: %s · Qayta login: %d marta' % ('tugagan (exit %s)' % done['exit'] if done else 'DONE.json yo\'q — tugamagan/uzilgan',
+                                                        ', '.join('%s=%s' % (k, 'OK' if v.get('ok') else 'XATO') for k, v in auth.items()) or '—', summ['relogins']), '',
+     '| Qism | Natija |', '|---|---|',
+     '| Health (sahifalar) | %(total)d: OK %(ok)d · bug %(bug)d · xato %(error)d · skip %(skip)d |' % summ['health'],
+     '| Regression (smoke\'dan keyin) | %(total)d: Pass %(passed)d · Fail %(fail)d (kecha Pass → bugun Fail: %(new_fail)d) · Skip %(skip)d · bug tuzatilgan %(bug_fixed)d |' % summ['regression'],
+     '| Simulyatsiya | %(total)d ssenariy: OK %(ok)d · FAIL %(fail)d · admin bilan (rol yo\'q) %(admin_fallback)d |' % summ['sim']]
+for role, a in summ['access'].items(): L.append('| Kirish: %s | OK %d · DENIED %d · xato %d |' % (role, a['ok'], a['denied'], a['error']))
+L += ['| Muammolar | jami %(total)d: YANGI %(new)d · kecha ham %(repeat)d · ma\'lum %(known)d |' % summ['candidates'], '| Kechagidan yo\'qolgan | %d |' % len(fixed), '', '## YANGI muammolar (tasdiqlash kerak)', '']
+for c in [c for c in cands if c['status'] == 'YANGI']:
+    L.append('- **%s → %s** [%s/%s] %s%s' % (c['module'], c['page'], c['source'], c['kind'], c['detail'][:300], (' · ' + c['shot']) if c.get('shot') else ''))
+if not summ['candidates']['new']: L.append('- yo\'q')
+L += ['', '## Tuzatilgan ko\'rinadi (Bug case bugun Pass)', ''] + ['- %s %s → %s' % (r['id'], r['module'], r.get('title', '')) for r in reg_fixed] + ([] if reg_fixed else ['- yo\'q'])
+L += ['', '## Kechagi yugurishda ham bor', ''] + ['- %s → %s [%s] %s' % (c['module'], c['page'], c['kind'], c['detail'][:200]) for c in cands if c['status'] == 'kecha ham bor'][:60]
+open(os.path.join(DAY, 'SUMMARY.md'), 'w', encoding='utf-8').write('\n'.join(L))
+print(json.dumps(summ, ensure_ascii=False))

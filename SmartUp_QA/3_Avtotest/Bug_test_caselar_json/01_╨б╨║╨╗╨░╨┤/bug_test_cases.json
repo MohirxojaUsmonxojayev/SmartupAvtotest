@@ -1,0 +1,3243 @@
+{
+ "module": "Склад",
+ "module_code": "SKL",
+ "generated": "2026-09-28",
+ "environment": {
+  "base_url": "https://app3.greenwhite.uz",
+  "app_prefix": "/xtrade/a2",
+  "old_app_prefix": "/xtrade/#/!<hash>",
+  "api_prefix": "/xtrade/b",
+  "user": "mohir@xan (test)",
+  "filial": "Toshkent",
+  "test_date": "2026-09-28"
+ },
+ "action_vocabulary": {
+  "nav": "Yuqori menyu orqali o'tish. target = \"Menyu > [Bo'lim >] Band\", value = route (bo'sh bo'lsa — menyu orqali).",
+  "open_url": "page.goto(BASE_URL + target).",
+  "menu_plus": "Menyu bandi yonidagi «+»: button[aria-label=\"<value>\"] (menyu ochilgandan keyin ko'rinadi).",
+  "click": "Ko'rinadigan matn bo'yicha tugma/havola. value = \"confirm:<matn>|<tugma>\" bo'lsa, keyin tasdiqlash oynasida <tugma> bosiladi.",
+  "row_click": "Ro'yxatda matni target ga mos .smt-data-row ichidagi .text-start katakni bosish (amal tugmalari chiqadi).",
+  "row_action": "Bosilgan qator ostidagi amal tugmasi (target = tugma matni).",
+  "fill": "Yorlig'i target bo'lgan input/textarea ga value yozish.",
+  "fill_date": "Sana maydoni: bosish, Ctrl+A, value (dd.mm.yyyy) yozish, Escape.",
+  "select": "smt-select / smt-data-select: bosish, value yozish, ArrowDown, Enter (variantlar .cdk-overlay-pane da).",
+  "multiselect": "smt-multi-data-select: har bir value uchun select, oxirida Escape.",
+  "remove_tag": "Teg yonidagi «×».",
+  "toggle": "[role=switch] (yoki label[smt-checkbox] [role=checkbox]) holatini value (on/off) ga keltirish.",
+  "radio": "Guruh target ichida value matnli radio.",
+  "grid_fill": "Jadval: target = \"<qator matni> | <ustun sarlavhasi>\", katakka value yozish (Подбор panelida ham).",
+  "pick": "«Подбор» → panelda target qatori, value = \"ustun=miqdor\" → «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+  "tab": "[role=tab] yoki wizard qadami, matni target.",
+  "confirm": "[role=dialog] da target matni borligini tekshirib, value tugmasini bosish (odatda «Да»).",
+  "dialog_close": "Ochiq xato/axborot oynasini target tugmasi bilan yopish.",
+  "sequence": "Bir nechta atomar amal ketma-ket: «ops» ro'yxatidagi har bir element — yuqoridagi action'lardan biri.",
+  "assert_text": "target joyida value matni borligini tekshirish.",
+  "assert_row": "Ro'yxatda value ustun qiymatlari (| bilan ajratilgan) bor qator mavjud.",
+  "assert_field": "Ko'rish/tahrir sahifasida target yorlig'i yonidagi qiymat = value.",
+  "assert_columns": "smt-cell-header matnlari value ro'yxatini o'z ichiga oladi.",
+  "assert_buttons": "Ko'rinadigan tugmalar value ro'yxatiga mos.",
+  "assert_api": "page.waitForResponse: URL target ga mos (masalan \"**:save\"), status = value.",
+  "assert_no_request": "Amal paytida target ga mos so'rov yuborilmagan.",
+  "assert_download": "page.waitForEvent('download'); fayl turi = value.",
+  "assert_url": "URL target ni o'z ichiga oladi.",
+  "observe": "Vizual/natijaviy tekshiruv: qadamning «expected» matni bo'yicha assertion yoziladi.",
+  "wait": "Kutish (sekund).",
+  "manual": "Avtomatlashtirish qiyin yoki bir necha sahifadan iborat qadam — description bo'yicha qo'lda yoki alohida helper bilan."
+ },
+ "selectors": {
+  "top_menu_item": "nav a, nav button — matn bo'yicha (masalan «Склад», «Торговый маркетинг»)",
+  "menu_plus_button": "button[aria-label=\"<Band> (создание)\"]",
+  "page_root": "main",
+  "page_title": "main h1, main .page-title (birinchi matn qatori)",
+  "header_button": "main button:has-text(\"<matn>\")",
+  "grid_row": ".smt-data-row",
+  "grid_row_cell": ".smt-data-row .text-start",
+  "grid_header": "smt-cell-header",
+  "grid_counter": "main — «N/M» ko'rinishidagi hisoblagich matni",
+  "select_trigger": "smt-select-trigger, smt-data-select, smt-multi-data-select",
+  "overlay_options": ".cdk-overlay-pane [role=option], .cdk-overlay-pane li",
+  "dropdown_menu_item": "[role=menuitem]",
+  "switch": "[role=switch]",
+  "checkbox": "label[smt-checkbox] [role=checkbox]",
+  "tab": "[role=tab]",
+  "dialog": "[role=dialog]",
+  "dialog_yes": "[role=dialog] button:has-text(\"Да\"), [role=dialog] button:has-text(\"да\")",
+  "invalid_field": ".ng-invalid.ng-touched, [aria-invalid=true]",
+  "toast": "Vaqtinchalik xabar (2–3 s) — matni bo'yicha darhol tekshiring",
+  "report_iframe": "Просмотр tabidagi iframe (Сформировать dan keyin)"
+ },
+ "routes": {
+  "init_balance_list": "/xtrade/a2/anor/mkw/init_balance/init_inventory_balance_list",
+  "init_balance_add": "/xtrade/a2/anor/mkw/init_balance/init_inventory_balance+add",
+  "init_balance_view": "/xtrade/a2/anor/mkw/init_balance/init_inventory_balance_view?balance_id=<ID>",
+  "purchase_request_list": "/xtrade/a2/anor/mkw/purchase/purchase_request_list",
+  "purchase_request_add": "/xtrade/a2/anor/mkw/purchase/purchase_request+add",
+  "purchase_request_view": "/xtrade/a2/anor/mkw/purchase/purchase_request_view?request_id=<ID>",
+  "purchase_list": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+  "purchase_add": "/xtrade/a2/anor/mkw/purchase/purchase+add",
+  "order_list": "/xtrade/#/!<hash>/anor/mkw/purchase/order_list",
+  "input_list": "/xtrade/a2/anor/mkw/input/input_list",
+  "input_add": "/xtrade/a2/anor/mkw/input/input+add",
+  "extra_cost_list": "/xtrade/a2/anor/mkw/extra_cost_list",
+  "extra_cost_add": "/xtrade/a2/anor/mkw/extra_cost+add",
+  "return_list": "/xtrade/a2/anor/mkw/return/return_list",
+  "return_add": "/xtrade/a2/anor/mkw/return/return+add",
+  "return_view": "/xtrade/a2/anor/mkw/return/return_view?return_id=<ID>",
+  "writeoff_list": "/xtrade/a2/anor/mkw/writeoff/writeoff_list",
+  "writeoff_add": "/xtrade/a2/anor/mkw/writeoff/writeoff+add",
+  "writeoff_view": "/xtrade/a2/anor/mkw/writeoff/writeoff_view?writeoff_id=<ID>",
+  "writeoff_edit": "/xtrade/a2/anor/mkw/writeoff/writeoff+edit?writeoff_id=<ID>",
+  "stocktaking_list": "/xtrade/a2/anor/mkw/stocktaking/stocktaking_list",
+  "stocktaking_add": "/xtrade/a2/anor/mkw/stocktaking/stocktaking+add",
+  "revaluation_list": "/xtrade/a2/anor/mkw/revaluation/revaluation_list",
+  "revaluation_edit": "/xtrade/a2/anor/mkw/revaluation/revaluation+edit?revaluation_id=<ID>",
+  "offset_list": "/xtrade/a2/anor/mkw/purchase/offset/offset_list",
+  "recalculate_input": "/xtrade/a2/anor/mkw/recalculate_input",
+  "aggregation_list": "/xtrade/a2/anor/mkw/marking/aggregation_list",
+  "disaggregation_list": "/xtrade/a2/anor/mkw/marking/disaggregation_list",
+  "withdraw_list": "/xtrade/a2/anor/mkw/marking/withdraw_list",
+  "withdraw_add": "/xtrade/a2/anor/mkw/marking/withdraw+add",
+  "forecast_list": "/xtrade/a2/anor/mfc/forecast_list",
+  "forecast_add": "/xtrade/a2/anor/mfc/forecast+add",
+  "movement_request_list": "/xtrade/a2/anor/mkw/movement/movement_request_list",
+  "movement_request_add": "/xtrade/a2/anor/mkw/movement/movement_request+add",
+  "movement_list": "/xtrade/a2/anor/mkw/movement/movement_list",
+  "movement_add": "/xtrade/a2/anor/mkw/movement/movement+add",
+  "movement_view": "/xtrade/a2/anor/mkw/movement/movement_view?movement_id=<ID>",
+  "spread_balance_movement": "/xtrade/a2/anor/mkw/movement/spread_balance_movement",
+  "from_movement_request_list": "/xtrade/a2/anor/mfm/from_movement_request_list",
+  "from_movement_request_add": "/xtrade/a2/anor/mfm/from_movement_request+add",
+  "to_movement_request_list": "/xtrade/a2/anor/mfm/to_movement_request_list",
+  "from_movement_list": "/xtrade/a2/anor/mfm/from_movement_list",
+  "from_movement_add": "/xtrade/a2/anor/mfm/from_movement+add",
+  "from_movement_view": "/xtrade/a2/anor/mfm/from_movement_view?movement_id=<ID>",
+  "to_movement_list": "/xtrade/a2/anor/mfm/to_movement_list",
+  "from_movement_history_list": "/xtrade/a2/anor/mfm/from_movement_history_list",
+  "cancelled_from_movement_list": "/xtrade/a2/anor/mfm/cancelled_from_movement_list",
+  "supplier_list": "/xtrade/a2/anor/mkw/supplier_list",
+  "supplier_add": "/xtrade/a2/anor/mkw/supplier+add",
+  "supplier_view": "/xtrade/a2/anor/mkw/supplier_view?supplier_id=<ID>",
+  "van_list": "/xtrade/a2/anor/mrf/van_list",
+  "van_add": "/xtrade/a2/anor/mrf/van+add",
+  "van_marking_balance": "/xtrade/a2/trade/tdeal/van_marking_balance?van_id=<ID>&van_name=<NAME>",
+  "warehouse_list": "/xtrade/a2/anor/mkw/warehouse_list",
+  "warehouse_add": "/xtrade/a2/anor/mkw/warehouse+add",
+  "warehouse_view": "/xtrade/a2/anor/mkw/warehouse_view?warehouse_id=<ID>",
+  "balance_list": "/xtrade/a2/anor/mkw/balance/balance_list",
+  "expiration_date": "/xtrade/a2/anor/pref/expiration_date",
+  "marking_balance": "/xtrade/a2/anor/mm/marking_balance",
+  "product_serials": "/xtrade/a2/anor/mkw/product_serials",
+  "wms": "/xtrade/a2/anor/mxsx/wms/document_list",
+  "logistics_list": "/xtrade/a2/trade/tdeal/logistics_list",
+  "logistics_add": "/xtrade/a2/trade/tdeal/logistics+add",
+  "rep_inventories": "/xtrade/a2/anor/rep/mkw/warehouse_inventories",
+  "rep_warehouse_balance": "/xtrade/a2/anor/rep/mkw/warehouse_balance/warehouse_balance",
+  "rep_mbi_movement": "/xtrade/a2/anor/rep/mbi/mkw/movement",
+  "rep_mbi_purchase_request": "/xtrade/a2/anor/rep/mbi/mkw/purchase_request",
+  "rep_mbi_purchase": "/xtrade/a2/anor/rep/mbi/mkw/purchase",
+  "rep_mbi_input": "/xtrade/a2/anor/rep/mbi/mkw/input",
+  "rep_mbi_writeoff": "/xtrade/a2/anor/rep/mbi/mkw/writeoff",
+  "rep_mbi_mfm_request": "/xtrade/a2/anor/rep/mbi/mfm/movement_request",
+  "rep_mbi_mfm_movement": "/xtrade/a2/anor/rep/mbi/mfm/movement",
+  "rep_shipment": "/xtrade/a2/trade/rep/warehouse_and_delivery"
+ },
+ "test_cases": [
+  {
+   "id": "TC-SKL-PR-008",
+   "section": "Запросы на закупку",
+   "form": "Запрос на закупку",
+   "title": "«Принят» so'rov tahrirlanmaydi va Черновик ga qaytarilmaydi",
+   "type": "Bug",
+   "priority": "P1",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/purchase/purchase_request_view?request_id=<ID>",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Номер: QA-PR-1",
+    "ТМЦ: TMS-1, Кол-во 5"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Запросы на закупку",
+     "value": "/xtrade/a2/anor/mkw/purchase/purchase_request_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Запросы на закупку» ni bosing.",
+     "expected": "«Запросы на закупку» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "click",
+     "target": "Создать",
+     "value": "",
+     "description": "«Создать» ni bosing.",
+     "expected": "«Запрос на закупку (создание)» ochiladi: Номер, Дата *, Статус * = «Новый», Крайний срок поставки, Примечание; pastda ТМЦ jadvali, «Подбор» va «Импорт» tugmalari."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "fill",
+       "target": "Номер",
+       "value": "QA-PR-1"
+      }
+     ],
+     "description": "«Номер» ga QA-PR-1 yozing.",
+     "expected": "Qiymat ko'rinadi."
+    },
+    {
+     "n": 4,
+     "action": "click",
+     "target": "Подбор",
+     "value": "",
+     "description": "«Подбор» ni bosing.",
+     "expected": "«Запрос на закупку (подбор)» paneli ochiladi, 7 ta ТМЦ."
+    },
+    {
+     "n": 5,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«TMS-1 / TMS maker / Toshkent» qatorida «Кол-во» ga 5 yozing, panel yuqorisidagi «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+     "expected": "Jadvalda TMS-1, шт, 5."
+    },
+    {
+     "n": 6,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Сохранить",
+       "value": ""
+      },
+      {
+       "action": "confirm",
+       "target": "Сохранить?",
+       "value": "Да"
+      }
+     ],
+     "description": "«Сохранить» → «Сохранить?» → «Да».",
+     "expected": "Ro'yxatda qator: «QA-PR-1 | 28.09.2026 … | Usmonxo'jayev Mohir | … | Новый»."
+    },
+    {
+     "n": 7,
+     "action": "row_click",
+     "target": "QA-PR-1",
+     "value": "",
+     "description": "Ro'yxatda QA-PR-1 qatorini bir marta bosing.",
+     "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Изменить, Статус (Удалить)."
+    },
+    {
+     "n": 8,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Статус» ni bosing, menyudan «Принято» ni tanlang, «Изменить статус документа QA-PR-1 на \"Принято\"?» → «Да».",
+     "expected": "Qatorda status «Принят». Qatorni yana bossangiz faqat «Просмотреть» va «Статус» chiqadi (bu to'g'ri)."
+    },
+    {
+     "n": 9,
+     "action": "click",
+     "target": "Просмотреть",
+     "value": "",
+     "description": "«Просмотреть» ni bosing.",
+     "expected": "«Запрос на закупку (просмотр)», «Статус» = Принят. Yuqorida «Изменить» tugmasi BO'LMASLIGI kerak (eski versiyadagidek)."
+    },
+    {
+     "n": 10,
+     "action": "click",
+     "target": "Изменить",
+     "value": "",
+     "description": "Yuqoridagi «Изменить» ni bosing.",
+     "expected": "(Tugma bo'lmasligi kerak edi.)"
+    },
+    {
+     "n": 11,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Статус *» maydonini bosing.",
+     "expected": "Joriy status «Принят» ko'rinishi kerak."
+    },
+    {
+     "n": 12,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Ro'yxatdan «Черновик» ni tanlang, «Сохранить» → «Сохранить?» → «Да».",
+     "expected": "Qabul qilingan so'rov qoralamaga qaytmasligi kerak."
+    }
+   ],
+   "bug_severity": "Yuqori",
+   "expected_result": "«Запрос на закупку (просмотр)», «Статус» = Принят. Yuqorida «Изменить» tugmasi BO'LMASLIGI kerak (eski versiyadagidek).",
+   "api_checks": [],
+   "cleanup": [
+    "Ro'yxatda QA-PR-1 → «Удалить» → «Удалить QA-PR-1?» → «Да»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 9,
+    "actual": "9-qadam: ko'rish sahifasida «Изменить» bor. 11-qadam: tahrir formasida «Статус *» BO'SH, variantlar faqat «Черновик» va «Новый». 12-qadam: saqlanadi — ko'rish sahifasida «Статус» = «Черновик». Ya'ni qabul qilingan so'rovni istalgan foydalanuvchi qoralamaga qaytara oladi.",
+    "bug": "BUG-004",
+    "note": "Bug hisobot: xatoliklar/BUG-004_zapros-na-zakupku-prinyat-tahrirlanadi.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15). Status yorliqlari nomuvofiq: menyuda «Принято», ro'yxatda «Принят»; «Отменено» → «Отклонен»."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-004",
+     "note": "QA-PR-1 (id 1442) → Принято → Просмотреть: «Изменить» hali bor; tahrirda Статус bo'sh, faqat Черновик/Новый; Черновик bilan saqlandi — qabul qilingan so'rov qoralamaga qaytdi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-PUR-008",
+   "section": "Закупки",
+   "form": "Закупка",
+   "title": "Копировать: nusxa asl hujjat maydonlarini saqlaydi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Поставщик: TMS maker",
+    "С поступлением на склад: yoqilgan",
+    "Валюта для учета остатков: Доллар США (default)",
+    "Склад: WH-Yashnobod",
+    "ТМЦ: TMS litr, Кол-во 1, Цена 1",
+    "Статус: Черновик"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Закупки",
+     "value": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Закупки» ni bosing.",
+     "expected": "«Закупки» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "click",
+     "target": "Создать закуп",
+     "value": "",
+     "description": "«Создать закуп» ni bosing.",
+     "expected": "«Закупка (создание)», 3 qadam: 1 Основное / 2 ТМЦ / 3 Завершение."
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "1-qadamda «С поступлением на склад» kalitini yoqing.",
+     "expected": "Yangi maydonlar: «Валюта для учета остатков *» = Доллар США, «Склад *» = WH-Yashnobod."
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Поставщик *» maydonini bosing va «TMS maker» ni tanlang. «Далее».",
+     "expected": "2-qadam."
+    },
+    {
+     "n": 5,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Jadval 1-qatorida «Название» → «TMS litr / TMS maker / Toshkent», «Кол-во» = 1, «Цена» = 1. «Далее».",
+     "expected": "3-qadam."
+    },
+    {
+     "n": 6,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "select",
+       "target": "Статус *",
+       "value": "Черновик"
+      },
+      {
+       "action": "click",
+       "target": "Сохранить",
+       "value": ""
+      },
+      {
+       "action": "confirm",
+       "target": "Сохранить?",
+       "value": "Да"
+      }
+     ],
+     "description": "«Статус *» → «Черновик», «Сохранить» → «Сохранить?» → «Да».",
+     "expected": "Ro'yxatda qator: «Шаблон для закуп | Доллар США | 28.09.2026 | … | <N> | TMS maker | Узбекский сум | 1 | 0 | Черновик» (2-ustun — Валюта для учета остатков)."
+    },
+    {
+     "n": 7,
+     "action": "row_click",
+     "target": "yangi закупка (<N>)",
+     "value": "",
+     "description": "Ro'yxatda yangi закупка (<N>) qatorini bir marta bosing.",
+     "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Изменить, Обновить, Статус, Удалить, Файлы, Импорт КМ, Копировать, Отчет."
+    },
+    {
+     "n": 8,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Копировать» → oynada «Копировать».",
+     "expected": "Yangi qator (<N+1>, Черновик) — «Валюта для учета остатков» asl hujjatdagidek «Доллар США»."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Yangi qator (<N+1>, Черновик) — «Валюта для учета остатков» asl hujjatdagidek «Доллар США».",
+   "api_checks": [],
+   "cleanup": [
+    "Ikkala qatorda: «Удалить» → «Delete purchase …?» → «Да»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 8,
+    "actual": "Nusxada «Валюта для учета остатков» = «Узбекский сум». Nusxa proveden qilinsa qoldiqlar boshqa valyutada hisoblanadi.",
+    "bug": "BUG-017",
+    "note": "Bug hisobot: xatoliklar/BUG-017_zakupka-kopiya-valyuta-uchet.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-017",
+     "note": "QA-PU-1 (1010095496, С поступлением, Валюта для учета остатков = Доллар США, Черновик) → Копировать → nusxa 1010095497: Валюта для учета остатков = Узбекский сум"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-PUR-009",
+   "section": "Закупки",
+   "form": "Закупка",
+   "title": "O'chirish tasdiq oynasi rus tilida",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "«Черновик» holatidagi закупка bor (yo'q bo'lsa BUG-017 ning 1–6-qadamlari)."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Закупки",
+     "value": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Закупки» ni bosing.",
+     "expected": "«Закупки» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Черновик» holatidagi закупка qatorini bosing → «Удалить».",
+     "expected": "«Удалить закупку 0000000024?» (rus tilida)."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "«Удалить закупку 0000000024?» (rus tilida).",
+   "api_checks": [],
+   "cleanup": [
+    "«Да» — hujjat o'chadi (test hujjati bo'lsa)."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 2,
+    "actual": "«Подтверждение — Delete purchase 0000000024? — Да / Нет».",
+    "bug": "BUG-029",
+    "note": "Bug hisobot: xatoliklar/BUG-029_zakupka-ochirish-tasdiq-inglizcha.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-029",
+     "note": "Закупки → o'z qoralamam → «Удалить»: tasdiq matni hali inglizcha «Delete purchase 0000000026?»"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-PUR-011",
+   "section": "Закупки",
+   "form": "Заказы на закупку",
+   "title": "Menyu «Заказы на закупку» yangi (a2) sahifani ochadi",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qo'lda",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/#/!…/anor/mkw/purchase/order_list",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Yuqori menyuda «Склад» → «Заказы на закупку».",
+     "expected": "Yangi (a2) dizayndagi sahifa, URL /xtrade/a2/…"
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "Yangi (a2) dizayndagi sahifa, URL /xtrade/a2/…",
+   "api_checks": [],
+   "cleanup": [],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 1,
+    "actual": "Eski AngularJS sahifa ochiladi (URL /xtrade/#/!odj8g7xk/anor/mkw/purchase/order_list), dizayn va navigatsiya o'zgaradi.",
+    "bug": "BUG-038",
+    "note": "Bug hisobot: xatoliklar/BUG-038_menyu-zakazy-eski-marshrut.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-038",
+     "note": "Склад → «Заказы на закупку» hali eski AngularJS sahifani ochadi: URL /xtrade/#/!nl8hefqg/anor/mkw/purchase/order_list, eski dizayn/menyu"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-EC-004",
+   "section": "Дополнительные расходы",
+   "form": "Дополнительный расход",
+   "title": "НДС summadan katta bo'lsa rad etiladi; ko'rishda formatlangan",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/extra_cost+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Сумма: 50000",
+    "Сумма НДС: 60000",
+    "Статья расходов: OC expense",
+    "Вид движения: Прочие операционные расходы",
+    "Примечание: QA-EC-1"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Дополнительные расходы",
+     "value": "/xtrade/a2/anor/mkw/extra_cost_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Дополнительные расходы» ni bosing.",
+     "expected": "«Дополнительные расходы» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "click",
+     "target": "Создать",
+     "value": "",
+     "description": "«Создать» ni bosing.",
+     "expected": "«Дополнительный расход (создание)»: Дата *, Включить в себестоимость ТМЦ, Номер/Дата счет-фактуры, Валюта *, Сумма *, Сумма НДС, Статья расходов *, Вид движения *, Примечание."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "fill",
+       "target": "Сумма *",
+       "value": "50000"
+      },
+      {
+       "action": "fill",
+       "target": "Сумма НДС",
+       "value": "60000"
+      }
+     ],
+     "description": "«Сумма *» = 50000, «Сумма НДС» = 60000.",
+     "expected": "«Сумма НДС» qizaradi: «НДС не может быть больше суммы»."
+    },
+    {
+     "n": 4,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "select",
+       "target": "Статья расходов *",
+       "value": "OC expense"
+      },
+      {
+       "action": "select",
+       "target": "Вид движения *",
+       "value": "Прочие операционные расходы"
+      },
+      {
+       "action": "fill",
+       "target": "Примечание",
+       "value": "QA-EC-1"
+      },
+      {
+       "action": "click",
+       "target": "Сохранить",
+       "value": ""
+      }
+     ],
+     "description": "«Статья расходов *» → OC expense; «Вид движения *» → Прочие операционные расходы; «Примечание» = QA-EC-1; «Сохранить».",
+     "expected": "«Сохранить?» tasdig'i (boshqa formalardagidek), validatsiya o'tmaydi."
+    },
+    {
+     "n": 5,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Ro'yxatda yangi qatorni bosing → «Просмотреть».",
+     "expected": "«Проведен» = Нет, «Сумма НДС» = 60 000."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "«Сумма НДС» qizaradi: «НДС не может быть больше суммы».",
+   "api_checks": [],
+   "cleanup": [
+    "Qator → «Удалить» → «Удалить дополнительный расход …?» → «Да»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 3,
+    "actual": "3-qadam: ogohlantirish yo'q. 4-qadam: tasdiqsiz darhol saqlanadi (Сумма 50 000, НДС 60 000). 5-qadam: «Проведен = N» (xom qiymat), «Сумма НДС = 60000» (formatlanmagan).",
+    "bug": "BUG-033",
+    "note": "Bug hisobot: xatoliklar/BUG-033_dop-rashod-nds-summadan-katta.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-033",
+     "note": "Дополнительный расход (создание): Сумма 50 000, Сумма НДС 60 000 — maydon qizarmaydi, ogohlantirish yo'q (❌ 3-qadam). Hujjat saqlanmadi (yozuv yaratmaslik uchun)"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-RET-004",
+   "section": "Возвраты поставщику",
+   "form": "Возврат поставщику (создание)",
+   "title": "2-qadam ustunlari siqilmagan",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Ha",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/return/return+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Склад: WH-Yashnobod",
+    "Поставщик: TMS maker"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Возвраты поставщику",
+     "value": "/xtrade/a2/anor/mkw/return/return_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Возвраты поставщику» ni bosing.",
+     "expected": "«Возвраты поставщику» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "click",
+     "target": "Создать",
+     "value": "",
+     "description": "«Создать» ni bosing.",
+     "expected": "«Возврат поставщику (создание)», 3 qadam: 1 Главное / 2 ТМЦ / 3 Завершение."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "select",
+       "target": "Склад *",
+       "value": "WH-Yashnobod"
+      },
+      {
+       "action": "select",
+       "target": "Поставщик *",
+       "value": "TMS maker"
+      },
+      {
+       "action": "click",
+       "target": "Далее",
+       "value": ""
+      }
+     ],
+     "description": "«Склад *» → WH-Yashnobod, «Поставщик *» → TMS maker, «Далее».",
+     "expected": "2-qadam: jadval ustunlari to'liq o'qiladi."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "2-qadam: jadval ustunlari to'liq o'qiladi.",
+   "api_checks": [],
+   "cleanup": [
+    "Formani «Закрыть»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 3,
+    "actual": "1024 px oynada «Оприходован на склад», «Ед. изм.», «Балансовый» ustunlari 41 px (sarlavha 1–2 harf), taxminan 714 px oynada 7 px — faqat bitta harf («С», «Е», «Б»). Boshqa ustunlar 82 px.",
+    "bug": "BUG-018",
+    "note": "Bug hisobot: xatoliklar/BUG-018_vozvrat-ustunlar-siqilgan.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-018",
+     "note": "Возврат → WH-Yashnobod + TMS maker → Далее (1000 px): «Оприходован на склад», «Ед. изм.», «Балансовый» ustunlari shunchalik tor-ki sarlavhasi umuman ko'rinmaydi (faqat saralash belgisi); boshqa sarlavhalar «Но…», «Се…», «До…», «Кол…» ga qisqargan"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-RET-005",
+   "section": "Возвраты поставщику",
+   "form": "Возврат поставщику (просмотр)",
+   "title": "Dublikat maydon va noto'g'ri «Дата закупа» yo'q",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/return/return_view?return_id=<ID>",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Номер: QA-RT-1",
+    "Склад: WH-Yashnobod",
+    "Поставщик: TMS maker",
+    "ТМЦ: TMS litr, 1, Цена 8000",
+    "Статус: Черновик"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Возвраты поставщику",
+     "value": "/xtrade/a2/anor/mkw/return/return_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Возвраты поставщику» ni bosing.",
+     "expected": "«Возвраты поставщику» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Создать»; «Закупка» bo'sh; «Номер» = QA-RT-1; «Склад *» → WH-Yashnobod; «Поставщик *» → TMS maker; «Далее».",
+     "expected": "2-qadam."
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Подбор» → «TMS litr» (Доступный остаток 2 023) qatorida «Кол-во» = 1 → «Закрыть» → «Да»; jadvalda «Цена» = 8000; «Далее».",
+     "expected": "3-qadam, «Статус *» = Завершен."
+    },
+    {
+     "n": 4,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "select",
+       "target": "Статус *",
+       "value": "Черновик"
+      },
+      {
+       "action": "click",
+       "target": "Завершить",
+       "value": ""
+      },
+      {
+       "action": "confirm",
+       "target": "Завершить?",
+       "value": "Да"
+      }
+     ],
+     "description": "«Статус *» → «Черновик»; «Завершить» → «Завершить?» → «Да».",
+     "expected": "Ro'yxatda «28.09.2026 | QA-RT-1 | WH-Yashnobod | TMS maker | … | 8 000 | Черновик»."
+    },
+    {
+     "n": 5,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "row_click",
+       "target": "<joriy qator>",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Просмотреть",
+       "value": ""
+      }
+     ],
+     "description": "Qatorni bosing → «Просмотреть».",
+     "expected": "Har bir maydon bir marta; закупка yo'q bo'lgani uchun «Номер закупки» va «Дата закупа» bo'sh."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "Har bir maydon bir marta; закупка yo'q bo'lgani uchun «Номер закупки» va «Дата закупа» bo'sh.",
+   "api_checks": [],
+   "cleanup": [
+    "Qator → «Удалить» → «Удалить QA-RT-1?» → «Да»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 5,
+    "actual": "«Номер закупки» maydoni ikki marta (ikkalasi bo'sh), «Дата закупа» = 28.09.2026 (qaytarish sanasi), garchi закупка tanlanmagan bo'lsa ham.",
+    "bug": "BUG-030",
+    "note": "Bug hisobot: xatoliklar/BUG-030_vozvrat-view-dublikat-maydon.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-030",
+     "note": "QA-RT-1 (return_id=1821, закупкасиз, Черновик) → Просмотреть: «Номер закупки» maydoni ikki marta (ikkalasi bo'sh), «Дата закупа» = 29.09.2026 (qaytarish sanasi)"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-WO-006",
+   "section": "Списания",
+   "form": "Списание (подбор)",
+   "title": "Mavjuddan ko'p miqdor — xabar, qator yo'qolmaydi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/writeoff/writeoff+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "WH-Yashnobod da TMS litr qoldig'i 2 023."
+   ],
+   "data": [
+    "Kol-vo: 3000 (mavjud 2 023 dan ko'p)"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Списания",
+     "value": "/xtrade/a2/anor/mkw/writeoff/writeoff_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Списания» ni bosing.",
+     "expected": "«Списания» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Создать",
+       "value": ""
+      },
+      {
+       "action": "select",
+       "target": "Склад *",
+       "value": "WH-Yashnobod"
+      }
+     ],
+     "description": "«Создать» → «Склад *» → WH-Yashnobod.",
+     "expected": "«Подбор» tugmasi chiqadi."
+    },
+    {
+     "n": 3,
+     "action": "click",
+     "target": "Подбор",
+     "value": "",
+     "description": "«Подбор» ni bosing.",
+     "expected": "«Списание (подбор)»: TMS-1 1 679, TMS-2 2 000, TMS litr 2 023 (Доступное кол-во)."
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«TMS litr» qatorida «Кол-во списания» ga 3000 yozing.",
+     "expected": "Maydon qizaradi / «Доступно: 2 023» kabi ogohlantirish chiqadi."
+    },
+    {
+     "n": 5,
+     "action": "click",
+     "target": "Закрыть",
+     "value": "",
+     "description": "Panel yuqorisidagi «Закрыть» ni bosing.",
+     "expected": "Panel yopilmaydi yoki ortiqcha miqdor haqida xabar beradi."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Maydon qizaradi / «Доступно: 2 023» kabi ogohlantirish chiqadi.",
+   "api_checks": [],
+   "cleanup": [
+    "Formani «Закрыть» (saqlamasdan)."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 4,
+    "actual": "4-qadam: hech qanday ogohlantirish yo'q, qiymat «3 000» bo'lib turadi. 5-qadam: panel so'rovsiz yopiladi, formadagi jadval bo'sh («Нет результатов») — kiritilgan ТМЦ jimgina yo'qoladi. (1 kiritilganda «Выбрать ТМЦ с заполненными данными?» chiqib, qator qo'shiladi.) Panelda «Применить» tugmasi yo'q — tanlov faqat yopilganda qo'llanadi.",
+    "bug": "BUG-014",
+    "note": "Bug hisobot: xatoliklar/BUG-014_spisanie-podbor-ortiqcha-miqdor-yoqoladi.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-014",
+     "note": "Списание → WH-Yashnobod → Подбор: TMS litr (Доступно 2 023) ga 3000 yozildi — ogohlantirish yo'q; «Закрыть» → panel so'rovsiz yopildi, jadval bo'sh"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-WO-007",
+   "section": "Списания",
+   "form": "Списание (просмотр)",
+   "title": "Ko'rishda hujjat sanasi ko'rinadi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/writeoff/writeoff_view?writeoff_id=<ID>",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "WH-Yashnobod da TMS litr qoldig'i ≥ 1."
+   ],
+   "data": [
+    "Номер: QA-WO-1",
+    "Склад: WH-Yashnobod",
+    "Причина списания: Контрольная проверка",
+    "ТМЦ: TMS litr, 1"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Списания",
+     "value": "/xtrade/a2/anor/mkw/writeoff/writeoff_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Списания» ni bosing.",
+     "expected": "«Списания» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "click",
+     "target": "Создать",
+     "value": "",
+     "description": "«Создать» ni bosing.",
+     "expected": "«Списание (создание)»: Номер, Дата * (bugun), Склад *, Валюта * (Узбекский сум), Причина списания, Примечание; yuqorida Сохранить / В сборке / Провести / Закрыть."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "fill",
+       "target": "Номер",
+       "value": "QA-WO-1"
+      },
+      {
+       "action": "select",
+       "target": "Склад *",
+       "value": "WH-Yashnobod"
+      },
+      {
+       "action": "select",
+       "target": "Причина списания",
+       "value": "Контрольная проверка"
+      }
+     ],
+     "description": "«Номер» = QA-WO-1; «Склад *» → WH-Yashnobod; «Причина списания» → «Контрольная проверка».",
+     "expected": "Склад tanlangach jadval ustida «Подбор» va «Импорт» chiqadi."
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Подбор» → «TMS litr / TMS maker / Toshkent» qatorida «Кол-во списания» = 1 → panel «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+     "expected": "Jadvalda TMS litr, Остаток 2 023, 1."
+    },
+    {
+     "n": 5,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Сохранить",
+       "value": ""
+      },
+      {
+       "action": "confirm",
+       "target": "Сохранить?",
+       "value": "Да"
+      }
+     ],
+     "description": "«Сохранить» → «Сохранить?» → «Да».",
+     "expected": "Ro'yxatda qator «28.09.2026 | QA-WO-1 | Контрольная проверка | … | Черновик» (yoki «Провести» bosilsa «Проведено»)."
+    },
+    {
+     "n": 6,
+     "action": "row_click",
+     "target": "QA-WO-1",
+     "value": "",
+     "description": "Ro'yxatda QA-WO-1 qatorini bir marta bosing.",
+     "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Изменить, Статус, Удалить."
+    },
+    {
+     "n": 7,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "«Просмотреть» ni bosing va sahifa sarlavhasi hamda maydonlarni qarang.",
+     "expected": "Sarlavhada yoki maydonlarda hujjat sanasi 28.09.2026 ko'rinadi (eski: «№ QA-WO-1 От 28.09.2026»)."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Sarlavhada yoki maydonlarda hujjat sanasi 28.09.2026 ko'rinadi (eski: «№ QA-WO-1 От 28.09.2026»).",
+   "api_checks": [],
+   "cleanup": [
+    "Ro'yxatda QA-WO-1 → «Удалить» → «Да». (Agar «Проведено» qilingan bo'lsa: «Статус» → «В сборке» → «Да», so'ng «Статус» → «Черновик» → «Да», keyin «Удалить».)"
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 7,
+    "actual": "Sarlavha faqat «№ QA-WO-1». Maydonlar: ИД, Статус, Валюта, Сумма списания, Склад, Причина списания, Примечание, Источник, Создал, Дата создания, Изменил, Дата последнего изменения — «Дата списания» yo'q (faqat yaratilgan vaqt).",
+    "bug": "BUG-009",
+    "note": "Bug hisobot: xatoliklar/BUG-009_spisanie-view-sana-yoq.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-009",
+     "note": "QA-WO-1 (writeoff_id=2941) → Просмотреть: sarlavha faqat «№ QA-WO-1», maydonlarda «Дата списания» yo'q (faqat Дата создания)"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-KM-004",
+   "section": "Маркировка (КМ)",
+   "form": "КМ: Вывод из оборота (создание)",
+   "title": "Tor ekranda (≤768 px) fayl bloklari kesilmaydi",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/marking/withdraw+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "Brauzer oynasini 768 px kenglikka toraytiring (yoki F12 → «Toggle device toolbar» → 768 × 900)."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > КМ: Вывод из оборота",
+     "value": "/xtrade/a2/anor/mkw/marking/withdraw_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «КМ: Вывод из оборота» ni bosing.",
+     "expected": "«КМ: Вывод из оборота» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "click",
+     "target": "Создать",
+     "value": "",
+     "description": "«Создать» ni bosing.",
+     "expected": "«КМ: Вывод из оборота (создание)»: «Основная информация» kartasida Дата вывода из оборота *, Причина *, Файл, Первичные документы *, Загрузить файл; ostida «Коды маркировки» kartasi."
+    },
+    {
+     "n": 3,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "«Основная информация» kartasini pastgacha ko'ring.",
+     "expected": "Barcha maydonlar, jumladan «Первичные документы *» va «Загрузить файл», ko'rinadi va bosiladi."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Barcha maydonlar, jumladan «Первичные документы *» va «Загрузить файл», ko'rinadi va bosiladi.",
+   "api_checks": [],
+   "cleanup": [],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 3,
+    "actual": "768 va 714 px da karta balandligi 355 px, ichidagi kontent 633 px: «Файл» blokining pastki qismi, «Первичные документы *» va «Загрузить файл» «Коды маркировки» kartasi ostida qoladi — majburiy hujjatni tanlab bo'lmaydi. 1024 px va kengroqda muammo yo'q.",
+    "bug": "BUG-011",
+    "note": "Bug hisobot: xatoliklar/BUG-011_km-vyvod-fayl-bloki-kesilgan.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15) — faqat oyna kengligi ≤ 768 px bo'lganda. section.custom-card !flex-none — ichki kontentga moslashmayapti."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-011",
+     "note": "768 px kenglikda «КМ: Вывод из оборота (создание)»: «Файл» bloki kesilgan, «Первичные документы *» va «Загрузить файл» ko'rinmaydi (DOMda bor, karta ichida yashiringan), karta ichida scroll yo'q"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-KM-006",
+   "section": "Маркировка (КМ)",
+   "form": "Остатки кодов маркировки",
+   "title": "Sahifa ochiladi, konsol xatosiz",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qo'lda",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mm/marking_balance",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "F12 → Console ochiq."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Склад → «Остатки кодов маркировки» sahifasini oching, so'ng boshqa sahifaga o'ting.",
+     "expected": "Konsolda xato yo'q."
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "BUG-021 ning 5–6-qadamlari (xarita oynasini ochib yopish).",
+     "expected": "Konsolda xato yo'q."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "Konsolda xato yo'q.",
+   "api_checks": [],
+   "cleanup": [],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 1,
+    "actual": "«Map container not found», «TypeError: Cannot read properties of undefined (reading 'bottomright') at e.onRemove (Yandex.min.js)».",
+    "bug": "BUG-039",
+    "note": "Bug hisobot: xatoliklar/BUG-039_konsol-xarita-xatolari.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-039",
+     "note": "Остатки кодов маркировки → Склады ga o'tilganda konsolda: «Failed to load map assets. Error: Map container not found. at e._initContainer (…/leaflet.js) … at init (…/map-module/custom/map.js:57)». Qo'shimcha: 404/500 resurs xatolari va wss://…/xtrade/broadcast ulanish xatolari"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-KM-007",
+   "section": "Маркировка (КМ)",
+   "form": "Остатки кодов маркировки",
+   "title": "«Генерировать»: mavjud bo'lmagan/bo'sh kod — tushunarli xabar",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qo'lda",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mm/marking_balance",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "Brauzerda popup'lar ruxsat etilgan."
+   ],
+   "data": [
+    "Код маркировки: 0104600000000000215QATEST"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Yuqori menyuda «Склад» → «Остатки кодов маркировки».",
+     "expected": "Sahifa: Вид поиска кода маркировки (Код маркировки / ТМЦ), Код маркировки *, Распечатать с детьми, Исключить коды…, С дезагрегированными кодами, «Генерировать»."
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Код маркировки *» ni bo'sh qoldirib «Генерировать» ni bosing.",
+     "expected": "Maydon qizaradi va xabar chiqadi."
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Код маркировки *» ga 0104600000000000215QATEST yozib «Генерировать» ni bosing.",
+     "expected": "Formada tushunarli xabar: «Такой код маркировки не существует» (yoki «История» ga yozuv)."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "Maydon qizaradi va xabar chiqadi.",
+   "api_checks": [],
+   "cleanup": [
+    "Ochilgan oynani yoping."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 2,
+    "actual": "2-qadam: hech narsa bo'lmaydi, xabar yo'q. 3-qadam: yangi brauzer oynasida xom matn: «Lazy report error: ORA-20000: {\"error_code\":\"A02-03-010\",\"message\":\"В системе такой код маркировки не существует…\"}». Forma matni «hisobot tayyor bo'lgach История dan yuklab olasiz» deydi, lekin to'g'ridan-to'g'ri xlsx so'rovi ochiladi.",
+    "bug": "BUG-034",
+    "note": "Bug hisobot: xatoliklar/BUG-034_markirovka-generatsiya-xom-ora-xato.md. Holat: Takrorlandi (28.09.2026, 14:56)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-034",
+     "note": "QISMAN: bo'sh kod bilan «Генерировать» → endi maydon qizil ramka bilan belgilanadi (xabar matni yo'q). Mavjud bo'lmagan kod (0104600000000000215QATEST) → «Генерировать» hali ham to'g'ridan-to'g'ri yangi oyna ochishga urinadi (История o'rniga) — brauzer paneli popup'ni blokladi, ichidagi xato matnini ko'rib bo'lmadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-MR-005",
+   "section": "Запросы на внутр. перемещения",
+   "form": "Запрос",
+   "title": "Status o'zgargandan keyin amal paneli yangilanadi",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Ha",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/movement/movement_request_list",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "«Новый» holatidagi запрос bor."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Запросы на внутр. перемещения",
+     "value": "/xtrade/a2/anor/mkw/movement/movement_request_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Запросы на внутр. перемещения» ni bosing.",
+     "expected": "«Запросы на внутр. перемещения» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "row_click",
+       "target": "<joriy qator>",
+       "value": ""
+      },
+      {
+       "action": "row_action",
+       "target": "Статус",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Принято",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Да",
+       "value": ""
+      }
+     ],
+     "description": "Qatorni bosing → «Статус» → «Принято» → «Да».",
+     "expected": "Qatorda «Принят», tugmalar paneli yangi statusga mos («Просмотреть», «Статус») ko'rinib turadi."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "row_click",
+       "target": "<joriy qator>",
+       "value": ""
+      }
+     ],
+     "description": "Qatorni yana bir marta bosing.",
+     "expected": "Tugmalar ko'rinadi."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "Qatorda «Принят», tugmalar paneli yangi statusga mos («Просмотреть», «Статус») ko'rinib turadi.",
+   "api_checks": [],
+   "cleanup": [],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Kuzatuv",
+    "fail_step": 2,
+    "actual": "2-qadamdan keyin panel yopiladi (tugma yo'q); 3-qadamda to'g'ri tugmalar chiqadi. Birinchi testda eskirgan tugmalar («Принят» uchun «Изменить») ko'ringan edi, qayta tekshiruvda takrorlanmadi.",
+    "bug": "BUG-024",
+    "note": "Bug hisobot: xatoliklar/BUG-024_status-ozgargandan-keyin-amallar-eskirgan.md. Holat: Qayta tekshiruvda ta'rifdagidek TAKRORLANMADI — tugmalar paneli faqat yopiladi; qatorni qayta bossangiz to'g'ri tugmalar chiqadi. Kuzatuv sifatida qoldirildi.."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-024",
+     "note": "O'z запросим 0000000001: Статус → Новый → Да, keyin Статус → Принято → Да — har ikkala holatda amal paneli yopiladi (tugmalar yo'qoladi), qatorni qayta bosish kerak. Eskirgan «Изменить» tugmasi ko'rinmadi. Yakuniy holat yana «Принят»"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-MV-002",
+   "section": "Внутренние перемещения",
+   "form": "Перемещение (создание)",
+   "title": "«Запрос» maydoni ochilganda bo'sh",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/movement/movement+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "Kamida bitta «Принят» holatidagi запрос на внутреннее перемещение bor (yo'q bo'lsa: Запросы на внутр. перемещения → Создать → Номер QA-MR-1, Со склада WH-Yashnobod, На склад Основной склад, Подбор TMS-1 = 7 → Сохранить → Статус → Принято)."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Внутренние перемещения",
+     "value": "/xtrade/a2/anor/mkw/movement/movement_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Внутренние перемещения» ni bosing.",
+     "expected": "«Внутренние перемещения» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "«Создать» ni bosing va «Запрос на внутреннее перемещение» maydonini qarang.",
+     "expected": "Maydon bo'sh (eski versiyadagidek), foydalanuvchi o'zi tanlaydi."
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Со склада *» → WH-Yashnobod, «На склад *» → Основной склад, «Далее» → «Подбор» → TMS-1 = 7 → «Закрыть» → «Да» → «Далее».",
+     "expected": "3-qadam ochiladi, «Статус *» da default qiymat (boshqa wizard'lardagidek)."
+    },
+    {
+     "n": 4,
+     "action": "click",
+     "target": "Завершить",
+     "value": "",
+     "description": "«Статус *» ni bo'sh qoldirib «Завершить» ni bosing.",
+     "expected": "Maydon qizaradi va «Выберите статус» kabi xabar chiqadi."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Maydon bo'sh (eski versiyadagidek), foydalanuvchi o'zi tanlaydi.",
+   "api_checks": [],
+   "cleanup": [
+    "Formani «Закрыть». Agar QA-MR-1 yaratgan bo'lsangiz: Статус → Новый → Удалить."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 2,
+    "actual": "2-qadam: «Запрос на внутреннее перемещение» = QA-MR-1 (birinchi ochiq запрос) avtomatik to'ldirilgan, lekin «Со склада»/«На склад» bo'sh — foydalanuvchi sezmasdan hujjatni boshqa запросga bog'laydi. 3-qadam: «Статус *» bo'sh (variantlar: Черновик/Новый/Ожидает отгрузку/В пути/Ожидает поступление). 4-qadam: hech narsa bo'lmaydi, xabar yo'q, so'rov yuborilmaydi. 2-qadam jadvalida «Кол-во по запросу» ham bo'sh.",
+    "bug": "BUG-016",
+    "note": "Bug hisobot: xatoliklar/BUG-016_peremeshenie-zapros-avto-tanlanadi.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-016",
+     "note": "Создать: «Запрос на внутреннее перемещение» = 0000000001 avtomatik to'ladi, endi Со склада/На склад ham shu запросdan to'ladi va bloklanadi. «×» bilan tozalansa ~2 s ichida yana avtomatik to'ladi — запроссиз перемещение yaratib bo'lmaydi (yomonlashgan)"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-MV-006",
+   "section": "Внутренние перемещения",
+   "form": "Перемещение (создание)",
+   "title": "Jami vazn miqdorga ko'paytiriladi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/movement/movement+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "TMS-1 ning bir dona vazni: нетто 1.1, брутто 1.5 (Межорг. перемещение da 2 dona = 2.2 / 3)."
+   ],
+   "data": [
+    "ТМЦ: TMS-1"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Внутренние перемещения",
+     "value": "/xtrade/a2/anor/mkw/movement/movement_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Внутренние перемещения» ni bosing.",
+     "expected": "«Внутренние перемещения» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Создать",
+       "value": ""
+      },
+      {
+       "action": "select",
+       "target": "Со склада *",
+       "value": "WH-Yashnobod"
+      },
+      {
+       "action": "select",
+       "target": "На склад *",
+       "value": "Основной склад"
+      },
+      {
+       "action": "click",
+       "target": "Далее",
+       "value": ""
+      }
+     ],
+     "description": "«Создать» → «Со склада *» → WH-Yashnobod, «На склад *» → Основной склад → «Далее».",
+     "expected": "2-qadam."
+    },
+    {
+     "n": 3,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "«Подбор» → TMS-1 «Кол-во» = 7 → «Закрыть» → «Да». Jadval ostidagi yakunni qarang.",
+     "expected": "«Кол-во: 7», «Вес нетто: 7.7», «Вес брутто: 10.5»."
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Jadvalda «Кол-во» ni 3 ga o'zgartiring.",
+     "expected": "«Вес нетто: 3.3», «Вес брутто: 4.5»."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "«Кол-во: 7», «Вес нетто: 7.7», «Вес брутто: 10.5».",
+   "api_checks": [],
+   "cleanup": [
+    "Formani «Закрыть»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 3,
+    "actual": "Ikkala holatda ham «Вес нетто: 1.1», «Вес брутто: 1.5» — bitta donaning vazni, miqdorga ko'paytirilmagan. Запрос asosida ochilganda ham «Кол-во по запросу» ustuni bo'sh.",
+    "bug": "BUG-042",
+    "note": "Bug hisobot: xatoliklar/BUG-042_peremeshenie-ves-kolvoga-bogliq-emas.md. Holat: YANGI — qayta tekshiruvda topildi (28.09.2026, 15:55)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "NOT_CHECKED",
+     "bug": "BUG-042",
+     "note": "Tekshirib bo'lmadi: BUG-016 (majburiy avto-запрос) va Основной складda TMS-1 = 0 sababli Подбор qatori qo'shilmaydi, vazn yakunini ko'rib bo'lmadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-MV-007",
+   "section": "Внутренние перемещения",
+   "form": "Перемещение (просмотр)",
+   "title": "ТМЦ tabi normal ko'rinadi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/movement/movement_view?movement_id=<ID>",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "WH-Yashnobod da TMS-1 qoldig'i ≥ 7 (TMS-1 da ~29 ta shtrix-kod bor)."
+   ],
+   "data": [
+    "Номер перемещения: QA-MV-1",
+    "Со склада: WH-Yashnobod",
+    "На склад: Основной склад",
+    "ТМЦ: TMS-1, 7",
+    "Статус: Новый"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Внутренние перемещения",
+     "value": "/xtrade/a2/anor/mkw/movement/movement_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Внутренние перемещения» ni bosing.",
+     "expected": "«Внутренние перемещения» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "click",
+     "target": "Создать",
+     "value": "",
+     "description": "«Создать» ni bosing.",
+     "expected": "«Внутреннее перемещение (создание)», 3 qadam: 1 Основная информация / 2 ТМЦ / 3 Завершить."
+    },
+    {
+     "n": 3,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "«Номер перемещения» = QA-MV-1; «Со склада *» → WH-Yashnobod; «На склад *» → Основной склад («Запрос на внутреннее перемещение» avtomatik to'lgan bo'lsa — qarang BUG-016 — tegmang). «Далее».",
+     "expected": "2-qadam ochiladi."
+    },
+    {
+     "n": 4,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Подбор",
+       "value": ""
+      },
+      {
+       "action": "grid_fill",
+       "target": "TMS-1 | Кол-во",
+       "value": "7"
+      },
+      {
+       "action": "click",
+       "target": "Закрыть",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Да",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Далее",
+       "value": ""
+      }
+     ],
+     "description": "«Подбор» → TMS-1 qatorida «Кол-во» = 7 → «Закрыть» → «Да». «Далее».",
+     "expected": "3-qadam."
+    },
+    {
+     "n": 5,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "select",
+       "target": "Статус *",
+       "value": "Новый"
+      },
+      {
+       "action": "click",
+       "target": "Завершить",
+       "value": ""
+      },
+      {
+       "action": "confirm",
+       "target": "Сохранить?",
+       "value": "Да"
+      }
+     ],
+     "description": "«Статус *» → «Новый», «Завершить» → «Сохранить?» → «Да».",
+     "expected": "Ro'yxatda «… | QA-MV-1 | … | WH-Yashnobod | Основной склад | Новый»."
+    },
+    {
+     "n": 6,
+     "action": "row_click",
+     "target": "QA-MV-1",
+     "value": "",
+     "description": "Ro'yxatda QA-MV-1 qatorini bir marta bosing.",
+     "expected": "Qator ostida amal tugmalari chiqadi: Просмотр, Изменить, Статус, Отчеты, Проводки."
+    },
+    {
+     "n": 7,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Просмотр» ni bosing, so'ng «ТМЦ» tabini bosing.",
+     "expected": "Bitta qator normal balandlikda (≈40 px) ko'rinadi; pastda «Позиций: 1 Общее кол-во: 7»."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Bitta qator normal balandlikda (≈40 px) ko'rinadi; pastda «Позиций: 1 Общее кол-во: 7».",
+   "api_checks": [],
+   "cleanup": [
+    "Ro'yxatda QA-MV-1 → «Статус» → «Черновик» → «Да» → qatorni yana bosing → «Удалить» → «Удалить перемещение?» → «Да»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 7,
+    "actual": "«Штрих-код» ustunida TMS-1 ning barcha ~29 shtrix-kodi vergul bilan chiqadi, qator 1107 px (1476 px oynada) — 2511 px (tor oynada) balandlikda; ekranning ko'rinadigan qismida jadval bo'sh ko'rinadi. Partiyali ТМЦ da «Номер партии» son sifatida formatlanadi: «20 251 017 000 000 031 026» (to'g'risi 20251017000000031026).",
+    "bug": "BUG-012",
+    "note": "Bug hisobot: xatoliklar/BUG-012_peremeshenie-view-tmc-qator-2500px.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "NOT_CHECKED",
+     "bug": "BUG-012",
+     "note": "Tekshirib bo'lmadi: BUG-016 sababli yangi перемещение faqat 0000000001 запросi bilan (Основной склад → WH-Yashnobod) yaratiladi, Основной складda TMS-1 qoldig'i 0 — Подбор jimgina tashlab yuboradi. Mavjud 2 ta hujjatda (1415, 1362) faqat TMS litr (1 ta shtrix-kod) — qator balandligi normal, lekin TMS-1 holati tekshirilmadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-FMR-003",
+   "section": "Межорг. перемещения: запросы",
+   "form": "Запрос",
+   "title": "Status o'zgarishi tasdiq bilan",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Ha",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mfm/from_movement_request_list",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Организация получателя: Buxoro",
+    "Примечание: QA-FMR-1",
+    "ТМЦ: TMS-1, 3"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Запросы на межорг. перемещ.: отправка",
+     "value": "/xtrade/a2/anor/mfm/from_movement_request_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Запросы на межорг. перемещ.: отправка» ni bosing.",
+     "expected": "«Запросы на межорг. перемещ.: отправка» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Создать",
+       "value": ""
+      },
+      {
+       "action": "select",
+       "target": "Организация получателя *",
+       "value": "Buxoro"
+      },
+      {
+       "action": "fill",
+       "target": "Примечание",
+       "value": "QA-FMR-1"
+      },
+      {
+       "action": "click",
+       "target": "Подбор",
+       "value": ""
+      },
+      {
+       "action": "grid_fill",
+       "target": "TMS-1 | Кол-во",
+       "value": "3"
+      },
+      {
+       "action": "click",
+       "target": "Закрыть",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Да",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Сохранить",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Да",
+       "value": ""
+      }
+     ],
+     "description": "«Создать» → «Организация получателя *» → Buxoro; «Примечание» = QA-FMR-1; «Подбор» → TMS-1 «Кол-во» = 3 → «Закрыть» → «Да»; «Сохранить» → «Да».",
+     "expected": "Ro'yxatda «<штрих-код> | Buxoro | Usmonxo'jayev Mohir | 28.09.2026 … | Новый»."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "row_click",
+       "target": "<joriy qator>",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Статус",
+       "value": ""
+      }
+     ],
+     "description": "Qatorni bosing → «Статус».",
+     "expected": "Menyu: «Отклонен», «Отправлен»."
+    },
+    {
+     "n": 4,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Отклонен",
+       "value": ""
+      }
+     ],
+     "description": "«Отклонен» ni tanlang.",
+     "expected": "«Изменить статус … на Отклонен?» tasdiqlash oynasi (boshqa formalardagidek)."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "«Изменить статус … на Отклонен?» tasdiqlash oynasi (boshqa formalardagidek).",
+   "api_checks": [],
+   "cleanup": [
+    "Qator → «Удалить» → «Удалить?» → «Да»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 4,
+    "actual": "Status darhol «Отклонен» ga o'zgaradi, tasdiqlash so'ralmaydi. «Отправлен» ham xuddi shunday — hujjat boshqa tashkilotga tasdiqsiz yuboriladi. Qo'shimcha: ro'yxat pastida «Общий вес нетто/брутто» ikki marta; Межорг. перемещения: отправка da «Статус» menyusi joriy statusni ham ko'rsatadi («Новое» holatida «Новое»).",
+    "bug": "BUG-027",
+    "note": "Bug hisobot: xatoliklar/BUG-027_mejorg-zapros-status-tasdiqsiz.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-027",
+     "note": "Yangi запрос 1350001281 (Buxoro, QA-FMR-2, TMS-1 = 3) → Статус → «Отклонен»: status darhol «Отклонен» ga o‘zgardi, tasdiqlash oynasi chiqmadi. Ro‘yxat pastida «Общий вес нетто/брутто» hali ikki marta"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-FM-002",
+   "section": "Межорг. перемещения",
+   "form": "Перемещение (создание)",
+   "title": "«Тип оплаты» majburiy — 1-qadamda tekshiriladi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mfm/from_movement+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "WH-Yashnobod da TMS-1 qoldig'i ≥ 2."
+   ],
+   "data": [
+    "BUG-010 dagi qiymatlar, lekin «Тип оплаты» BO'SH"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Межорг. перемещения: отправка",
+     "value": "/xtrade/a2/anor/mfm/from_movement_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Межорг. перемещения: отправка» ni bosing.",
+     "expected": "«Межорг. перемещения: отправка» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Создать». 1-qadam: Рабочая зона отправителя → Room - Yashnobod; Штат → Main Manager; Организация получателя → Buxoro; Со склада → WH-Yashnobod; Тип цены → Sotish sum. «Тип оплаты» ni BO'SH qoldiring (yulduzchasi yo'q).",
+     "expected": "Majburiy bo'lsa, «Тип оплаты» yonida * bo'lishi va «Далее» da tekshirilishi kerak."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Далее",
+       "value": ""
+      }
+     ],
+     "description": "«Далее».",
+     "expected": "2-qadam ochiladi (xato yo'q)."
+    },
+    {
+     "n": 4,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "«Подбор» → TMS-1 «Кол-во» = 2 → «Закрыть» → «Да». Jadval ostidagi yakunni qarang.",
+     "expected": "«Сумма: 20 000», «Оплачено: 0», «Осталось доплатить: 20 000»."
+    },
+    {
+     "n": 5,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Далее",
+       "value": ""
+      }
+     ],
+     "description": "«Далее».",
+     "expected": "3-qadam: Статус * = «Отправлено»."
+    },
+    {
+     "n": 6,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Завершение",
+       "value": ""
+      },
+      {
+       "action": "confirm",
+       "target": "Сохранить?",
+       "value": "Да"
+      }
+     ],
+     "description": "Pastdagi «Завершение» tugmasini bosing, «Сохранить?» → «Да».",
+     "expected": "Hujjat saqlanadi (yoki 1-qadamda to'xtatilgan bo'lardi)."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Hujjat saqlanadi (yoki 1-qadamda to'xtatilgan bo'lardi).",
+   "api_checks": [],
+   "cleanup": [
+    "Xato oynasini yoping, formani «Закрыть» (saqlanmaydi)."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 6,
+    "actual": "6-qadam: «Ошибка A02-16-047 — Выберите тип оплаты! ИД заказа = …» (server xatosi). Foydalanuvchi 3 qadam orqaga qaytishi kerak. 4-qadam: «Оплачено:» BO'SH, «Осталось доплатить: -20 000» (manfiy). Panelda «Сумма НДС» 6 xonali kasr: «2 142.857143». 3-qadam yorliqlari: «Тип оплат», «Общая кол-во».",
+    "bug": "BUG-015",
+    "note": "Bug hisobot: xatoliklar/BUG-015_mejorg-tip-oplaty-majburiy-emas.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-015",
+     "note": "Межорг. перемещение (создание) 1-qadam: «Тип оплаты» yulduzchasiz (boshqa majburiy maydonlarda * bor); Тип оплаты bo‘sh qoldirilib «Далее» bosildi — 2-qadamga xatosiz o‘tdi; pastda «Оплачено:» bo‘sh. Hujjat oxirigacha yuborilmadi (tashkilotga jo‘natmaslik uchun), shuning uchun 6-qadamdagi server xatosi qayta tekshirilmadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-FM-004",
+   "section": "Межорг. перемещения",
+   "form": "Перемещение (просмотр)",
+   "title": "Ko'rishda sanalar ko'rinadi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Ha",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mfm/from_movement_view?movement_id=<ID>",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "WH-Yashnobod da TMS-1 qoldig'i ≥ 2."
+   ],
+   "data": [
+    "Рабочая зона отправителя: Room - Yashnobod",
+    "Штат: Main Manager",
+    "Организация получателя: Buxoro",
+    "Со склада: WH-Yashnobod",
+    "Тип цены: Sotish sum",
+    "Тип оплаты: Наличные деньги",
+    "ТМЦ: TMS-1, 2",
+    "Статус: Новое (qoldiq harakatlanmasligi uchun)"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Межорг. перемещения: отправка",
+     "value": "/xtrade/a2/anor/mfm/from_movement_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Межорг. перемещения: отправка» ni bosing.",
+     "expected": "«Межорг. перемещения: отправка» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "click",
+     "target": "Создать",
+     "value": "",
+     "description": "«Создать» ni bosing.",
+     "expected": "«Межорганизационное перемещение: отправка (создание)», 3 qadam: 1 Основная информация / 2 ТМЦ / 3 Завершение."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "select",
+       "target": "Рабочая зона отправителя *",
+       "value": "Room - Yashnobod"
+      },
+      {
+       "action": "select",
+       "target": "Штат *",
+       "value": "Main Manager"
+      },
+      {
+       "action": "select",
+       "target": "Организация получателя *",
+       "value": "Buxoro"
+      },
+      {
+       "action": "select",
+       "target": "Со склада *",
+       "value": "WH-Yashnobod"
+      },
+      {
+       "action": "select",
+       "target": "Тип цены *",
+       "value": "Sotish sum"
+      },
+      {
+       "action": "select",
+       "target": "Тип оплаты",
+       "value": "Наличные деньги"
+      },
+      {
+       "action": "click",
+       "target": "Далее",
+       "value": ""
+      }
+     ],
+     "description": "1-qadamda: «Рабочая зона отправителя *» → Room - Yashnobod; «Штат *» → Main Manager; «Организация получателя *» → Buxoro; «Со склада *» → WH-Yashnobod; «Тип цены *» → Sotish sum; «Тип оплаты» → Наличные деньги. «Далее».",
+     "expected": "«Пользователь» avtomatik Usmonxo'jayev Mohir; 2-qadam ochiladi."
+    },
+    {
+     "n": 4,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Подбор",
+       "value": ""
+      },
+      {
+       "action": "grid_fill",
+       "target": "TMS-1 | Кол-во",
+       "value": "2"
+      },
+      {
+       "action": "click",
+       "target": "Закрыть",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Да",
+       "value": ""
+      },
+      {
+       "action": "click",
+       "target": "Далее",
+       "value": ""
+      }
+     ],
+     "description": "«Подбор» → TMS-1 qatorida «Кол-во» = 2 → «Закрыть» → «Да». «Далее».",
+     "expected": "3-qadam ochiladi."
+    },
+    {
+     "n": 5,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "select",
+       "target": "Статус *",
+       "value": "Новое"
+      },
+      {
+       "action": "click",
+       "target": "Завершение",
+       "value": ""
+      },
+      {
+       "action": "confirm",
+       "target": "Сохранить?",
+       "value": "Да"
+      }
+     ],
+     "description": "«Статус *» → «Новое» ni tanlang, «Завершение» → «Сохранить?» → «Да».",
+     "expected": "Ro'yxatda qator: «<ID> | Room - Yashnobod | Main Manager | WH-Yashnobod | 28.09.2026 … | Buxoro | … | 20 000 | 20 000 | Нет | Новое»."
+    },
+    {
+     "n": 6,
+     "action": "row_click",
+     "target": "yangi (<ID>)",
+     "value": "",
+     "description": "Ro'yxatda yangi (<ID>) qatorini bir marta bosing.",
+     "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Изменить, Изменить проект, Изменить тип цены, Статус, Отчеты, Soliq.uz."
+    },
+    {
+     "n": 7,
+     "action": "click",
+     "target": "Просмотреть",
+     "value": "",
+     "description": "«Просмотреть» ni bosing.",
+     "expected": "«Дата перемещения» va «Дата отправки» (28.09.2026) ko'rinadi."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "«Дата перемещения» va «Дата отправки» (28.09.2026) ko'rinadi.",
+   "api_checks": [],
+   "cleanup": [
+    "Ro'yxatda qator → «Статус» → «Отменено» → «Вы действительно хотите изменить статус на Отменено?» → «Да».",
+    "«Отмененные межорг. перемещения» ro'yxatida 28.09.2026 qatori → «Удалить» → «Вы действительно хотите удалить перемещение?» → «Да»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 7,
+    "actual": "Maydonlar: ИД, Статус, Запрос, Организация получателя, Причина…, Рабочая зона отправителя, Проект, Номер ТТН, Договор, Экспедитор, Автотранспорт, Штат отправителя, Отправитель, Со склада, Тип цены, «Тип оплат», Примечание, Создал/Изменил/даты — «Дата перемещения» ham, «Дата отправки» ham yo'q. Qo'shimcha: bo'sh «Автотранспорт» maydonida «|» belgisi chiqadi.",
+    "bug": "BUG-010",
+    "note": "Bug hisobot: xatoliklar/BUG-010_mejorg-otpravka-view-sanalar-yoq.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-010",
+     "note": "Mavjud hujjat 2347 → Просмотреть: «Дата перемещения» va «Дата отправки» hali yo'q; yorliq «Тип оплат»; «Автотранспорт» qiymatida «BMWxan|10B888BB» ajratgich"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-SUP-006",
+   "section": "Поставщики",
+   "form": "Поставщик (создание)",
+   "title": "Validatsiya: НДС 0–100 oralig'ida",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/supplier+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Название: bekbaraka (ro'yxatdan)",
+    "НДС: yoqilgan",
+    "НДС (%): 150"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Поставщики",
+     "value": "/xtrade/a2/anor/mkw/supplier_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Поставщики» ni bosing.",
+     "expected": "«Поставщики» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "click",
+     "target": "Создать",
+     "value": "",
+     "description": "«Создать» ni bosing.",
+     "expected": "«Поставщик (создание)»: Статус (Активный), Тип поставщика (Юридическое лицо), Название *, НДС (Нет), Акциз (Нет)."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "select",
+       "target": "Название *",
+       "value": "bekbaraka"
+      }
+     ],
+     "description": "«Название *» → «bekbaraka».",
+     "expected": "Tanlanadi."
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«НДС» kalitini yoqing.",
+     "expected": "«НДС (%)» maydoni chiqadi."
+    },
+    {
+     "n": 5,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "fill",
+       "target": "НДС (%)",
+       "value": "150"
+      }
+     ],
+     "description": "«НДС (%)» ga 150 yozing.",
+     "expected": "Maydon qizaradi: «0 dan 100 gacha» xabari."
+    },
+    {
+     "n": 6,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Сохранить",
+       "value": ""
+      },
+      {
+       "action": "confirm",
+       "target": "Сохранить?",
+       "value": "Да"
+      }
+     ],
+     "description": "«Сохранить» → «Сохранить?» → «Да».",
+     "expected": "(Validatsiya o'tmasligi kerak edi.)"
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Maydon qizaradi: «0 dan 100 gacha» xabari.",
+   "api_checks": [],
+   "cleanup": [
+    "Xato oynasini yoping, formani «Закрыть»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 5,
+    "actual": "5-qadam: ogohlantirish yo'q. 6-qadam: «Ошибка — URL: /xtrade/b/anor/mkw/supplier+add:save — Z:#z:mkw_suppliers check violated[vat_percent between 0 and 100] vat_percent=150». Foydalanuvchiga texnik xato ko'rsatiladi (saqlanmaydi).",
+    "bug": "BUG-019",
+    "note": "Bug hisobot: xatoliklar/BUG-019_postavshik-nds-150-db-xato.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15). Ko'rish sahifasida kiritilgan «Акциз» maydoni ko'rsatilmaydi."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-019",
+     "note": "Поставщик (создание): bekbaraka, НДС=Да, НДС (%) = 150 — maydonda ogohlantirish yo'q; Сохранить → Да → «Ошибка URL: /xtrade/b/anor/mkw/supplier+add:save — Z:#z:mkw_suppliers check violated[vat_percent between 0 and 100] vat_percent=150»"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-VAN-008",
+   "section": "Автотранспорт",
+   "form": "Автотранспорт (создание)",
+   "title": "Takroriy «Код» — tushunarli xabar",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Ha",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mrf/van+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "Kodi «001» bo'lgan transport (MersXan) bor."
+   ],
+   "data": [
+    "Код: 001",
+    "Гос. номер: 01QA111A",
+    "Название: QA-VAN-DUP",
+    "Грузоподъемность (кг): 100"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Автотранспорт",
+     "value": "/xtrade/a2/anor/mrf/van_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Автотранспорт» ni bosing.",
+     "expected": "«Автотранспорт» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Создать",
+       "value": ""
+      },
+      {
+       "action": "fill",
+       "target": "Код",
+       "value": "001"
+      },
+      {
+       "action": "fill",
+       "target": "Гос. номер *",
+       "value": "01QA111A"
+      },
+      {
+       "action": "fill",
+       "target": "Название *",
+       "value": "QA-VAN-DUP"
+      },
+      {
+       "action": "fill",
+       "target": "Грузоподъемность (кг) *",
+       "value": "100"
+      }
+     ],
+     "description": "«Создать» → «Код» = 001, «Гос. номер *» = 01QA111A, «Название *» = QA-VAN-DUP, «Грузоподъемность (кг) *» = 100.",
+     "expected": "Qiymatlar kiritildi."
+    },
+    {
+     "n": 3,
+     "action": "click",
+     "target": "Сохранить",
+     "value": "",
+     "description": "«Сохранить» ni bosing.",
+     "expected": "«Транспорт с таким кодом уже существует» kabi tushunarli xabar."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "«Транспорт с таким кодом уже существует» kabi tushunarli xabar.",
+   "api_checks": [],
+   "cleanup": [
+    "Xato oynasini yoping, formani «Закрыть». Agar gos. nomer testi bilan transport yaratilgan bo'lsa: qatorni bosing → «Удалить» → «Да»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 3,
+    "actual": "«Ошибка — URL: /xtrade/b/anor/mrf/van+add:save — Z:#z:mrf_vans dup_val_on_index code=001 company_id=1600 code=001 filial_id=159720 code=001». Boshqa kod bilan, lekin mavjud «Гос. номер» (masalan 10B888BB) bilan esa ogohlantirishsiz saqlanadi.",
+    "bug": "BUG-031",
+    "note": "Bug hisobot: xatoliklar/BUG-031_avtotransport-dublikat-kod-xom-xato.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-031",
+     "note": "Автотранспорт (создание): Код=001 (band), Гос. номер 01QA111A, QA-VAN-DUP, 100 kg → Сохранить: «Ошибка URL: /xtrade/b/anor/mrf/van+add:save — Z:#z:mrf_vans dup_val_on_index code=001 company_id=1600 …» (xom DB xatosi). Yozuv yaratilmadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-VAN-009",
+   "section": "Автотранспорт",
+   "form": "Остаток кодов маркировки в автотранспорте",
+   "title": "Bo'sh kod bilan «Прикрепить» bloklanadi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Ha",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/trade/tdeal/van_marking_balance?van_id=981&van_name=BMWxan",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Автотранспорт: BMWxan"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Автотранспорт",
+     "value": "/xtrade/a2/anor/mrf/van_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Автотранспорт» ni bosing.",
+     "expected": "«Автотранспорт» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "row_click",
+     "target": "BMWxan",
+     "value": "",
+     "description": "Ro'yxatda «BMWxan» qatorini bir marta bosing.",
+     "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Изменить, Остаток кодов маркировки в автотранспорте, Прикрепление водителя, Неактивный, Удалить."
+    },
+    {
+     "n": 3,
+     "action": "click",
+     "target": "Остаток кодов маркировки в автотранспорте",
+     "value": "",
+     "description": "«Остаток кодов маркировки в автотранспорте» ni bosing.",
+     "expected": "«Автотранспорт: BMWxan» sahifasi (jadval bo'sh), yuqorida «Прикрепить маркировку»."
+    },
+    {
+     "n": 4,
+     "action": "click",
+     "target": "Прикрепить маркировку",
+     "value": "",
+     "description": "«Прикрепить маркировку» ni bosing.",
+     "expected": "Oyna: Код маркировки * (bo'sh), ТМЦ; tugmalar Найти маркировку / Прикрепить / Закрыть."
+    },
+    {
+     "n": 5,
+     "action": "click",
+     "target": "Прикрепить",
+     "value": "",
+     "description": "Hech narsa kiritmasdan «Прикрепить» ni bosing.",
+     "expected": "«Код маркировки» qizaradi, so'rov yuborilmaydi (tugma kod topilguncha nofaol bo'lishi kerak)."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "«Код маркировки» qizaradi, so'rov yuborilmaydi (tugma kod topilguncha nofaol bo'lishi kerak).",
+   "api_checks": [],
+   "cleanup": [
+    "Oynalarni «Закрыть»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 5,
+    "actual": "So'rov yuboriladi: «Ошибка — URL: /xtrade/b/trade/tdeal/van_marking_balance$attach_marking — Z:#z:mm_markings no_data_found company_id=1600 marking_id=». Kod kiritib, «Найти маркировку» topmagan holda «Прикрепить» bosilganda ham xuddi shu xato.",
+    "bug": "BUG-020",
+    "note": "Bug hisobot: xatoliklar/BUG-020_avtotransport-markirovka-bosh-500.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15). «Найти маркировку» test muhitida «A02-03-047 Токен Asl Belgisi не указан для филиала Toshkent» qaytaradi — bu sozlama, xato emas."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-020",
+     "note": "BMWxan → Остаток кодов маркировки → Прикрепить маркировку → bo'sh kod bilan «Прикрепить» (tugma faol): «Ошибка URL: /xtrade/b/trade/tdeal/van_marking_balance$attach_marking — Z:#z:mm_markings no_data_found company_id=1600 marking_id=»"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-WH-007",
+   "section": "Склады",
+   "form": "Склад (просмотр)",
+   "title": "«Остатки» tabi ustunlari normal, «Номер карточки» bor",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Ha",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/warehouse_view?warehouse_id=2031",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "Brauzer oynasi kengligi kamida 1024 px (noutbuk/monitor, oyna to'liq ochilgan)."
+   ],
+   "data": [
+    "Склад: WH-Yashnobod"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Склады",
+     "value": "/xtrade/a2/anor/mkw/warehouse_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Склады» ni bosing.",
+     "expected": "«Склады» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "row_click",
+     "target": "WH-Yashnobod",
+     "value": "",
+     "description": "Ro'yxatda «WH-Yashnobod» qatorini bir marta bosing.",
+     "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Изменить, Неактивный, Прикрепить тип цены, Удалить."
+    },
+    {
+     "n": 3,
+     "action": "click",
+     "target": "Просмотреть",
+     "value": "",
+     "description": "«Просмотреть» ni bosing.",
+     "expected": "«Склад (просмотр)» ochiladi, yuqorida 13 ta tab."
+    },
+    {
+     "n": 4,
+     "action": "tab",
+     "target": "Остатки",
+     "value": "",
+     "description": "«Остатки» tabini bosing.",
+     "expected": "Jadval: Полное название | Номер карточки | Доступно | Остатки | Заказы; ustunlar o'qiladigan kenglikda (eski versiyadagidek)."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Jadval: Полное название | Номер карточки | Доступно | Остатки | Заказы; ustunlar o'qiladigan kenglikda (eski versiyadagidek).",
+   "api_checks": [],
+   "cleanup": [],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 4,
+    "actual": "Birinchi 4 ta ustun 41 px ga siqilgan (sarlavhalar «П.», «Д.», «О.», «З.»), ТМЦ nomlari harfma-harf bir necha qatorga bo'linadi, bitta qator ~420 px balandlikda. «Номер карточки» ustuni yo'q — bir xil ТМЦ ning qatorlari dublikatdek ko'rinadi. Toza yuklashda ham takrorlanadi.",
+    "bug": "BUG-008",
+    "note": "Bug hisobot: xatoliklar/BUG-008_sklad-view-ostatki-tab-ustunlar-siqilgan.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-008",
+     "note": "Склады → WH-Yashnobod → Просмотреть → Остатки: ustunlar hali siqilgan, ТМЦ nomi harfma-harf bo'linadi (bitta qator ~330 px), sarlavhalar bo'sh ko'rinadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-WH-008",
+   "section": "Склады",
+   "form": "Склад — GPS xarita",
+   "title": "Xarita oynasi: sarlavha tarjima qilingan, konsol xatosiz",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/warehouse+add",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "Chrome DevTools konsoli ochiq (F12 → Console)."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Склады",
+     "value": "/xtrade/a2/anor/mkw/warehouse_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Склады» ni bosing.",
+     "expected": "«Склады» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Создать» ni bosing (yoki mavjud omborda «Изменить»).",
+     "expected": "«Склад (создание)» formasi."
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«GPS координаты» maydoni yonidagi xarita belgisi ustiga sichqonchani olib boring.",
+     "expected": "Tooltip rus tilida (masalan «Карта»)."
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Xarita belgisini bosing.",
+     "expected": "Xarita oynasi rus tilidagi sarlavha bilan ochiladi."
+    },
+    {
+     "n": 5,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Xaritada biror nuqtani sichqoncha bilan ikki marta bosing.",
+     "expected": "Pastdagi maydonda koordinata paydo bo'ladi; konsolda xato yo'q."
+    },
+    {
+     "n": 6,
+     "action": "click",
+     "target": "Создать и закрыть",
+     "value": "",
+     "description": "«Создать и закрыть» ni bosing.",
+     "expected": "Oyna yopiladi, koordinata «GPS координаты» ga yoziladi; konsolda xato yo'q."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Tooltip rus tilida (masalan «Карта»).",
+   "api_checks": [],
+   "cleanup": [
+    "Formani saqlamasdan «Закрыть»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 3,
+    "actual": "3–4-qadam: tooltip va oyna sarlavhasi «map» (tarjima qilinmagan); tugma matni «Создать и закрыть» (nuqta tanlash uchun g'alati). 5-qadam (birinchi testda, tahrir formasida): konsolda «RangeError: Maximum call stack size exceeded at setMapSelection» (chunk-KO5INPJH.js) — cheksiz rekursiya, sekin kompyuterda sahifa qotishi mumkin. 6-qadam: konsolda «TypeError: Cannot read properties of undefined (reading 'bottomright') at e.onRemove (…/Yandex.min.js)» — har safar takrorlanadi. Koordinata saqlanadi.",
+    "bug": "BUG-021",
+    "note": "Bug hisobot: xatoliklar/BUG-021_sklad-xarita-rekursiya-va-map.md. Holat: Qisman takrorlandi: «bottomright» konsol xatosi va «map» sarlavhasi takrorlandi; «Maximum call stack» xatosi haqiqiy sichqoncha bilan ikki marta bosilganda chiqqan — qo'lda tekshirish kerak."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-021",
+     "note": "QISMAN: tugma/oyna sarlavhasi endi «Карта» (tarjima tuzatilgan). Lekin xaritada ikki marta bosilganda konsolda «RangeError: Maximum call stack size exceeded at l.setMapSelection (chunk-ATE2WVWU.js)» (cheksiz rekursiya) va «Создать и закрыть» da «TypeError: Cannot read properties of undefined (reading 'bottomright') at e.onRemove (Yandex.min.js)» hali bor. Koordinata maydonga yozildi; forma saqlanmadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-LOG-005",
+   "section": "Логистика",
+   "form": "Логистика",
+   "title": "Ro'yxat ustunlari va mavjud reys tahriri",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/trade/tdeal/logistics_list",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Reys: 21.06.2026, BMWxan, Abdiev Abo"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Логистика",
+     "value": "/xtrade/a2/trade/tdeal/logistics_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Логистика» ni bosing.",
+     "expected": "«Логистика» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "Jadvaldagi «ИД» va «Рейс» ustunlarini qarang.",
+     "expected": "Qiymatlar to'ldirilgan."
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«21.06.2026 | BMWxan | … | Abdiev Abo | 1 | 4.5 | 0%» qatorini bosing → «Изменить».",
+     "expected": "Reys tarkibida 1 ta buyurtma (Client-1 Yashnobod, 4.5 kg) tanlangan."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "Qiymatlar to'ldirilgan.",
+   "api_checks": [],
+   "cleanup": [
+    "«Закрыть» (saqlamang)."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 2,
+    "actual": "2: «ИД» va «Рейс» barcha qatorlarda bo'sh, sarlavha «Р..» ga kesilgan. 3: «Рейс пустой — Добавьте хотя бы один заказ», «Выбранные заказы: Заказы не выбраны», 0 / 3000 кг; server javobida transfer_routes = []. Qatorda faqat «Изменить» amali (ko'rish/o'chirish yo'q).",
+    "bug": "BUG-041",
+    "note": "Bug hisobot: xatoliklar/BUG-041_logistika-royxat-va-tahrir-bosh.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-041",
+     "note": "QISMAN (asosiy qismi tuzatilgan): 21.06.2026 reysi endi ИД=2422, Рейс=2; amallar Просмотреть/Изменить/Удалить/Отчёт; «Изменить» da reys tarkibi to'g'ri — 1 ta buyurtma (Client-1 Yashnobod, 4.5 kg, 4.5/3000 kg). Hali bor: 03.07.2026 qatorida «ИД» va «Рейс» bo'sh"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-REP-006",
+   "section": "Hisobotlar",
+   "form": "Общий отчет по складам",
+   "title": "Validatsiya: davr teskari",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/rep/mkw/warehouse_balance/warehouse_balance",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Дата начала периода: 30.09.2026",
+    "Дата окончания периода: 01.09.2026"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Yuqori menyuda «Склад» ni bosing, ro'yxatning hisobotlar qismidan «Общий отчет по складам» ni bosing.",
+     "expected": "Parametrlar: Дата начала периода *, Дата окончания периода *, Организации, Склады, …, «Сформировать»."
+    },
+    {
+     "n": 2,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "fill_date",
+       "target": "Дата начала периода",
+       "value": "30.09.2026"
+      },
+      {
+       "action": "fill_date",
+       "target": "Дата окончания периода",
+       "value": "01.09.2026"
+      }
+     ],
+     "description": "«Дата начала периода» = 30.09.2026, «Дата окончания периода» = 01.09.2026 kiriting.",
+     "expected": "Maydon qizaradi yoki «Дата начала не может быть больше даты окончания»."
+    },
+    {
+     "n": 3,
+     "action": "click",
+     "target": "Сформировать",
+     "value": "",
+     "description": "«Сформировать» ni bosing.",
+     "expected": "Hisobot yaratilmaydi, xabar chiqadi."
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "(Ixtiyoriy, ehtiyot bo'ling — qayta hisoblash amali) «Склад» → «Пересчет приходных цен»: Дата начала = 30.09.2026, Дата окончания = 01.09.2026 → «Скорректировать».",
+     "expected": "Xato xabari, amal bajarilmaydi."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Maydon qizaradi yoki «Дата начала не может быть больше даты окончания».",
+   "api_checks": [],
+   "cleanup": [
+    "Hisobot oynasini yoping."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 2,
+    "actual": "2-qadam: hech qanday ogohlantirish yo'q. 3-qadam: yangi oynada hisobot ochiladi — sarlavhalarda «Остаток на 30.09.2026 … Остаток на 01.09.2026» (ma'nosiz). 4-qadam (birinchi testda): so'rov bajarildi (200), foydalanuvchiga hech qanday natija yoki xabar ko'rsatilmadi.",
+    "bug": "BUG-025",
+    "note": "Bug hisobot: xatoliklar/BUG-025_sana-oraligi-tekshirilmaydi.md. Holat: Takrorlandi (Общий отчет по складам, 28.09.2026); Пересчет приходных цен — birinchi testda."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-025",
+     "note": "Общий отчет по складам: Дата начала 30.09.2026 > Дата окончания 01.09.2026 — ogohlantirish yo'q; «Сформировать» bosilganda sahifa darhol hisobot oynasini ochishga urindi (validatsiyasiz). «Пересчет приходных цен» qadami xavfli bo'lgani uchun bajarilmadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-REP-010",
+   "section": "Hisobotlar",
+   "form": "Konstruktorlar",
+   "title": "Toolbar va yorliqlar bir xil",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qo'lda",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/rep/mbi/mkw/writeoff",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [
+    "Фильтр: Дата списания 01.01.2025 – 28.09.2026"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "7 ta konstruktorni navbat bilan oching (Склад → Отчеты).",
+     "expected": "Hammasida bir xil toolbar: Параметры / Просмотреть / Настройки / HTML / EXCEL / CSV / XML / Закрыть / Сохранить шаблон."
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Конструктор отчетов по списанию»: chapdagi «Склад» ni sichqoncha bilan «Строки» ga sudrab o'tkazing; «Фильтр» da boshlanish sanasini 01.01.2025 qiling; «HTML».",
+     "expected": "Hisobotda ombor NOMI (WH-Yashnobod | 7 885)."
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "«Шаблон» maydonini bosing.",
+     "expected": "Saqlangan shablonlar ro'yxati ochiladi."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "Hammasida bir xil toolbar: Параметры / Просмотреть / Настройки / HTML / EXCEL / CSV / XML / Закрыть / Сохранить шаблон.",
+   "api_checks": [],
+   "cleanup": [
+    "Agar shablon saqlagan bo'lsangiz: maydonga nomini yozing → qizil belgi → «Да»."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 1,
+    "actual": "1: «по запросам на закуп» — «Просмотр» va Параметры/Настройки tablari yo'q; «по закупкам» — «Сохранить новый шаблон»; qolganlari «Просмотреть» / «Сохранить шаблон». 2: «ИД склада | 2031 | 7 885» (label warehouse_id); перемещения konstruktorida nom chiqadi. 3: ro'yxat chiqmaydi — faqat matn yozilgandan keyin ko'rinadi.",
+    "bug": "BUG-040",
+    "note": "Bug hisobot: xatoliklar/BUG-040_konstruktor-nomuvofiqliklar.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-040",
+     "note": "Toolbar hali bir xil emas: «…по запросам на закуп» — «Просмотр», «…по списанию» — «Просмотреть» (qolganlari HTML/EXCEL/CSV/XML/Сохранить шаблон). «Столбцы» blokida «Подитог строк» (Подитог столбцов bo‘lishi kerak); menyu nomi «по запросам на закуп»"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-GEN-007",
+   "section": "Umumiy",
+   "form": "To'g'ridan URL",
+   "title": "URL orqali ochilgan formada «Закрыть» bor, saqlashdan keyin ro'yxatga qaytadi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/writeoff/writeoff+edit?writeoff_id=<ID>",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "«Черновик» holatidagi списание bor (yo'q bo'lsa BUG-009 ning 1–5-qadamlari bilan yarating)."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Списания ro'yxatida QA-WO-1 qatorini bosing → «Изменить». Brauzer manzil satridagi URL ni nusxalang (…/writeoff/writeoff+edit?writeoff_id=<ID>).",
+     "expected": "URL nusxalandi."
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Yangi tab oching, URL ni manzil satriga qo'ying va Enter bosing.",
+     "expected": "«Списание (изменение)» formasi ochiladi; yuqorida «Сохранить», «В сборке», «Провести» va «Закрыть» tugmalari."
+    },
+    {
+     "n": 3,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "click",
+       "target": "Сохранить",
+       "value": ""
+      },
+      {
+       "action": "confirm",
+       "target": "Сохранить?",
+       "value": "Да"
+      }
+     ],
+     "description": "«Сохранить» → «Сохранить?» → «Да».",
+     "expected": "Hujjat saqlanadi va Списания ro'yxati (yoki ko'rish sahifasi) ochiladi."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "«Списание (изменение)» formasi ochiladi; yuqorida «Сохранить», «В сборке», «Провести» va «Закрыть» tugmalari.",
+   "api_checks": [],
+   "cleanup": [
+    "BUG-009 dagi tozalash."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 2,
+    "actual": "2-qadam: «Закрыть» tugmasi yo'q (faqat Сохранить / В сборке / Провести). 3-qadam: /xtrade/a2/biruni/intro/dashboard ga o'tadi — faqat menyu ko'rinadi, sahifa bo'sh. Xuddi shu holat boshqa formalarda ham (Склад, Автотранспорт va b.) kuzatildi.",
+    "bug": "BUG-013",
+    "note": "Bug hisobot: xatoliklar/BUG-013_togridan-url-saqlash-bosh-dashboard.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15). Bir marta to'g'ridan-to'g'ri ochishda sahifa butunlay bo'sh qolgan (router-outlet bo'sh), qayta ochishda yuklandi — barqaror emas."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-013",
+     "note": "O'z qoralamam 0000000003 (writeoff_id=2922) tahrir URL'i to'g'ridan-to'g'ri ochildi: «Закрыть» va orqaga strelka yo'q; «Сохранить» → «Да» → /xtrade/a2/biruni/intro/dashboard — bo'sh sahifa"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-GEN-008",
+   "section": "Umumiy",
+   "form": "Jadvallar",
+   "title": "So'z/sonlar o'rtasidan bo'linmaydi",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/mkw/balance/balance_list",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring).",
+    "Oyna kengligi 1024 px yoki torroq."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "nav",
+     "target": "Склад > Остатки ТМЦ",
+     "value": "/xtrade/a2/anor/mkw/balance/balance_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Остатки ТМЦ» ni bosing.",
+     "expected": "«Остатки ТМЦ» ro'yxat sahifasi ochiladi."
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Jadval ustidagi filtr belgisini bosib, filtr panelini oching.",
+     "expected": "Ustunlar torayadi, lekin so'z/sonlar butun holda keyingi qatorga o'tadi."
+    },
+    {
+     "n": 3,
+     "action": "nav",
+     "target": "Склад > Взаиморасчеты с поставщиками",
+     "value": "/xtrade/a2/anor/mkw/purchase/offset/offset_list",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Взаиморасчеты с поставщиками» ni bosing.",
+     "expected": "Ro'yxatda «Узбекский сум», «Toshkent», summalar butun ko'rinadi."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "Ustunlar torayadi, lekin so'z/sonlar butun holda keyingi qatorga o'tadi.",
+   "api_checks": [],
+   "cleanup": [],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 2,
+    "actual": "Sonlar va so'zlar o'rtasidan bo'linadi: «277|0», «40 00|0», «Узбекский с|ум», «Toshke|nt». Sabab: katak ichidagi span'larda `break-all` klassi (word-break: break-all).",
+    "bug": "BUG-022",
+    "note": "Bug hisobot: xatoliklar/BUG-022_grid-soz-va-sonlar-bolinadi.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15). span.block.min-w-0.break-all.whitespace-normal — `break-words` (overflow-wrap:anywhere) bilan almashtirish tavsiya etiladi."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-022",
+     "note": "Остатки ТМЦ + filtr paneli: «WH-Yashnob|od», «Основной ск|лад» so'z o'rtasidan bo'linadi; Закупки va Межорг. отправка ro'yxatlarida sana «29.09.2|026», «Узбекский сум» harfma-harf ustun bo'lib ketadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-GEN-009",
+   "section": "Umumiy",
+   "form": "Son formatlari",
+   "title": "Barcha formalarda son formati bir xil",
+   "type": "Bug",
+   "priority": "P2",
+   "automation": "Qo'lda",
+   "tags": [
+    "bug"
+   ],
+   "route": "",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Остатки ТМЦ» ni bosing. «WH-Yashnobod | TMS litr» qatorini bosing → «Детали». Pastdagi yakun qatorini qarang.",
+     "expected": "«Кол-во в наличии: (Узбекский сум): 2 023», «Сумма в наличии: … 16 160 000» (eski versiyadagidek)."
+    },
+    {
+     "n": 2,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "Остатки ТМЦ ro'yxatida «В наличии» ustunini qarang.",
+     "expected": "«2 023», «1 947» — probel bilan, o'ngga tekislangan."
+    },
+    {
+     "n": 3,
+     "action": "observe",
+     "target": "",
+     "value": "",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Взаиморасчеты с поставщиками» ni bosing. Jadval pastidagi yakunni qarang.",
+     "expected": "«442 232 000» (jadvaldagidek)."
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Дополнительные расходы» ni bosing. Istalgan hujjatni «Просмотреть».",
+     "expected": "«Сумма НДС» = «60 000» ko'rinishida."
+    },
+    {
+     "n": 5,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Склады → WH-Yashnobod → Просмотреть → «Поступление на склад» tabi.",
+     "expected": "Narx/summa 2 xonagacha kasr."
+    },
+    {
+     "n": 6,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Склад → Отчеты → «Общий отчет по складам» → «Сформировать».",
+     "expected": "«Себестоимость», «Дни в запасе» 2 xonagacha kasr."
+    }
+   ],
+   "bug_severity": "O'rta",
+   "expected_result": "«Кол-во в наличии: (Узбекский сум): 2 023», «Сумма в наличии: … 16 160 000» (eski versiyadagidek).",
+   "api_checks": [],
+   "cleanup": [],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 1,
+    "actual": "1: «(Узбекский ): 2023», «16160000» — probelsiz, valyuta nomi kesilgan («сум» yo'q) — REGRESSIYA. 2: «2023», «1947» — probelsiz, chapga tekislangan. 3: «442,232,000.00» (vergul+nuqta), yonidagi «ИТОГО (): 0.00» — valyuta bo'sh. 4: «60000». 5: «0.833333», «833.333». 6: «7 993.968334», «9 478.571429». Qo'shimcha: Межорг. перемещение panelida «Сумма НДС 2 142.857143», «Общая сумма: 15,000»; Автотранспорт view «1500», forma «1 500».",
+    "bug": "BUG-023",
+    "note": "Bug hisobot: xatoliklar/BUG-023_son-formatlari-nomuvofiq.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-023",
+     "note": "Остатки ТМЦ → Детали: yakunda «Кол-во в наличии: (Узбекский ): 8938.5», «Сумма в наличии: (Узбекский ): 81746500», «(Доллар США): 1622.716391» — valyuta nomi kesilgan, probelsiz, 6 xonali kasr"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-GEN-010",
+   "section": "Umumiy",
+   "form": "Jim validatsiya",
+   "title": "Tugma bosilganda sabab aytiladi (3 joy)",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qisman",
+   "tags": [
+    "bug"
+   ],
+   "route": "/xtrade/a2/anor/pref/expiration_date",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Menyuda «Склад» → «Остатки ТМЦ» → yuqoridagi «Настройки сроков годности».",
+     "expected": "Jadval: ТМЦ turi (oborudov, my_tms, a, c, b, d) × Отличный / Умеренный / Критический / Просроченный."
+    },
+    {
+     "n": 2,
+     "action": "sequence",
+     "target": "",
+     "value": "",
+     "ops": [
+      {
+       "action": "grid_fill",
+       "target": "oborudov | Умеренный срок",
+       "value": "5"
+      },
+      {
+       "action": "click",
+       "target": "Сохранить",
+       "value": ""
+      }
+     ],
+     "description": "«oborudov» qatorida «Умеренный срок» = 5 kiriting («Критический» 10 bo'lib turibdi) → «Сохранить».",
+     "expected": "«Умеренный срок должен быть больше критического» kabi xabar."
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Прогноз для закупки → Создать → Поставщик TMS maker, Характеристика ТМЦ My_Type → «Получить данные» → «Данные пользователя» dagi sanalarni bo'sh qoldirib «Рассчитать».",
+     "expected": "«Заполните даты…» kabi xabar yoki maydonlar qizaradi."
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Внутренние перемещения → Создать → (BUG-016 2-qadamgacha) → 3-qadamda «Статус *» bo'sh → «Завершить».",
+     "expected": "«Выберите статус» xabari."
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "«Умеренный срок должен быть больше критического» kabi xabar.",
+   "api_checks": [],
+   "cleanup": [
+    "Настройки sahifasida o'zgarishni bekor qiling (saqlamang)."
+   ],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 2,
+    "actual": "Uchala holatda ham hech narsa bo'lmaydi: so'rov yuborilmaydi, xabar yo'q, foydalanuvchi nima uchun ishlamayotganini bilmaydi. (To'g'ri qiymatlar kiritilsa ishlaydi: masalan 40/10/0 → «Сохранить?» chiqadi.)",
+    "bug": "BUG-035",
+    "note": "Bug hisobot: xatoliklar/BUG-035_jim-validatsiya-xabarsiz.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "NOT_CHECKED",
+     "bug": "BUG-035",
+     "note": "To'liq tekshirilmadi. 3-band (Прогноз: sanalar bo'sh → «Рассчитать»): endi «Данные пользователя» tabidagi 12 ta sana maydoni qizil ramka bilan belgilanadi (tuzatilgan, lekin boshqa tabda bo'lgani uchun xabar ko'rinmaydi). 2-band (Настройки сроков годности — umumiy sozlama) ataylab o'tkazib yuborildi; 4-band (перемещение statusi) BUG-016 sababli bajarib bo'lmadi"
+    }
+   }
+  },
+  {
+   "id": "TC-SKL-GEN-012",
+   "section": "Umumiy",
+   "form": "Matnlar",
+   "title": "Matn va grammatika xatolari yo'q",
+   "type": "Bug",
+   "priority": "P3",
+   "automation": "Qo'lda",
+   "tags": [
+    "bug"
+   ],
+   "route": "",
+   "pre": [
+    "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: «Администрирование» → filialni «Toshkent» ga almashtiring)."
+   ],
+   "data": [],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Инвентаризации → «Черновик» hujjat → «Статус» → «В сборке».",
+     "expected": "«Изменить статус инвентаризации … на \"В сборке\"?»"
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Списания → hujjat → «Статус» → «В сборке».",
+     "expected": "«Изменить статус документа № …»"
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Поступления ТМЦ на склад → hujjat → «Статус» → «Завершено».",
+     "expected": "«Изменить статус документа … на \"Завершено\"?», tugmalar «Да/Нет»"
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Поставщики yoki Автотранспорт → qator → «Неактивный».",
+     "expected": "«Изменить статус поставщика/транспорта X на Неактивный?»"
+    },
+    {
+     "n": 5,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Инвентаризации → Создать → Склад tanlang.",
+     "expected": "«Разбить по номерам партий»"
+    },
+    {
+     "n": 6,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Взаиморасчеты → filtr; Склады → filtr.",
+     "expected": "«Выбрать валюту», «Выбрать материально ответственное лицо»"
+    },
+    {
+     "n": 7,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Межорг. перемещения: отправка → Создать → 3-qadam.",
+     "expected": "«Тип оплаты», «Общее кол-во»"
+    },
+    {
+     "n": 8,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Материальный отчет → Настройки.",
+     "expected": "«Отображать цену с дополнительным расходом»"
+    },
+    {
+     "n": 9,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Склады → WH-Yashnobod → Просмотреть → tablar.",
+     "expected": "«Внутренние перемещения: отправка»; «Межорг. перемещения: прием» tabida «Организация отправителя»"
+    },
+    {
+     "n": 10,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Конструктор отчетов (istalgan) → «Столбцы» bloki; «Конструктор отчетов по запросам на закуп».",
+     "expected": "«Подитог столбцов»; «…по запросам на закупку»"
+    },
+    {
+     "n": 11,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Отчёт по отгрузкам и оплатам.",
+     "expected": "Sarlavha menyudagi nom bilan bir xil; ustun sarlavhalari bosh harf bilan"
+    },
+    {
+     "n": 12,
+     "action": "manual",
+     "target": "",
+     "value": "",
+     "description": "Закупки → Создать закуп → 3-qadam yakuni.",
+     "expected": "«Сумма», «Сумма скидки», «Сумма с учетом скидки» — har biri bir marta"
+    }
+   ],
+   "bug_severity": "Past",
+   "expected_result": "«Изменить статус инвентаризации … на \"В сборке\"?»",
+   "api_checks": [],
+   "cleanup": [],
+   "last_run": {
+    "date": "2026-09-28",
+    "result": "Fail",
+    "fail_step": 1,
+    "actual": "1: «ивентаризации», «В сброке». 2: «статус документ №». 3: «Изменить статуса документа … на \" Завершено \"» + kichik harfli «да/нет». 4: «Изменить статус с bekbaraka на Неактивный?». 5: «по номерами партий». 6: «Выбрать Валюта», «Выбрать Материально ответственное лицо». 7: «Тип оплат», «Общая кол-во». 8: «Отображать цена с дополнительный расхода». 9: «Внутренние перемещения:отправка» (probelsiz), «Организация получателя». 10: «Подитог строк» (Столбцы blokida), «по запросам на закуп». 11: «Отчёт по складу и доставке»; «оплаты от клиентов (заявки)», «возвраты», «отчёт принял». 12: «Сумма с учетом скидки:0 / Сумма с учетом скидки:1» (bir yorliq ikki marta, har xil qiymat). Qo'shimcha: Переоценка sarlavhalari «Переоценки … (просмотр)» / «Переоценка … (создание)»; Запрос на перемещение view: texnik ustun «Знаков после запятой», «Срок действия».",
+    "bug": "BUG-037",
+    "note": "Bug hisobot: xatoliklar/BUG-037_matn-va-grammatika-xatolari.md. Holat: Takrorlandi (qayta tekshiruv 28.09.2026, 15:40–16:15)."
+   },
+   "recheck": {
+    "29.09.2026": {
+     "status": "STILL",
+     "bug": "BUG-037",
+     "note": "QISMAN: 2-band tuzatilgan — Списания: «Изменить статус документа № 0000000003 на \"В сборке\"?». Hali bor: Поставщики → Неактивный: «Изменить статус с TMS maker на Неактивный?» (javob «Нет»); Материальный отчет → Настройки: «Отображать цена с дополнительный расхода»; Межорг. отправка view: «Тип оплат»"
+    }
+   }
+  }
+ ]
+}

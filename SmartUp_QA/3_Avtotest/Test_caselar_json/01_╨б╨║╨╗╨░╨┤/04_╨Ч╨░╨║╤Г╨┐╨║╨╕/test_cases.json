@@ -1,0 +1,840 @@
+{
+  "module": "Склад",
+  "module_code": "SKL",
+  "generated": "2026-09-28",
+  "environment": {
+    "base_url": "https://app3.greenwhite.uz",
+    "app_prefix": "/xtrade/a2",
+    "old_app_prefix": "/xtrade/#/!<hash>",
+    "api_prefix": "/xtrade/b",
+    "user": "mohir@xan (test)",
+    "filial": "Toshkent",
+    "test_date": "2026-09-28"
+  },
+  "action_vocabulary": {
+    "nav": "Yuqori menyu orqali o'tish. target = \"Menyu > [Bo'lim >] Band\", value = route (bo'sh bo'lsa — menyu orqali).",
+    "open_url": "page.goto(BASE_URL + target).",
+    "menu_plus": "Menyu bandi yonidagi «+»: button[aria-label=\"<value>\"] (menyu ochilgandan keyin ko'rinadi).",
+    "click": "Ko'rinadigan matn bo'yicha tugma/havola. value = \"confirm:<matn>|<tugma>\" bo'lsa, keyin tasdiqlash oynasida <tugma> bosiladi.",
+    "row_click": "Ro'yxatda matni target ga mos .smt-data-row ichidagi .text-start katakni bosish (amal tugmalari chiqadi).",
+    "row_action": "Bosilgan qator ostidagi amal tugmasi (target = tugma matni).",
+    "fill": "Yorlig'i target bo'lgan input/textarea ga value yozish.",
+    "fill_date": "Sana maydoni: bosish, Ctrl+A, value (dd.mm.yyyy) yozish, Escape.",
+    "select": "smt-select / smt-data-select: bosish, value yozish, ArrowDown, Enter (variantlar .cdk-overlay-pane da).",
+    "multiselect": "smt-multi-data-select: har bir value uchun select, oxirida Escape.",
+    "remove_tag": "Teg yonidagi «×».",
+    "toggle": "[role=switch] (yoki label[smt-checkbox] [role=checkbox]) holatini value (on/off) ga keltirish.",
+    "radio": "Guruh target ichida value matnli radio.",
+    "grid_fill": "Jadval: target = \"<qator matni> | <ustun sarlavhasi>\", katakka value yozish (Подбор panelida ham).",
+    "pick": "«Подбор» → panelda target qatori, value = \"ustun=miqdor\" → «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+    "tab": "[role=tab] yoki wizard qadami, matni target.",
+    "confirm": "[role=dialog] da target matni borligini tekshirib, value tugmasini bosish (odatda «Да»).",
+    "dialog_close": "Ochiq xato/axborot oynasini target tugmasi bilan yopish.",
+    "sequence": "Bir nechta atomar amal ketma-ket: «ops» ro'yxatidagi har bir element — yuqoridagi action'lardan biri.",
+    "assert_text": "target joyida value matni borligini tekshirish.",
+    "assert_row": "Ro'yxatda value ustun qiymatlari (| bilan ajratilgan) bor qator mavjud.",
+    "assert_field": "Ko'rish/tahrir sahifasida target yorlig'i yonidagi qiymat = value.",
+    "assert_columns": "smt-cell-header matnlari value ro'yxatini o'z ichiga oladi.",
+    "assert_buttons": "Ko'rinadigan tugmalar value ro'yxatiga mos.",
+    "assert_api": "page.waitForResponse: URL target ga mos (masalan \"**:save\"), status = value.",
+    "assert_no_request": "Amal paytida target ga mos so'rov yuborilmagan.",
+    "assert_download": "page.waitForEvent('download'); fayl turi = value.",
+    "assert_url": "URL target ni o'z ichiga oladi.",
+    "observe": "Vizual/natijaviy tekshiruv: qadamning «expected» matni bo'yicha assertion yoziladi.",
+    "wait": "Kutish (sekund).",
+    "manual": "Avtomatlashtirish qiyin yoki bir necha sahifadan iborat qadam — description bo'yicha qo'lda yoki alohida helper bilan."
+  },
+  "selectors": {
+    "top_menu_item": "nav a, nav button — matn bo'yicha (masalan «Склад», «Торговый маркетинг»)",
+    "menu_plus_button": "button[aria-label=\"<Band> (создание)\"]",
+    "page_root": "main",
+    "page_title": "main h1, main .page-title (birinchi matn qatori)",
+    "header_button": "main button:has-text(\"<matn>\")",
+    "grid_row": ".smt-data-row",
+    "grid_row_cell": ".smt-data-row .text-start",
+    "grid_header": "smt-cell-header",
+    "grid_counter": "main — «N/M» ko'rinishidagi hisoblagich matni",
+    "select_trigger": "smt-select-trigger, smt-data-select, smt-multi-data-select",
+    "overlay_options": ".cdk-overlay-pane [role=option], .cdk-overlay-pane li",
+    "dropdown_menu_item": "[role=menuitem]",
+    "switch": "[role=switch]",
+    "checkbox": "label[smt-checkbox] [role=checkbox]",
+    "tab": "[role=tab]",
+    "dialog": "[role=dialog]",
+    "dialog_yes": "[role=dialog] button:has-text(\"Да\"), [role=dialog] button:has-text(\"да\")",
+    "invalid_field": ".ng-invalid.ng-touched, [aria-invalid=true]",
+    "toast": "Vaqtinchalik xabar (2–3 s) — matni bo'yicha darhol tekshiring",
+    "report_iframe": "Просмотр tabidagi iframe (Сформировать dan keyin)"
+  },
+  "routes": {
+    "init_balance_list": "/xtrade/a2/anor/mkw/init_balance/init_inventory_balance_list",
+    "init_balance_add": "/xtrade/a2/anor/mkw/init_balance/init_inventory_balance+add",
+    "init_balance_view": "/xtrade/a2/anor/mkw/init_balance/init_inventory_balance_view?balance_id=<ID>",
+    "purchase_request_list": "/xtrade/a2/anor/mkw/purchase/purchase_request_list",
+    "purchase_request_add": "/xtrade/a2/anor/mkw/purchase/purchase_request+add",
+    "purchase_request_view": "/xtrade/a2/anor/mkw/purchase/purchase_request_view?request_id=<ID>",
+    "purchase_list": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+    "purchase_add": "/xtrade/a2/anor/mkw/purchase/purchase+add",
+    "order_list": "/xtrade/#/!<hash>/anor/mkw/purchase/order_list",
+    "input_list": "/xtrade/a2/anor/mkw/input/input_list",
+    "input_add": "/xtrade/a2/anor/mkw/input/input+add",
+    "extra_cost_list": "/xtrade/a2/anor/mkw/extra_cost_list",
+    "extra_cost_add": "/xtrade/a2/anor/mkw/extra_cost+add",
+    "return_list": "/xtrade/a2/anor/mkw/return/return_list",
+    "return_add": "/xtrade/a2/anor/mkw/return/return+add",
+    "return_view": "/xtrade/a2/anor/mkw/return/return_view?return_id=<ID>",
+    "writeoff_list": "/xtrade/a2/anor/mkw/writeoff/writeoff_list",
+    "writeoff_add": "/xtrade/a2/anor/mkw/writeoff/writeoff+add",
+    "writeoff_view": "/xtrade/a2/anor/mkw/writeoff/writeoff_view?writeoff_id=<ID>",
+    "writeoff_edit": "/xtrade/a2/anor/mkw/writeoff/writeoff+edit?writeoff_id=<ID>",
+    "stocktaking_list": "/xtrade/a2/anor/mkw/stocktaking/stocktaking_list",
+    "stocktaking_add": "/xtrade/a2/anor/mkw/stocktaking/stocktaking+add",
+    "revaluation_list": "/xtrade/a2/anor/mkw/revaluation/revaluation_list",
+    "revaluation_edit": "/xtrade/a2/anor/mkw/revaluation/revaluation+edit?revaluation_id=<ID>",
+    "offset_list": "/xtrade/a2/anor/mkw/purchase/offset/offset_list",
+    "recalculate_input": "/xtrade/a2/anor/mkw/recalculate_input",
+    "aggregation_list": "/xtrade/a2/anor/mkw/marking/aggregation_list",
+    "disaggregation_list": "/xtrade/a2/anor/mkw/marking/disaggregation_list",
+    "withdraw_list": "/xtrade/a2/anor/mkw/marking/withdraw_list",
+    "withdraw_add": "/xtrade/a2/anor/mkw/marking/withdraw+add",
+    "forecast_list": "/xtrade/a2/anor/mfc/forecast_list",
+    "forecast_add": "/xtrade/a2/anor/mfc/forecast+add",
+    "movement_request_list": "/xtrade/a2/anor/mkw/movement/movement_request_list",
+    "movement_request_add": "/xtrade/a2/anor/mkw/movement/movement_request+add",
+    "movement_list": "/xtrade/a2/anor/mkw/movement/movement_list",
+    "movement_add": "/xtrade/a2/anor/mkw/movement/movement+add",
+    "movement_view": "/xtrade/a2/anor/mkw/movement/movement_view?movement_id=<ID>",
+    "spread_balance_movement": "/xtrade/a2/anor/mkw/movement/spread_balance_movement",
+    "from_movement_request_list": "/xtrade/a2/anor/mfm/from_movement_request_list",
+    "from_movement_request_add": "/xtrade/a2/anor/mfm/from_movement_request+add",
+    "to_movement_request_list": "/xtrade/a2/anor/mfm/to_movement_request_list",
+    "from_movement_list": "/xtrade/a2/anor/mfm/from_movement_list",
+    "from_movement_add": "/xtrade/a2/anor/mfm/from_movement+add",
+    "from_movement_view": "/xtrade/a2/anor/mfm/from_movement_view?movement_id=<ID>",
+    "to_movement_list": "/xtrade/a2/anor/mfm/to_movement_list",
+    "from_movement_history_list": "/xtrade/a2/anor/mfm/from_movement_history_list",
+    "cancelled_from_movement_list": "/xtrade/a2/anor/mfm/cancelled_from_movement_list",
+    "supplier_list": "/xtrade/a2/anor/mkw/supplier_list",
+    "supplier_add": "/xtrade/a2/anor/mkw/supplier+add",
+    "supplier_view": "/xtrade/a2/anor/mkw/supplier_view?supplier_id=<ID>",
+    "van_list": "/xtrade/a2/anor/mrf/van_list",
+    "van_add": "/xtrade/a2/anor/mrf/van+add",
+    "van_marking_balance": "/xtrade/a2/trade/tdeal/van_marking_balance?van_id=<ID>&van_name=<NAME>",
+    "warehouse_list": "/xtrade/a2/anor/mkw/warehouse_list",
+    "warehouse_add": "/xtrade/a2/anor/mkw/warehouse+add",
+    "warehouse_view": "/xtrade/a2/anor/mkw/warehouse_view?warehouse_id=<ID>",
+    "balance_list": "/xtrade/a2/anor/mkw/balance/balance_list",
+    "expiration_date": "/xtrade/a2/anor/pref/expiration_date",
+    "marking_balance": "/xtrade/a2/anor/mm/marking_balance",
+    "product_serials": "/xtrade/a2/anor/mkw/product_serials",
+    "wms": "/xtrade/a2/anor/mxsx/wms/document_list",
+    "logistics_list": "/xtrade/a2/trade/tdeal/logistics_list",
+    "logistics_add": "/xtrade/a2/trade/tdeal/logistics+add",
+    "rep_inventories": "/xtrade/a2/anor/rep/mkw/warehouse_inventories",
+    "rep_warehouse_balance": "/xtrade/a2/anor/rep/mkw/warehouse_balance/warehouse_balance",
+    "rep_mbi_movement": "/xtrade/a2/anor/rep/mbi/mkw/movement",
+    "rep_mbi_purchase_request": "/xtrade/a2/anor/rep/mbi/mkw/purchase_request",
+    "rep_mbi_purchase": "/xtrade/a2/anor/rep/mbi/mkw/purchase",
+    "rep_mbi_input": "/xtrade/a2/anor/rep/mbi/mkw/input",
+    "rep_mbi_writeoff": "/xtrade/a2/anor/rep/mbi/mkw/writeoff",
+    "rep_mbi_mfm_request": "/xtrade/a2/anor/rep/mbi/mfm/movement_request",
+    "rep_mbi_mfm_movement": "/xtrade/a2/anor/rep/mbi/mfm/movement",
+    "rep_shipment": "/xtrade/a2/trade/rep/warehouse_and_delivery"
+  },
+  "test_cases": [
+    {
+      "id": "TC-SKL-PUR-001",
+      "section": "Закупки",
+      "form": "Закупка (создание)",
+      "title": "Validatsiya: поставщик tanlanmasa «Далее» o'tmaydi",
+      "type": "Validatsiya",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test ma'lumotlari mavjud: ombor WH-Yashnobod (TMS-1, TMS-2, TMS litr qoldig'i bor) va «Основной склад»; поставщик TMS maker; organizatsiya Buxoro; transport BMWxan|10B888BB; экспедитор Abdiev Abo; рабочая зона Room - Yashnobod; штат Main Manager; тип цены Sotish sum."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Закупки",
+          "value": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Закупки» ni bosing.",
+          "expected": "«Закупки» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать закуп",
+          "value": "",
+          "description": "«Создать закуп» tugmasini bosing.",
+          "expected": "Amal bajariladi, xato oynasi chiqmaydi."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "«Поставщик *» qizil; 2-qadamga o'tmaydi."
+        }
+      ],
+      "expected_result": "O'tmaydi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-SKL-PUR-002",
+      "section": "Закупки",
+      "form": "Закупка (создание)",
+      "title": "Validatsiya: ТМЦ siz saqlash",
+      "type": "Validatsiya",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test ma'lumotlari mavjud: ombor WH-Yashnobod (TMS-1, TMS-2, TMS litr qoldig'i bor) va «Основной склад»; поставщик TMS maker; organizatsiya Buxoro; transport BMWxan|10B888BB; экспедитор Abdiev Abo; рабочая зона Room - Yashnobod; штат Main Manager; тип цены Sotish sum."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Закупки",
+          "value": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Закупки» ni bosing.",
+          "expected": "Tablar: Поступления ТМЦ на склад, Списания при закупке, Статус закупок, Прогноз для закупки; tugmalar «Создать закуп», «Создать закупку через faktura.uz», «Создать закупку через Soliq Servis», «Чаты закупки», «Закрыть»."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать закуп",
+          "value": "",
+          "description": "«Создать закуп» tugmasini bosing.",
+          "expected": "«Закупка (создание)», qadamlar 1 Основное / 2 ТМЦ / 3 Завершение."
+        },
+        {
+          "n": 3,
+          "action": "select",
+          "target": "Поставщик *",
+          "value": "TMS maker",
+          "description": "«Поставщик *» maydonini bosing va ro'yxatdan «TMS maker» ni tanlang.",
+          "expected": "Maydonda TMS maker ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "assert_field",
+          "target": "Шаблон операции *",
+          "value": "Шаблон для закуп",
+          "description": "Standart shablonni tekshiring.",
+          "expected": "«Шаблон для закуп»."
+        },
+        {
+          "n": 5,
+          "action": "assert_field",
+          "target": "Валюта *",
+          "value": "Узбекский сум",
+          "description": "«Валюта *» maydoni qiymatini tekshiring.",
+          "expected": "«Валюта *» = Узбекский сум."
+        },
+        {
+          "n": 6,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "2-qadam."
+        },
+        {
+          "n": 7,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "3-qadam yoki xabar «ТМЦ не выбраны»."
+        },
+        {
+          "n": 8,
+          "action": "click",
+          "target": "Сохранить",
+          "value": "confirm:Сохранить?|Да",
+          "description": "«Сохранить» ni bosing, «Сохранить?» so'rovida «Да» ni bosing.",
+          "expected": "Xato xabari: ТМЦ yo'q; saqlanmaydi."
+        }
+      ],
+      "expected_result": "Saqlanmaydi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-SKL-PUR-003",
+      "section": "Закупки",
+      "form": "Закупка (создание)",
+      "title": "«С поступлением на склад» yoqilganda qo'shimcha maydonlar",
+      "type": "UI",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test ma'lumotlari mavjud: ombor WH-Yashnobod (TMS-1, TMS-2, TMS litr qoldig'i bor) va «Основной склад»; поставщик TMS maker; organizatsiya Buxoro; transport BMWxan|10B888BB; экспедитор Abdiev Abo; рабочая зона Room - Yashnobod; штат Main Manager; тип цены Sotish sum."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Закупки",
+          "value": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Закупки» ni bosing.",
+          "expected": "Tablar: Поступления ТМЦ на склад, Списания при закупке, Статус закупок, Прогноз для закупки; tugmalar «Создать закуп», «Создать закупку через faktura.uz», «Создать закупку через Soliq Servis», «Чаты закупки», «Закрыть»."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать закуп",
+          "value": "",
+          "description": "«Создать закуп» tugmasini bosing.",
+          "expected": "«Закупка (создание)», qadamlar 1 Основное / 2 ТМЦ / 3 Завершение."
+        },
+        {
+          "n": 3,
+          "action": "select",
+          "target": "Поставщик *",
+          "value": "TMS maker",
+          "description": "«Поставщик *» maydonini bosing va ro'yxatdan «TMS maker» ni tanlang.",
+          "expected": "Maydonda TMS maker ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "assert_field",
+          "target": "Шаблон операции *",
+          "value": "Шаблон для закуп",
+          "description": "Standart shablonni tekshiring.",
+          "expected": "«Шаблон для закуп»."
+        },
+        {
+          "n": 5,
+          "action": "assert_field",
+          "target": "Валюта *",
+          "value": "Узбекский сум",
+          "description": "«Валюта *» maydoni qiymatini tekshiring.",
+          "expected": "«Валюта *» = Узбекский сум."
+        },
+        {
+          "n": 6,
+          "action": "toggle",
+          "target": "С поступлением на склад",
+          "value": "on",
+          "description": "«С поступлением на склад» kalitini (switch) yoqing.",
+          "expected": "«Валюта для учета остатков *» (standart Доллар США) va «Склад *» (standart WH-Yashnobod) paydo bo'ladi."
+        },
+        {
+          "n": 7,
+          "action": "toggle",
+          "target": "С поступлением на склад",
+          "value": "off",
+          "description": "«С поступлением на склад» kalitini (switch) o'chiring.",
+          "expected": "Maydonlar yo'qoladi."
+        }
+      ],
+      "expected_result": "Maydonlar switch bilan boshqariladi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-SKL-PUR-004",
+      "section": "Закупки",
+      "form": "Закупка (создание)",
+      "title": "Qoralama закупка: Сохранить (Черновик) → ro'yxatda qator",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [
+        "crud"
+      ],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test ma'lumotlari mavjud: ombor WH-Yashnobod (TMS-1, TMS-2, TMS litr qoldig'i bor) va «Основной склад»; поставщик TMS maker; organizatsiya Buxoro; transport BMWxan|10B888BB; экспедитор Abdiev Abo; рабочая зона Room - Yashnobod; штат Main Manager; тип цены Sotish sum."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Закупки",
+          "value": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Закупки» ni bosing.",
+          "expected": "Tablar: Поступления ТМЦ на склад, Списания при закупке, Статус закупок, Прогноз для закупки; tugmalar «Создать закуп», «Создать закупку через faktura.uz», «Создать закупку через Soliq Servis», «Чаты закупки», «Закрыть»."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать закуп",
+          "value": "",
+          "description": "«Создать закуп» tugmasini bosing.",
+          "expected": "«Закупка (создание)», qadamlar 1 Основное / 2 ТМЦ / 3 Завершение."
+        },
+        {
+          "n": 3,
+          "action": "select",
+          "target": "Поставщик *",
+          "value": "TMS maker",
+          "description": "«Поставщик *» maydonini bosing va ro'yxatdan «TMS maker» ni tanlang.",
+          "expected": "Maydonda TMS maker ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "assert_field",
+          "target": "Шаблон операции *",
+          "value": "Шаблон для закуп",
+          "description": "Standart shablonni tekshiring.",
+          "expected": "«Шаблон для закуп»."
+        },
+        {
+          "n": 5,
+          "action": "assert_field",
+          "target": "Валюта *",
+          "value": "Узбекский сум",
+          "description": "«Валюта *» maydoni qiymatini tekshiring.",
+          "expected": "«Валюта *» = Узбекский сум."
+        },
+        {
+          "n": 6,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Keyingi qadam ochiladi."
+        },
+        {
+          "n": 7,
+          "action": "tab",
+          "target": "Товар",
+          "value": "",
+          "description": "«Товар» tabini bosing.",
+          "expected": "Amal bajariladi, xato oynasi chiqmaydi."
+        },
+        {
+          "n": 8,
+          "action": "select",
+          "target": "Название (1-qator)",
+          "value": "TMS litr",
+          "description": "«Название (1-qator)» maydonini bosing va ro'yxatdan «TMS litr» ni tanlang.",
+          "expected": "Ro'yxat keng, nomlar to'liq."
+        },
+        {
+          "n": 9,
+          "action": "grid_fill",
+          "target": "TMS litr | Кол-во",
+          "value": "1",
+          "description": "Jadvalda «TMS litr» qatorining «Кол-во» katagiga 1 yozing.",
+          "expected": "Amal bajariladi, xato oynasi chiqmaydi."
+        },
+        {
+          "n": 10,
+          "action": "grid_fill",
+          "target": "TMS litr | Цена",
+          "value": "1",
+          "description": "Jadvalda «TMS litr» qatorining «Цена» katagiga 1 yozing.",
+          "expected": "Amal bajariladi, xato oynasi chiqmaydi."
+        },
+        {
+          "n": 11,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "3-qadam: Статус * (standart Завершено; variantlar Черновик/Новый/На таможне/В пути/Завершено)."
+        },
+        {
+          "n": 12,
+          "action": "select",
+          "target": "Статус *",
+          "value": "Черновик",
+          "description": "«Статус *» maydonini bosing va ro'yxatdan «Черновик» ni tanlang.",
+          "expected": "Maydonda Черновик ko'rinadi."
+        },
+        {
+          "n": 13,
+          "action": "click",
+          "target": "Сохранить",
+          "value": "confirm:Сохранить?|Да",
+          "description": "«Сохранить» ni bosing, «Сохранить?» so'rovida «Да» ni bosing.",
+          "expected": "«Сохранить?» so'rovi chiqadi; «Да» dan keyin amal bajariladi (hujjat saqlanadi va ro'yxatga qaytadi), xato oynasi yo'q."
+        },
+        {
+          "n": 14,
+          "action": "assert_row",
+          "target": "purchase_list",
+          "value": "Шаблон для закуп | … | 28.09.2026 | <№> | TMS maker | Узбекский сум | 1 | 0 | Черновик",
+          "description": "Ro'yxatda yangi qatorni toping va ustun qiymatlarini tekshiring.",
+          "expected": "Qator: Шаблон для закуп | … | 28.09.2026 | <№> | TMS maker | Узбекский сум | 1 | 0 | Черновик."
+        }
+      ],
+      "expected_result": "Закупка «Черновик» holatida saqlanadi.",
+      "api_checks": [],
+      "cleanup": [
+        "Qator → «Удалить» → «Да»."
+      ],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Kuzatuv: 3-qadamda «Сумма с учетом скидки» yorlig'i ikki marta."
+      }
+    },
+    {
+      "id": "TC-SKL-PUR-005",
+      "section": "Закупки",
+      "form": "Закупка",
+      "title": "Ko'rish: tablar va maydonlar",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Qisman",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test ma'lumotlari mavjud: ombor WH-Yashnobod (TMS-1, TMS-2, TMS litr qoldig'i bor) va «Основной склад»; поставщик TMS maker; organizatsiya Buxoro; transport BMWxan|10B888BB; экспедитор Abdiev Abo; рабочая зона Room - Yashnobod; штат Main Manager; тип цены Sotish sum.",
+        "TC-SKL-PUR-004 bajarilgan."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Закупки",
+          "value": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Закупки» ni bosing.",
+          "expected": "«Закупки» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "Черновик holatidagi закупка",
+          "value": "",
+          "description": "Ro'yxatda Черновик holatidagi закупка qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Изменить, Обновить, Статус, Удалить, Файлы, Импорт КМ, Копировать, Отчет."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Просмотреть",
+          "value": "",
+          "description": "Qator ostidagi «Просмотреть» tugmasini bosing.",
+          "expected": "Ko'rish sahifasi; Поставщик TMS maker, Статус Черновик, ТМЦ TMS litr 1 × 1."
+        },
+        {
+          "n": 4,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Barcha tablarni navbat bilan oching.",
+          "expected": "Har bir tab xatosiz yuklanadi."
+        }
+      ],
+      "expected_result": "Ma'lumotlar to'g'ri.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-SKL-PUR-006",
+      "section": "Закупки",
+      "form": "Закупка (изменение)",
+      "title": "Tahrir saqlanadi",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test ma'lumotlari mavjud: ombor WH-Yashnobod (TMS-1, TMS-2, TMS litr qoldig'i bor) va «Основной склад»; поставщик TMS maker; organizatsiya Buxoro; transport BMWxan|10B888BB; экспедитор Abdiev Abo; рабочая зона Room - Yashnobod; штат Main Manager; тип цены Sotish sum.",
+        "TC-SKL-PUR-004 bajarilgan."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Закупки",
+          "value": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Закупки» ni bosing.",
+          "expected": "«Закупки» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "Черновик закупка",
+          "value": "",
+          "description": "Ro'yxatda Черновик закупка qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Изменить",
+          "value": "",
+          "description": "Qator ostidagi «Изменить» tugmasini bosing.",
+          "expected": "Wizard to'ldirilgan holda."
+        },
+        {
+          "n": 4,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Keyingi qadam ochiladi."
+        },
+        {
+          "n": 5,
+          "action": "grid_fill",
+          "target": "TMS litr | Кол-во",
+          "value": "2",
+          "description": "Jadvalda «TMS litr» qatorining «Кол-во» katagiga 2 yozing.",
+          "expected": "Сумма 2."
+        },
+        {
+          "n": 6,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Keyingi qadam ochiladi."
+        },
+        {
+          "n": 7,
+          "action": "click",
+          "target": "Сохранить",
+          "value": "confirm:Сохранить?|Да",
+          "description": "«Сохранить» ni bosing, «Сохранить?» so'rovida «Да» ni bosing.",
+          "expected": "«Сохранить?» so'rovi chiqadi; «Да» dan keyin amal bajariladi (hujjat saqlanadi va ro'yxatga qaytadi), xato oynasi yo'q."
+        },
+        {
+          "n": 8,
+          "action": "row_action",
+          "target": "Просмотреть",
+          "value": "",
+          "description": "Qator ostidagi «Просмотреть» tugmasini bosing.",
+          "expected": "Ko'rish sahifasi ochiladi."
+        },
+        {
+          "n": 9,
+          "action": "assert_field",
+          "target": "ТМЦ | TMS litr | Кол-во",
+          "value": "2",
+          "description": "«ТМЦ | TMS litr | Кол-во» maydoni qiymatini tekshiring.",
+          "expected": "«ТМЦ | TMS litr | Кол-во» = 2."
+        }
+      ],
+      "expected_result": "O'zgarish saqlanadi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-SKL-PUR-007",
+      "section": "Закупки",
+      "form": "Закупка",
+      "title": "Provodka: «С поступлением на склад» bilan Провести → Поступление yaratiladi, qoldiq oshadi",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Qisman",
+      "tags": [
+        "posting"
+      ],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test ma'lumotlari mavjud: ombor WH-Yashnobod (TMS-1, TMS-2, TMS litr qoldig'i bor) va «Основной склад»; поставщик TMS maker; organizatsiya Buxoro; transport BMWxan|10B888BB; экспедитор Abdiev Abo; рабочая зона Room - Yashnobod; штат Main Manager; тип цены Sotish sum.",
+        "Qoldiqni tekshirish: Склад → Остатки ТМЦ → «WH-Yashnobod | TMS litr» qatoridagi «В наличии» qiymatini yozib oling."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Закупки",
+          "value": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Закупки» ni bosing.",
+          "expected": "Tablar: Поступления ТМЦ на склад, Списания при закупке, Статус закупок, Прогноз для закупки; tugmalar «Создать закуп», «Создать закупку через faktura.uz», «Создать закупку через Soliq Servis», «Чаты закупки», «Закрыть»."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать закуп",
+          "value": "",
+          "description": "«Создать закуп» tugmasini bosing.",
+          "expected": "«Закупка (создание)», qadamlar 1 Основное / 2 ТМЦ / 3 Завершение."
+        },
+        {
+          "n": 3,
+          "action": "select",
+          "target": "Поставщик *",
+          "value": "TMS maker",
+          "description": "«Поставщик *» maydonini bosing va ro'yxatdan «TMS maker» ni tanlang.",
+          "expected": "Maydonda TMS maker ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "assert_field",
+          "target": "Шаблон операции *",
+          "value": "Шаблон для закуп",
+          "description": "Standart shablonni tekshiring.",
+          "expected": "«Шаблон для закуп»."
+        },
+        {
+          "n": 5,
+          "action": "assert_field",
+          "target": "Валюта *",
+          "value": "Узбекский сум",
+          "description": "«Валюта *» maydoni qiymatini tekshiring.",
+          "expected": "«Валюта *» = Узбекский сум."
+        },
+        {
+          "n": 6,
+          "action": "toggle",
+          "target": "С поступлением на склад",
+          "value": "on",
+          "description": "«С поступлением на склад» kalitini (switch) yoqing.",
+          "expected": "Kalit holati o'zgaradi."
+        },
+        {
+          "n": 7,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Keyingi qadam ochiladi."
+        },
+        {
+          "n": 8,
+          "action": "select",
+          "target": "Название (1-qator)",
+          "value": "TMS litr",
+          "description": "«Название (1-qator)» maydonini bosing va ro'yxatdan «TMS litr» ni tanlang.",
+          "expected": "Maydonda TMS litr ko'rinadi."
+        },
+        {
+          "n": 9,
+          "action": "grid_fill",
+          "target": "TMS litr | Кол-во",
+          "value": "4",
+          "description": "Jadvalda «TMS litr» qatorining «Кол-во» katagiga 4 yozing.",
+          "expected": "Amal bajariladi, xato oynasi chiqmaydi."
+        },
+        {
+          "n": 10,
+          "action": "grid_fill",
+          "target": "TMS litr | Цена",
+          "value": "1",
+          "description": "Jadvalda «TMS litr» qatorining «Цена» katagiga 1 yozing.",
+          "expected": "Amal bajariladi, xato oynasi chiqmaydi."
+        },
+        {
+          "n": 11,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Keyingi qadam ochiladi."
+        },
+        {
+          "n": 12,
+          "action": "click",
+          "target": "Провести",
+          "value": "",
+          "description": "«Провести» tugmasini bosing.",
+          "expected": "«Провести?» → «Да»; ro'yxatda status «Завершено»."
+        },
+        {
+          "n": 13,
+          "action": "assert_row",
+          "target": "Закупки → tab «Поступления ТМЦ на склад»",
+          "value": "yangi поступление",
+          "description": "«Поступления ТМЦ на склад» tabini oching.",
+          "expected": "Shu закупкага bog'liq поступление bor."
+        },
+        {
+          "n": 14,
+          "action": "assert_text",
+          "target": "Остатки ТМЦ | WH-Yashnobod | TMS litr | В наличии",
+          "value": "+4",
+          "description": "Склад → Остатки ТМЦ sahifasida «WH-Yashnobod | TMS litr» qatorining «В наличии» qiymatini boshlang'ich qiymat bilan solishtiring.",
+          "expected": "Qoldiq +4 ga o'zgargan."
+        },
+        {
+          "n": 15,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Закупка qatori → «Статус» → «Черновик» → tasdiqlang.",
+          "expected": "Поступление «Черновик» ga qaytadi, qoldiq boshlang'ich qiymatga qaytadi."
+        }
+      ],
+      "expected_result": "Qoldiq +4, bekor qilinganda qaytadi.",
+      "api_checks": [],
+      "cleanup": [
+        "Закупкани «Удалить» (bog'liq поступление ham o'chadi)."
+      ],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    }
+  ]
+}

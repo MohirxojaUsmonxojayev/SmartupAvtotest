@@ -1,0 +1,624 @@
+{
+  "module": "Склад",
+  "module_code": "SKL",
+  "generated": "2026-09-28",
+  "environment": {
+    "base_url": "https://app3.greenwhite.uz",
+    "app_prefix": "/xtrade/a2",
+    "old_app_prefix": "/xtrade/#/!<hash>",
+    "api_prefix": "/xtrade/b",
+    "user": "mohir@xan (test)",
+    "filial": "Toshkent",
+    "test_date": "2026-09-28"
+  },
+  "action_vocabulary": {
+    "nav": "Yuqori menyu orqali o'tish. target = \"Menyu > [Bo'lim >] Band\", value = route (bo'sh bo'lsa — menyu orqali).",
+    "open_url": "page.goto(BASE_URL + target).",
+    "menu_plus": "Menyu bandi yonidagi «+»: button[aria-label=\"<value>\"] (menyu ochilgandan keyin ko'rinadi).",
+    "click": "Ko'rinadigan matn bo'yicha tugma/havola. value = \"confirm:<matn>|<tugma>\" bo'lsa, keyin tasdiqlash oynasida <tugma> bosiladi.",
+    "row_click": "Ro'yxatda matni target ga mos .smt-data-row ichidagi .text-start katakni bosish (amal tugmalari chiqadi).",
+    "row_action": "Bosilgan qator ostidagi amal tugmasi (target = tugma matni).",
+    "fill": "Yorlig'i target bo'lgan input/textarea ga value yozish.",
+    "fill_date": "Sana maydoni: bosish, Ctrl+A, value (dd.mm.yyyy) yozish, Escape.",
+    "select": "smt-select / smt-data-select: bosish, value yozish, ArrowDown, Enter (variantlar .cdk-overlay-pane da).",
+    "multiselect": "smt-multi-data-select: har bir value uchun select, oxirida Escape.",
+    "remove_tag": "Teg yonidagi «×».",
+    "toggle": "[role=switch] (yoki label[smt-checkbox] [role=checkbox]) holatini value (on/off) ga keltirish.",
+    "radio": "Guruh target ichida value matnli radio.",
+    "grid_fill": "Jadval: target = \"<qator matni> | <ustun sarlavhasi>\", katakka value yozish (Подбор panelida ham).",
+    "pick": "«Подбор» → panelda target qatori, value = \"ustun=miqdor\" → «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+    "tab": "[role=tab] yoki wizard qadami, matni target.",
+    "confirm": "[role=dialog] da target matni borligini tekshirib, value tugmasini bosish (odatda «Да»).",
+    "dialog_close": "Ochiq xato/axborot oynasini target tugmasi bilan yopish.",
+    "sequence": "Bir nechta atomar amal ketma-ket: «ops» ro'yxatidagi har bir element — yuqoridagi action'lardan biri.",
+    "assert_text": "target joyida value matni borligini tekshirish.",
+    "assert_row": "Ro'yxatda value ustun qiymatlari (| bilan ajratilgan) bor qator mavjud.",
+    "assert_field": "Ko'rish/tahrir sahifasida target yorlig'i yonidagi qiymat = value.",
+    "assert_columns": "smt-cell-header matnlari value ro'yxatini o'z ichiga oladi.",
+    "assert_buttons": "Ko'rinadigan tugmalar value ro'yxatiga mos.",
+    "assert_api": "page.waitForResponse: URL target ga mos (masalan \"**:save\"), status = value.",
+    "assert_no_request": "Amal paytida target ga mos so'rov yuborilmagan.",
+    "assert_download": "page.waitForEvent('download'); fayl turi = value.",
+    "assert_url": "URL target ni o'z ichiga oladi.",
+    "observe": "Vizual/natijaviy tekshiruv: qadamning «expected» matni bo'yicha assertion yoziladi.",
+    "wait": "Kutish (sekund).",
+    "manual": "Avtomatlashtirish qiyin yoki bir necha sahifadan iborat qadam — description bo'yicha qo'lda yoki alohida helper bilan."
+  },
+  "selectors": {
+    "top_menu_item": "nav a, nav button — matn bo'yicha (masalan «Склад», «Торговый маркетинг»)",
+    "menu_plus_button": "button[aria-label=\"<Band> (создание)\"]",
+    "page_root": "main",
+    "page_title": "main h1, main .page-title (birinchi matn qatori)",
+    "header_button": "main button:has-text(\"<matn>\")",
+    "grid_row": ".smt-data-row",
+    "grid_row_cell": ".smt-data-row .text-start",
+    "grid_header": "smt-cell-header",
+    "grid_counter": "main — «N/M» ko'rinishidagi hisoblagich matni",
+    "select_trigger": "smt-select-trigger, smt-data-select, smt-multi-data-select",
+    "overlay_options": ".cdk-overlay-pane [role=option], .cdk-overlay-pane li",
+    "dropdown_menu_item": "[role=menuitem]",
+    "switch": "[role=switch]",
+    "checkbox": "label[smt-checkbox] [role=checkbox]",
+    "tab": "[role=tab]",
+    "dialog": "[role=dialog]",
+    "dialog_yes": "[role=dialog] button:has-text(\"Да\"), [role=dialog] button:has-text(\"да\")",
+    "invalid_field": ".ng-invalid.ng-touched, [aria-invalid=true]",
+    "toast": "Vaqtinchalik xabar (2–3 s) — matni bo'yicha darhol tekshiring",
+    "report_iframe": "Просмотр tabidagi iframe (Сформировать dan keyin)"
+  },
+  "routes": {
+    "init_balance_list": "/xtrade/a2/anor/mkw/init_balance/init_inventory_balance_list",
+    "init_balance_add": "/xtrade/a2/anor/mkw/init_balance/init_inventory_balance+add",
+    "init_balance_view": "/xtrade/a2/anor/mkw/init_balance/init_inventory_balance_view?balance_id=<ID>",
+    "purchase_request_list": "/xtrade/a2/anor/mkw/purchase/purchase_request_list",
+    "purchase_request_add": "/xtrade/a2/anor/mkw/purchase/purchase_request+add",
+    "purchase_request_view": "/xtrade/a2/anor/mkw/purchase/purchase_request_view?request_id=<ID>",
+    "purchase_list": "/xtrade/a2/anor/mkw/purchase/purchase_list",
+    "purchase_add": "/xtrade/a2/anor/mkw/purchase/purchase+add",
+    "order_list": "/xtrade/#/!<hash>/anor/mkw/purchase/order_list",
+    "input_list": "/xtrade/a2/anor/mkw/input/input_list",
+    "input_add": "/xtrade/a2/anor/mkw/input/input+add",
+    "extra_cost_list": "/xtrade/a2/anor/mkw/extra_cost_list",
+    "extra_cost_add": "/xtrade/a2/anor/mkw/extra_cost+add",
+    "return_list": "/xtrade/a2/anor/mkw/return/return_list",
+    "return_add": "/xtrade/a2/anor/mkw/return/return+add",
+    "return_view": "/xtrade/a2/anor/mkw/return/return_view?return_id=<ID>",
+    "writeoff_list": "/xtrade/a2/anor/mkw/writeoff/writeoff_list",
+    "writeoff_add": "/xtrade/a2/anor/mkw/writeoff/writeoff+add",
+    "writeoff_view": "/xtrade/a2/anor/mkw/writeoff/writeoff_view?writeoff_id=<ID>",
+    "writeoff_edit": "/xtrade/a2/anor/mkw/writeoff/writeoff+edit?writeoff_id=<ID>",
+    "stocktaking_list": "/xtrade/a2/anor/mkw/stocktaking/stocktaking_list",
+    "stocktaking_add": "/xtrade/a2/anor/mkw/stocktaking/stocktaking+add",
+    "revaluation_list": "/xtrade/a2/anor/mkw/revaluation/revaluation_list",
+    "revaluation_edit": "/xtrade/a2/anor/mkw/revaluation/revaluation+edit?revaluation_id=<ID>",
+    "offset_list": "/xtrade/a2/anor/mkw/purchase/offset/offset_list",
+    "recalculate_input": "/xtrade/a2/anor/mkw/recalculate_input",
+    "aggregation_list": "/xtrade/a2/anor/mkw/marking/aggregation_list",
+    "disaggregation_list": "/xtrade/a2/anor/mkw/marking/disaggregation_list",
+    "withdraw_list": "/xtrade/a2/anor/mkw/marking/withdraw_list",
+    "withdraw_add": "/xtrade/a2/anor/mkw/marking/withdraw+add",
+    "forecast_list": "/xtrade/a2/anor/mfc/forecast_list",
+    "forecast_add": "/xtrade/a2/anor/mfc/forecast+add",
+    "movement_request_list": "/xtrade/a2/anor/mkw/movement/movement_request_list",
+    "movement_request_add": "/xtrade/a2/anor/mkw/movement/movement_request+add",
+    "movement_list": "/xtrade/a2/anor/mkw/movement/movement_list",
+    "movement_add": "/xtrade/a2/anor/mkw/movement/movement+add",
+    "movement_view": "/xtrade/a2/anor/mkw/movement/movement_view?movement_id=<ID>",
+    "spread_balance_movement": "/xtrade/a2/anor/mkw/movement/spread_balance_movement",
+    "from_movement_request_list": "/xtrade/a2/anor/mfm/from_movement_request_list",
+    "from_movement_request_add": "/xtrade/a2/anor/mfm/from_movement_request+add",
+    "to_movement_request_list": "/xtrade/a2/anor/mfm/to_movement_request_list",
+    "from_movement_list": "/xtrade/a2/anor/mfm/from_movement_list",
+    "from_movement_add": "/xtrade/a2/anor/mfm/from_movement+add",
+    "from_movement_view": "/xtrade/a2/anor/mfm/from_movement_view?movement_id=<ID>",
+    "to_movement_list": "/xtrade/a2/anor/mfm/to_movement_list",
+    "from_movement_history_list": "/xtrade/a2/anor/mfm/from_movement_history_list",
+    "cancelled_from_movement_list": "/xtrade/a2/anor/mfm/cancelled_from_movement_list",
+    "supplier_list": "/xtrade/a2/anor/mkw/supplier_list",
+    "supplier_add": "/xtrade/a2/anor/mkw/supplier+add",
+    "supplier_view": "/xtrade/a2/anor/mkw/supplier_view?supplier_id=<ID>",
+    "van_list": "/xtrade/a2/anor/mrf/van_list",
+    "van_add": "/xtrade/a2/anor/mrf/van+add",
+    "van_marking_balance": "/xtrade/a2/trade/tdeal/van_marking_balance?van_id=<ID>&van_name=<NAME>",
+    "warehouse_list": "/xtrade/a2/anor/mkw/warehouse_list",
+    "warehouse_add": "/xtrade/a2/anor/mkw/warehouse+add",
+    "warehouse_view": "/xtrade/a2/anor/mkw/warehouse_view?warehouse_id=<ID>",
+    "balance_list": "/xtrade/a2/anor/mkw/balance/balance_list",
+    "expiration_date": "/xtrade/a2/anor/pref/expiration_date",
+    "marking_balance": "/xtrade/a2/anor/mm/marking_balance",
+    "product_serials": "/xtrade/a2/anor/mkw/product_serials",
+    "wms": "/xtrade/a2/anor/mxsx/wms/document_list",
+    "logistics_list": "/xtrade/a2/trade/tdeal/logistics_list",
+    "logistics_add": "/xtrade/a2/trade/tdeal/logistics+add",
+    "rep_inventories": "/xtrade/a2/anor/rep/mkw/warehouse_inventories",
+    "rep_warehouse_balance": "/xtrade/a2/anor/rep/mkw/warehouse_balance/warehouse_balance",
+    "rep_mbi_movement": "/xtrade/a2/anor/rep/mbi/mkw/movement",
+    "rep_mbi_purchase_request": "/xtrade/a2/anor/rep/mbi/mkw/purchase_request",
+    "rep_mbi_purchase": "/xtrade/a2/anor/rep/mbi/mkw/purchase",
+    "rep_mbi_input": "/xtrade/a2/anor/rep/mbi/mkw/input",
+    "rep_mbi_writeoff": "/xtrade/a2/anor/rep/mbi/mkw/writeoff",
+    "rep_mbi_mfm_request": "/xtrade/a2/anor/rep/mbi/mfm/movement_request",
+    "rep_mbi_mfm_movement": "/xtrade/a2/anor/rep/mbi/mfm/movement",
+    "rep_shipment": "/xtrade/a2/trade/rep/warehouse_and_delivery"
+  },
+  "test_cases": [
+    {
+      "id": "TC-SKL-MV-001",
+      "section": "Внутренние перемещения",
+      "form": "Перемещение (создание)",
+      "title": "Validatsiya: 1-qadam majburiy maydonlari",
+      "type": "Validatsiya",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Внутренние перемещения",
+          "value": "/xtrade/a2/anor/mkw/movement/movement_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Внутренние перемещения» ni bosing.",
+          "expected": "«Внутренние перемещения» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "Yaratish formasi ochiladi."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Дата отправки *, Дата принятия *, Со склада *, На склад * qizil."
+        }
+      ],
+      "expected_result": "O'tmaydi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-SKL-MV-003",
+      "section": "Внутренние перемещения",
+      "form": "Перемещение (создание)",
+      "title": "Validatsiya: 3-qadamda Статус bo'sh bo'lsa «Завершить» — xabar",
+      "type": "Validatsiya",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test ma'lumotlari mavjud: ombor WH-Yashnobod (TMS-1, TMS-2, TMS litr qoldig'i bor) va «Основной склад»; поставщик TMS maker; organizatsiya Buxoro; transport BMWxan|10B888BB; экспедитор Abdiev Abo; рабочая зона Room - Yashnobod; штат Main Manager; тип цены Sotish sum."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Внутренние перемещения",
+          "value": "/xtrade/a2/anor/mkw/movement/movement_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Внутренние перемещения» ni bosing.",
+          "expected": "Tugmalar: Создать / Рекомендованное перемещение / Закрыть."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "«Внутреннее перемещение (создание)», qadamlar 1 Основная информация / 2 ТМЦ / 3 Завершить."
+        },
+        {
+          "n": 3,
+          "action": "fill",
+          "target": "Номер перемещения",
+          "value": "QA-MV-1",
+          "description": "«Номер перемещения» maydoniga QA-MV-1 yozing.",
+          "expected": "Maydonda QA-MV-1 ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "select",
+          "target": "Со склада *",
+          "value": "WH-Yashnobod",
+          "description": "«Со склада *» maydonini bosing va ro'yxatdan «WH-Yashnobod» ni tanlang.",
+          "expected": "Maydonda WH-Yashnobod ko'rinadi."
+        },
+        {
+          "n": 5,
+          "action": "select",
+          "target": "На склад *",
+          "value": "Основной склад",
+          "description": "«На склад *» maydonini bosing va ro'yxatdan «Основной склад» ni tanlang.",
+          "expected": "Maydonda Основной склад ko'rinadi."
+        },
+        {
+          "n": 6,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Keyingi qadam ochiladi."
+        },
+        {
+          "n": 7,
+          "action": "pick",
+          "target": "TMS-1",
+          "value": "Кол-во=7",
+          "description": "«Подбор» ni bosing; ochilgan panelda «TMS-1» qatorining «Кол-во» katagiga 7 yozing; panel yuqorisidagi «Закрыть» ni bosing; «Выбрать ТМЦ с заполненными данными?» so'rovida «Да» ni bosing.",
+          "expected": "Formadagi jadvalga «TMS-1» qatori 7 miqdor bilan qo'shiladi."
+        },
+        {
+          "n": 8,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "3-qadam: Статус * bo'sh."
+        },
+        {
+          "n": 9,
+          "action": "click",
+          "target": "Завершить",
+          "value": "",
+          "description": "«Завершить» tugmasini bosing.",
+          "expected": "«Статус» qizil + xabar."
+        }
+      ],
+      "bug_severity": "Past",
+      "expected_result": "Xabar.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Fail",
+        "fail_step": 9,
+        "actual": "Hech narsa bo'lmaydi (dialog ham, so'rov ham, xabar ham yo'q). Boshqa wizardlarda Статус standart qiymatga ega.",
+        "bug": "BUG-035",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-SKL-MV-004",
+      "section": "Внутренние перемещения",
+      "form": "Перемещение",
+      "title": "To'liq sikl: so'rov asosida → Новый → Ожидает отгрузку → В пути → Завершено; qoldiqlar",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Qisman",
+      "tags": [
+        "posting"
+      ],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test ma'lumotlari mavjud: ombor WH-Yashnobod (TMS-1, TMS-2, TMS litr qoldig'i bor) va «Основной склад»; поставщик TMS maker; organizatsiya Buxoro; transport BMWxan|10B888BB; экспедитор Abdiev Abo; рабочая зона Room - Yashnobod; штат Main Manager; тип цены Sotish sum.",
+        "QA-MR-1 «Принят» (TC-SKL-MR-004)."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Внутренние перемещения",
+          "value": "/xtrade/a2/anor/mkw/movement/movement_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Внутренние перемещения» ni bosing.",
+          "expected": "Tugmalar: Создать / Рекомендованное перемещение / Закрыть."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "«Внутреннее перемещение (создание)», qadamlar 1 Основная информация / 2 ТМЦ / 3 Завершить."
+        },
+        {
+          "n": 3,
+          "action": "fill",
+          "target": "Номер перемещения",
+          "value": "QA-MV-1",
+          "description": "«Номер перемещения» maydoniga QA-MV-1 yozing.",
+          "expected": "Maydonda QA-MV-1 ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "select",
+          "target": "Запрос на внутреннее перемещение",
+          "value": "QA-MR-1",
+          "description": "«Запрос на внутреннее перемещение» maydonini bosing va ro'yxatdan «QA-MR-1» ni tanlang.",
+          "expected": "Maydonda QA-MR-1 ko'rinadi."
+        },
+        {
+          "n": 5,
+          "action": "select",
+          "target": "Со склада *",
+          "value": "WH-Yashnobod",
+          "description": "«Со склада *» maydonini bosing va ro'yxatdan «WH-Yashnobod» ni tanlang.",
+          "expected": "Maydonda WH-Yashnobod ko'rinadi."
+        },
+        {
+          "n": 6,
+          "action": "select",
+          "target": "На склад *",
+          "value": "Основной склад",
+          "description": "«На склад *» maydonini bosing va ro'yxatdan «Основной склад» ni tanlang.",
+          "expected": "Maydonda Основной склад ko'rinadi."
+        },
+        {
+          "n": 7,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Keyingi qadam ochiladi."
+        },
+        {
+          "n": 8,
+          "action": "pick",
+          "target": "TMS-1",
+          "value": "Кол-во=7",
+          "description": "«Подбор» ni bosing; ochilgan panelda «TMS-1» qatorining «Кол-во» katagiga 7 yozing; panel yuqorisidagi «Закрыть» ni bosing; «Выбрать ТМЦ с заполненными данными?» so'rovida «Да» ni bosing.",
+          "expected": "Qator TMS-1, 7."
+        },
+        {
+          "n": 9,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Keyingi qadam ochiladi."
+        },
+        {
+          "n": 10,
+          "action": "select",
+          "target": "Статус *",
+          "value": "Новый",
+          "description": "«Статус *» maydonini bosing va ro'yxatdan «Новый» ni tanlang.",
+          "expected": "Maydonda Новый ko'rinadi."
+        },
+        {
+          "n": 11,
+          "action": "click",
+          "target": "Завершить",
+          "value": "",
+          "description": "«Завершить» tugmasini bosing.",
+          "expected": "«Сохранить?» so'rovi chiqadi."
+        },
+        {
+          "n": 12,
+          "action": "confirm",
+          "target": "Сохранить?",
+          "value": "Да",
+          "description": "«Сохранить?» so'rovida «Да» ni bosing.",
+          "expected": "Oyna yopiladi, amal bajariladi."
+        },
+        {
+          "n": 13,
+          "action": "assert_row",
+          "target": "movement_list",
+          "value": "<ID> | QA-MV-1 | … | Новый",
+          "description": "Ro'yxatda yangi qatorni toping va ustun qiymatlarini tekshiring.",
+          "expected": "Qator: <ID> | QA-MV-1 | … | Новый."
+        },
+        {
+          "n": 14,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Qator → «Статус» orqali ketma-ket: «Ожидает отгрузку» → «В пути» → «Завершено» (har birida tasdiqlang).",
+          "expected": "Har o'tishda status yangilanadi."
+        },
+        {
+          "n": 15,
+          "action": "assert_text",
+          "target": "Остатки ТМЦ | WH-Yashnobod | TMS-1 | В наличии",
+          "value": "−7 (WH-Yashnobod)",
+          "description": "Склад → Остатки ТМЦ sahifasida «WH-Yashnobod | TMS-1» qatorining «В наличии» qiymatini boshlang'ich qiymat bilan solishtiring.",
+          "expected": "Qoldiq −7 (WH-Yashnobod) ga o'zgargan."
+        },
+        {
+          "n": 16,
+          "action": "assert_text",
+          "target": "Остатки ТМЦ | Основной склад | TMS-1",
+          "value": "+7",
+          "description": "Основной склад dagi TMS-1 qoldig'ini tekshiring.",
+          "expected": "+7."
+        }
+      ],
+      "expected_result": "Qoldiqlar to'g'ri ko'chadi.",
+      "api_checks": [],
+      "cleanup": [
+        "Status «Черновик» («Изменить статус перемещения № QA-MV-1 на Черновик?» → «Да») → «Удалить» («Удалить перемещение?» → «Да»)."
+      ],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-SKL-MV-005",
+      "section": "Внутренние перемещения",
+      "form": "Перемещение (создание)",
+      "title": "Подбор so'rov ТМЦ bo'yicha filtrlanadi, «Кол-во по запросу» to'ldiriladi",
+      "type": "Salbiy",
+      "priority": "P3",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "QA-MR-1 Принят."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Внутренние перемещения",
+          "value": "/xtrade/a2/anor/mkw/movement/movement_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Внутренние перемещения» ni bosing.",
+          "expected": "Tugmalar: Создать / Рекомендованное перемещение / Закрыть."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "«Внутреннее перемещение (создание)», qadamlar 1 Основная информация / 2 ТМЦ / 3 Завершить."
+        },
+        {
+          "n": 3,
+          "action": "fill",
+          "target": "Номер перемещения",
+          "value": "QA-MV-1",
+          "description": "«Номер перемещения» maydoniga QA-MV-1 yozing.",
+          "expected": "Maydonda QA-MV-1 ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "select",
+          "target": "Запрос на внутреннее перемещение",
+          "value": "QA-MR-1",
+          "description": "«Запрос на внутреннее перемещение» maydonini bosing va ro'yxatdan «QA-MR-1» ni tanlang.",
+          "expected": "Maydonda QA-MR-1 ko'rinadi."
+        },
+        {
+          "n": 5,
+          "action": "select",
+          "target": "Со склада *",
+          "value": "WH-Yashnobod",
+          "description": "«Со склада *» maydonini bosing va ro'yxatdan «WH-Yashnobod» ni tanlang.",
+          "expected": "Maydonda WH-Yashnobod ko'rinadi."
+        },
+        {
+          "n": 6,
+          "action": "select",
+          "target": "На склад *",
+          "value": "Основной склад",
+          "description": "«На склад *» maydonini bosing va ro'yxatdan «Основной склад» ni tanlang.",
+          "expected": "Maydonda Основной склад ko'rinadi."
+        },
+        {
+          "n": 7,
+          "action": "click",
+          "target": "Далее",
+          "value": "",
+          "description": "«Далее» tugmasini bosing.",
+          "expected": "Keyingi qadam ochiladi."
+        },
+        {
+          "n": 8,
+          "action": "click",
+          "target": "Подбор",
+          "value": "",
+          "description": "«Подбор» tugmasini bosing.",
+          "expected": "Panelda faqat so'rovdagi ТМЦ (TMS-1)."
+        },
+        {
+          "n": 9,
+          "action": "pick",
+          "target": "TMS-1",
+          "value": "Кол-во=7",
+          "description": "«Подбор» ni bosing; ochilgan panelda «TMS-1» qatorining «Кол-во» katagiga 7 yozing; panel yuqorisidagi «Закрыть» ni bosing; «Выбрать ТМЦ с заполненными данными?» so'rovida «Да» ni bosing.",
+          "expected": "«Кол-во по запросу» = 7."
+        }
+      ],
+      "bug_severity": "O'rta",
+      "expected_result": "Filtrlanadi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Kuzatuv",
+        "fail_step": 8,
+        "actual": "Panelda barcha ТМЦ (TMS litr, TMS-1, TMS-2, TMS-8); «Кол-во по запросу» bo'sh (BUG-042 ga qarang).",
+        "bug": "BUG-042",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-SKL-MV-008",
+      "section": "Внутренние перемещения",
+      "form": "Перемещение",
+      "title": "Hisobotlar va «Проводки»",
+      "type": "Ijobiy",
+      "priority": "P3",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Склад > Внутренние перемещения",
+          "value": "/xtrade/a2/anor/mkw/movement/movement_list",
+          "description": "Yuqori qora menyuda «Склад» ni bosing, ochilgan ro'yxatdan «Внутренние перемещения» ni bosing.",
+          "expected": "«Внутренние перемещения» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "QA-MV-1",
+          "value": "",
+          "description": "Ro'yxatda QA-MV-1 qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi: Просмотр, Изменить, Статус, Отчеты, Проводки."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Отчеты",
+          "value": "",
+          "description": "Qator ostidagi «Отчеты» tugmasini bosing.",
+          "expected": "Hisobot variantlari."
+        },
+        {
+          "n": 4,
+          "action": "row_action",
+          "target": "Проводки",
+          "value": "",
+          "description": "Qator ostidagi «Проводки» tugmasini bosing.",
+          "expected": "Oyna ochiladi."
+        }
+      ],
+      "expected_result": "Ochiladi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Not run",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Amal tugmasi «Просмотр» (boshqalarda «Просмотреть») — BUG-037."
+      }
+    }
+  ]
+}

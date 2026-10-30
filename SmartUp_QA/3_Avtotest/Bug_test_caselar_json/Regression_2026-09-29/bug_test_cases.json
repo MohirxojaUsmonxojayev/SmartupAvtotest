@@ -1,0 +1,105 @@
+{
+ "generated": "2026-09-29",
+ "cases": [
+  {
+   "id": "TC-NEW-001",
+   "bug": "REG-002",
+   "module": "Склад",
+   "form": "Переоценки себестоимости ТМЦ",
+   "title": "Переоценка: ТМЦ siz (bo'sh) hujjat saqlanadi — 28.09 da rad etilar edi (regressiya, 29.09 relizi)",
+   "type": "Bug",
+   "priority": "P1",
+   "pre": [
+    "mohir@xan bilan kirilgan, filial Toshkent",
+    "Склад → Переоценки себестоимости ТМЦ ro'yxati ochiq"
+   ],
+   "data": [
+    "Номер: QA-RV-2",
+    "Склад: WH-Yashnobod",
+    "ТМЦ jadvali: bo'sh"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "d": "«Создать» ni bosing",
+     "e": "«Переоценка себестоимости ТМЦ (создание)» ochiladi; Дата = bugun, Валюта = Узбекский сум"
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "d": "«Номер» ga QA-RV-2 yozing",
+     "e": "Maydonda QA-RV-2"
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "d": "«Склад *» dan WH-Yashnobod ni tanlang",
+     "e": "Maydonda WH-Yashnobod; jadval «Нет результатов», ИТОГО сумма разницы: 0"
+    },
+    {
+     "n": 4,
+     "action": "manual",
+     "d": "«Сохранить» → «Сохранить?» → «Да»",
+     "e": "Xabar chiqadi (ТМЦ tanlanmagan), hujjat saqlanmaydi"
+    }
+   ],
+   "expected": "Xabar chiqadi (ТМЦ tanlanmagan), hujjat saqlanmaydi",
+   "actual": "Xabar chiqmaydi, forma yopiladi va ro'yxatda yangi qator paydo bo'ladi: «29.09.2026 | QA-RV-2 | – | – | WH-Yashnobod | Узбекский сум | 0 | Нет». Regression yugurishida TC-SKL-RV-001 ham xuddi shunday bo'sh QA-RV-1 ni saqlagan. 28.09 da shu case «Pass» (saqlanmagan) edi.",
+   "fail_step": 4,
+   "result": "Fail",
+   "route": "/xtrade/a2/anor/mkw/revaluation/revaluation+add",
+   "cleanup": [
+    "Yaratilgan bo'sh QA-RV-1 va QA-RV-2 o'chirildi (29.09)"
+   ],
+   "report": "hisobotlar/REG-002_переоценка-тмц-siz-bosh-hujjat-saqlanadi-2809-da-r.md"
+  },
+  {
+   "id": "TC-NEW-002",
+   "bug": "REG-001",
+   "module": "Торговый маркетинг",
+   "form": "Настройка характеристики → Подтип характеристики (создание)",
+   "title": "Подтип характеристики: ro'yxatda ko'rinmaydigan (nofaol) yozuvdagi «Код» bilan saqlashda xom DB xatosi «dup_val_on_index»",
+   "type": "Bug",
+   "priority": "P2",
+   "pre": [
+    "mohir@xan, filial Toshkent",
+    "Торговый маркетинг → Настройка характеристики: Группа (person_type_list) — ro'yxatda 5 ta yozuv (A, C, M, Подтип 1, Подтип 2), QAPT1 kodli yozuv ko'rinmaydi",
+    "QAPT1 kodi ro'yxatda ko'rinmaydigan yozuvda band (ehtimol 28.09 da yaratilib, keyin nofaol qilingan QA-PT-1)"
+   ],
+   "data": [
+    "Название: QA-PT-9",
+    "Код: QAPT1"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "action": "manual",
+     "d": "«Создать» ni bosing",
+     "e": "«Подтип характеристики физических лиц (создание)» ochiladi"
+    },
+    {
+     "n": 2,
+     "action": "manual",
+     "d": "«Название *» = QA-PT-9, «Код» = QAPT1",
+     "e": "Qiymatlar maydonlarda"
+    },
+    {
+     "n": 3,
+     "action": "manual",
+     "d": "«Сохранить» ni bosing",
+     "e": "Tushunarli xabar: «Код уже используется» (qaysi yozuvda ekanini ko'rsatib); saqlanmaydi"
+    }
+   ],
+   "expected": "Tushunarli xabar: «Код уже используется» (qaysi yozuvda ekanini ko'rsatib); saqlanmaydi",
+   "actual": "Xato oynasi: «Ошибка URL: /xtrade/b/anor/mr/person/person_type+add:save — Z:#z:mr_person_types dup_val_on_index code=QAPT1 company_id=1600 code=QAPT1 person_group_id=2383 code=QAPT1». Foydalanuvchi kod qayerda bandligini bilmaydi (ro'yxatda ko'rinmaydi).",
+   "fail_step": 3,
+   "result": "Fail",
+   "route": "/xtrade/a2/anor/mr/person/person_type+add?person_group_id=2383",
+   "cleanup": [
+    "Hech narsa saqlanmadi"
+   ],
+   "report": "hisobotlar/REG-001_подтип-характеристики-royxatda-korinmaydigan-nofao.md"
+  }
+ ]
+}

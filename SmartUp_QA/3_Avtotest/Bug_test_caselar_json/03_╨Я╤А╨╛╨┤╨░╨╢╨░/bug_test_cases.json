@@ -1,0 +1,631 @@
+{
+  "module": "Продажа",
+  "module_code": "PRD",
+  "generated": "2026-09-28",
+  "environment": {
+    "base_url": "https://app3.greenwhite.uz",
+    "app_prefix": "/xtrade/a2",
+    "old_app_prefix": "/xtrade/#/!<hash>",
+    "api_prefix": "/xtrade/b",
+    "user": "mohir@xan (test)",
+    "filial": "Toshkent",
+    "test_date": "2026-09-28"
+  },
+  "action_vocabulary": {
+    "nav": "Yuqori menyu orqali o'tish. target = \"Menyu > [Bo'lim >] Band\", value = route (bo'sh bo'lsa — menyu orqali).",
+    "open_url": "page.goto(BASE_URL + target).",
+    "menu_plus": "Menyu bandi yonidagi «+»: button[aria-label=\"<value>\"] (menyu ochilgandan keyin ko'rinadi).",
+    "click": "Ko'rinadigan matn bo'yicha tugma/havola. value = \"confirm:<matn>|<tugma>\" bo'lsa, keyin tasdiqlash oynasida <tugma> bosiladi.",
+    "row_click": "Ro'yxatda matni target ga mos .smt-data-row ichidagi .text-start katakni bosish (amal tugmalari chiqadi).",
+    "row_action": "Bosilgan qator ostidagi amal tugmasi (target = tugma matni).",
+    "fill": "Yorlig'i target bo'lgan input/textarea ga value yozish.",
+    "fill_date": "Sana maydoni: bosish, Ctrl+A, value (dd.mm.yyyy) yozish, Escape.",
+    "select": "smt-select / smt-data-select: bosish, value yozish, ArrowDown, Enter (variantlar .cdk-overlay-pane da).",
+    "multiselect": "smt-multi-data-select: har bir value uchun select, oxirida Escape.",
+    "remove_tag": "Teg yonidagi «×».",
+    "toggle": "[role=switch] (yoki label[smt-checkbox] [role=checkbox]) holatini value (on/off) ga keltirish.",
+    "radio": "Guruh target ichida value matnli radio.",
+    "grid_fill": "Jadval: target = \"<qator matni> | <ustun sarlavhasi>\", katakka value yozish (Подбор panelida ham).",
+    "pick": "«Подбор» → panelda target qatori, value = \"ustun=miqdor\" → «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+    "tab": "[role=tab] yoki wizard qadami, matni target.",
+    "confirm": "[role=dialog] da target matni borligini tekshirib, value tugmasini bosish (odatda «Да»).",
+    "dialog_close": "Ochiq xato/axborot oynasini target tugmasi bilan yopish.",
+    "sequence": "Bir nechta atomar amal ketma-ket: «ops» ro'yxatidagi har bir element — yuqoridagi action'lardan biri.",
+    "assert_text": "target joyida value matni borligini tekshirish.",
+    "assert_row": "Ro'yxatda value ustun qiymatlari (| bilan ajratilgan) bor qator mavjud.",
+    "assert_field": "Ko'rish/tahrir sahifasida target yorlig'i yonidagi qiymat = value.",
+    "assert_columns": "smt-cell-header matnlari value ro'yxatini o'z ichiga oladi.",
+    "assert_buttons": "Ko'rinadigan tugmalar value ro'yxatiga mos.",
+    "assert_api": "page.waitForResponse: URL target ga mos (masalan \"**:save\"), status = value.",
+    "assert_no_request": "Amal paytida target ga mos so'rov yuborilmagan.",
+    "assert_download": "page.waitForEvent('download'); fayl turi = value.",
+    "assert_url": "URL target ni o'z ichiga oladi.",
+    "observe": "Vizual/natijaviy tekshiruv: qadamning «expected» matni bo'yicha assertion yoziladi.",
+    "wait": "Kutish (sekund).",
+    "manual": "Avtomatlashtirish qiyin yoki bir necha sahifadan iborat qadam — description bo'yicha qo'lda yoki alohida helper bilan."
+  },
+  "selectors": {
+    "top_menu_item": "nav a, nav button — matn bo'yicha (masalan «Склад», «Торговый маркетинг»)",
+    "menu_plus_button": "button[aria-label=\"<Band> (создание)\"]",
+    "page_root": "main",
+    "page_title": "main h1, main .page-title (birinchi matn qatori)",
+    "header_button": "main button:has-text(\"<matn>\")",
+    "grid_row": ".smt-data-row",
+    "grid_row_cell": ".smt-data-row .text-start",
+    "grid_header": "smt-cell-header",
+    "grid_counter": "main — «N/M» ko'rinishidagi hisoblagich matni",
+    "select_trigger": "smt-select-trigger, smt-data-select, smt-multi-data-select",
+    "overlay_options": ".cdk-overlay-pane [role=option], .cdk-overlay-pane li",
+    "dropdown_menu_item": "[role=menuitem]",
+    "switch": "[role=switch]",
+    "checkbox": "label[smt-checkbox] [role=checkbox]",
+    "tab": "[role=tab]",
+    "dialog": "[role=dialog]",
+    "dialog_yes": "[role=dialog] button:has-text(\"Да\"), [role=dialog] button:has-text(\"да\")",
+    "invalid_field": ".ng-invalid.ng-touched, [aria-invalid=true]",
+    "toast": "Vaqtinchalik xabar (2–3 s) — matni bo'yicha darhol tekshiring",
+    "report_iframe": "Просмотр tabidagi iframe (Сформировать dan keyin)"
+  },
+  "routes": {
+    "visit_list": "/xtrade/a2/trade/tvt/visit_list",
+    "visit_view": "/xtrade/a2/trade/tvt/visit_view?visit_id=<ID>",
+    "visit_history_list": "/xtrade/a2/trade/tvt/visit_history_list",
+    "user_locations": "/xtrade/a2/trade/tvt/user_locations",
+    "user_tracking": "/xtrade/a2/trade/tph/user_tracking",
+    "room_list": "/xtrade/a2/trade/tvt/plan/room_list",
+    "room_robot_list": "/xtrade/a2/trade/tvt/plan/room_robot_list?room_id=<ID>&…",
+    "plan_list": "/xtrade/a2/trade/tvt/plan/plan_list",
+    "plan": "/xtrade/a2/trade/tvt/plan/plan?robot_id=<ID>",
+    "auto_gen_visit_plan": "/xtrade/a2/trade/tvt/auto_gen_visit_plan",
+    "equipment_review_list": "/xtrade/a2/trade/tvt/equipment_review_list",
+    "equipment_review_view": "/xtrade/a2/trade/tvt/equipment_review_view?visit_id=<ID>",
+    "photo_video_gallery": "/xtrade/a2/trade/tvt/photo_video_gallery",
+    "visit_analysis_report": "/xtrade/a2/trade/rep/tvta/visit_analysis_report",
+    "order_request_list": "/xtrade/#/!<hash>/anor/mdeal/order/order_request_list",
+    "order_list": "/xtrade/#/!<hash>/trade/tdeal/order/order_list",
+    "order_beta_add": "/xtrade/#/!<hash>/anor/mdeal/order/order_beta+add",
+    "order_history_list": "/xtrade/#/!<hash>/trade/tdeal/order/order_history_list",
+    "order_cancelled_list": "/xtrade/#/!<hash>/trade/tdeal/order/order_cancelled_list",
+    "return_list": "/xtrade/a2/anor/mdeal/return/return_list",
+    "return_add": "/xtrade/a2/anor/mdeal/return/return+add",
+    "return_view": "/xtrade/a2/anor/mdeal/return/return_view?deal_id=<ID>",
+    "return_edit": "/xtrade/a2/anor/mdeal/return/return+edit?deal_id=<ID>",
+    "return_reason_list": "/xtrade/a2/anor/mdeal/return/return_reason_list",
+    "return_reason_add": "/xtrade/a2/anor/mdeal/return/return_reason+add",
+    "offset_list": "/xtrade/#/!<hash>/anor/mdeal/order/offset/offset_list",
+    "sales_dashboard": "/xtrade/a2/trade/tdeal/sales_dashboard",
+    "sales_dashboard_two": "/xtrade/a2/trade/tdeal/sales_dashboard_two",
+    "rep_mbi_order": "/xtrade/#/!<hash>/trade/rep/mbi/tdeal/order",
+    "rep_sales": "/xtrade/a2/trade/rep/tdeal/sales",
+    "rep_debtor_clients": "/xtrade/a2/anor/rep/analytics/debtor_clients",
+    "rep_sales_discount": "/xtrade/a2/trade/rep/tdeal/sales_discount",
+    "rep_mbi_visit": "/xtrade/a2/trade/rep/mbi/tvt/visit",
+    "rep_visits": "/xtrade/a2/trade/rep/tvt/visits",
+    "rep_route_analysis": "/xtrade/a2/trade/rep/route_analysis",
+    "rep_path_visit_user": "/xtrade/a2/trade/rep/path_visit_user"
+  },
+  "test_cases": [
+    {
+      "id": "TC-PRD-RET-010",
+      "section": "Возвраты",
+      "form": "Возврат (создание)",
+      "title": "Validatsiya: narx yo'q bo'lsa tushunarli xabar",
+      "type": "Bug",
+      "priority": "P2",
+      "automation": "Qisman",
+      "tags": [
+        "bug"
+      ],
+      "route": "/xtrade/a2/anor/mdeal/return/return+add",
+      "pre": [
+        "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: filial nomini bosib «Toshkent» ni tanlang)."
+      ],
+      "data": [
+        "ТМЦ: TMS-1, Кол-во возврата 1",
+        "Тип цены: tanlanmaydi",
+        "Примечание: QA-SRT-1"
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Yuqori qora menyuda «Продажа» ni bosing, «Продажа» bo'limidan «Возвраты» ni bosing.",
+          "expected": "«Возвраты» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "«Возврат (создание)», 1-qadam «Основная информация»."
+        },
+        {
+          "n": 3,
+          "action": "select",
+          "target": "Рабочая зона *",
+          "value": "Room - Yashnobod",
+          "description": "«Рабочая зона *» maydonini bosing va ro'yxatdan «Room - Yashnobod» ni tanlang.",
+          "expected": "Maydonda Room - Yashnobod."
+        },
+        {
+          "n": 4,
+          "action": "select",
+          "target": "Штат *",
+          "value": "Main Manager",
+          "description": "«Штат *» maydonini bosing va ro'yxatdan «Main Manager» ni tanlang.",
+          "expected": "«Торговый представитель» = Usmonxo'jayev Mohir."
+        },
+        {
+          "n": 5,
+          "action": "select",
+          "target": "Склад *",
+          "value": "WH-Yashnobod",
+          "description": "«Склад *» maydonini bosing va ro'yxatdan «WH-Yashnobod» ni tanlang.",
+          "expected": "Maydonda WH-Yashnobod."
+        },
+        {
+          "n": 6,
+          "action": "select",
+          "target": "Клиент *",
+          "value": "Client-2/Yashnobod",
+          "description": "«Клиент *» maydonini bosing va ro'yxatdan «Client-2/Yashnobod» ni tanlang.",
+          "expected": "Maydonda Client-2/Yashnobod."
+        },
+        {
+          "n": 7,
+          "action": "click",
+          "target": "Далее →",
+          "value": "",
+          "description": "«Далее →» ni bosing.",
+          "expected": "2-qadam «ТМЦ»: Тип цены, Подбор, jadval."
+        },
+        {
+          "n": 8,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Jadval 1-qatorida «Название» maydonini bosing, TMS-1 yozing va «TMS-1 / TMS maker / Toshkent» ni tanlang.",
+          "expected": "Qator qo'shiladi."
+        },
+        {
+          "n": 9,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Кол-во возврата» katagiga 1 yozing, Tab.",
+          "expected": "Pastda «Кол-во: 1», «Сумма: 0» — narx yo'qligi ko'rsatiladi (qizil katak yoki xabar)."
+        },
+        {
+          "n": 10,
+          "action": "click",
+          "target": "Далее →",
+          "value": "",
+          "description": "«Далее →» ni bosing.",
+          "expected": "Narx kiritilmaganligi haqida xabar; keyingi qadamga o'tmaydi."
+        },
+        {
+          "n": 11,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Далее →» (3-qadam), «Примечание» = QA-SRT-1, yana «Далее →».",
+          "expected": "4-qadam «Завершение», Статус = Черновик."
+        },
+        {
+          "n": 12,
+          "action": "sequence",
+          "target": "",
+          "value": "",
+          "ops": [
+            {
+              "action": "click",
+              "target": "Сохранить",
+              "value": ""
+            },
+            {
+              "action": "confirm",
+              "target": "Сохранить?",
+              "value": "Да"
+            }
+          ],
+          "description": "«Сохранить» → «Сохранить?» → «Да».",
+          "expected": "Tushunarli xabar yoki saqlash."
+        }
+      ],
+      "bug_severity": "O'rta",
+      "expected_result": "Pastda «Кол-во: 1», «Сумма: 0» — narx yo'qligi ko'rsatiladi (qizil katak yoki xabar).",
+      "api_checks": [],
+      "cleanup": [
+        "Xato oynasini yoping, «Тип цены» → Sotish sum → «Да», saqlang; so'ng ro'yxatda qatorni o'chiring (Удалить → Да)."
+      ],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Fail",
+        "fail_step": 9,
+        "actual": "Narx bo'sh bo'lsa ham 2- va 3-qadamlardan o'tadi. Saqlashda «Ошибка — URL: /xtrade/b/anor/mdeal/return/return+add$save — Z:Отсутствует значение поля \"Цена продукта\"» (texnik URL va «Z:» prefiksi bilan). «Тип цены» tanlansa («Использовать тип цены Sotish sum на все позиции?» → «Да») narx 10 000 bo'ladi va saqlash ishlaydi.",
+        "bug": "PRD-003",
+        "note": "Bug hisobot: 1_Smoke_2026-09-28/Buglar/…/hisobotlar/PRD-003_vozvrat-narx-bosh-xom-xato.md. Склад → Возврат поставщику dagi BUG-043 bilan bir xil turdagi muammo: narx klient tomonida tekshirilmaydi."
+      }
+    },
+    {
+      "id": "TC-PRD-RET-011",
+      "section": "Возвраты",
+      "form": "Возврат (изменение)",
+      "title": "ТМЦ miqdorini o'zgartirib saqlash",
+      "type": "Bug",
+      "priority": "P1",
+      "automation": "Qisman",
+      "tags": [
+        "bug"
+      ],
+      "route": "/xtrade/a2/anor/mdeal/return/return+edit?deal_id=<ID>",
+      "pre": [
+        "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: filial nomini bosib «Toshkent» ni tanlang).",
+        "«Черновик» holatidagi qaytarish: TMS-1 × 1, narx 10 000 (TC-PRD-RET-004)."
+      ],
+      "data": [
+        "Кол-во возврата: 1 → 2"
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Yuqori qora menyuda «Продажа» ni bosing, «Продажа» bo'limidan «Возвраты» ni bosing.",
+          "expected": "«Возвраты» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "QA qaytarish qatorini bosing → «Изменить».",
+          "expected": "«Возврат (изменение)»."
+        },
+        {
+          "n": 3,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«2 ТМЦ» qadamini bosing.",
+          "expected": "TMS-1: Кол-во возврата 1, Цена 10 000; pastda «Кол-во: 1, Сумма: 10 000»."
+        },
+        {
+          "n": 4,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Кол-во возврата» katagini bosing, qiymatni belgilab 2 yozing, Tab.",
+          "expected": "Katakda 2; pastda «Кол-во: 2, Сумма: 20 000»."
+        },
+        {
+          "n": 5,
+          "action": "click",
+          "target": "Далее →",
+          "value": "",
+          "description": "«Далее →» ni bosing.",
+          "expected": "3-qadamga o'tadi."
+        }
+      ],
+      "bug_severity": "Yuqori",
+      "expected_result": "Katakda 2; pastda «Кол-во: 2, Сумма: 20 000».",
+      "api_checks": [],
+      "cleanup": [
+        "Formani saqlamasdan yoping; qaytarishni ro'yxatdan o'chiring."
+      ],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Fail",
+        "fail_step": 4,
+        "actual": "4-qadam: katak BO'SHAB QOLADI, pastda «Кол-во: 0, Сумма: 0». Qayta 1 yozilsa katakda 1, lekin yakun baribir «Кол-во: 0, Сумма: 0», «Сумма к оплате» 0. 5-qadam: «Ошибка — Некорректный ввод количества или цены. Тип ТМЦ: Товар, Название: TMS-1 / TMS maker / Toshkent, Строка: 1». «Тип цены» qayta tanlash ham yordam bermaydi — tahrirni saqlab bo'lmaydi (faqat forma yopiladi). Yaratish formasida miqdor kiritish normal ishlaydi.",
+        "bug": "PRD-006",
+        "note": "Bug hisobot: 1_Smoke_2026-09-28/Buglar/…/hisobotlar/PRD-006_vozvrat-tahrir-miqdor-buziladi.md."
+      }
+    },
+    {
+      "id": "TC-PRD-RET-012",
+      "section": "Возвраты",
+      "form": "Возврат (просмотр)",
+      "title": "Ko'rishda Примечание va qo'shimcha maydonlar ko'rinadi",
+      "type": "Bug",
+      "priority": "P2",
+      "automation": "Qisman",
+      "tags": [
+        "bug"
+      ],
+      "route": "/xtrade/a2/anor/mdeal/return/return_view?deal_id=<ID>",
+      "pre": [
+        "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: filial nomini bosib «Toshkent» ni tanlang)."
+      ],
+      "data": [
+        "Примечание: QA-SRT-1"
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Yuqori qora menyuda «Продажа» ni bosing, «Продажа» bo'limidan «Возвраты» ni bosing.",
+          "expected": "«Возвраты» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "sequence",
+          "target": "",
+          "value": "",
+          "ops": [
+            {
+              "action": "grid_fill",
+              "target": "TC-PRD-RET-004 bo'yicha | Примечание",
+              "value": "QA-SRT-1 bilan qoralama qaytarish yarating"
+            }
+          ],
+          "description": "TC-PRD-RET-004 bo'yicha «Примечание» = QA-SRT-1 bilan qoralama qaytarish yarating.",
+          "expected": "Ro'yxatda yangi qator (10 000, Черновик)."
+        },
+        {
+          "n": 3,
+          "action": "sequence",
+          "target": "",
+          "value": "",
+          "ops": [
+            {
+              "action": "row_click",
+              "target": "<joriy qator>",
+              "value": ""
+            },
+            {
+              "action": "click",
+              "target": "Просмотреть",
+              "value": ""
+            },
+            {
+              "action": "tab",
+              "target": "Дополнительная информация",
+              "value": ""
+            }
+          ],
+          "description": "Qatorni bosing → «Просмотреть» → «Дополнительная информация» tabi.",
+          "expected": "Примечание = QA-SRT-1 va 3-qadamdagi boshqa maydonlar ko'rinadi."
+        },
+        {
+          "n": 4,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Taqqoslash: qator → «Изменить» → «3 Дополнительная информация».",
+          "expected": "Примечание = QA-SRT-1."
+        }
+      ],
+      "bug_severity": "O'rta",
+      "expected_result": "Примечание = QA-SRT-1 va 3-qadamdagi boshqa maydonlar ko'rinadi.",
+      "api_checks": [],
+      "cleanup": [
+        "Qatorni o'chiring."
+      ],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Fail",
+        "fail_step": 3,
+        "actual": "Ko'rish tabida faqat Причина возврата, Тип оплаты, Договор, Короткий/Полный адрес доставки, GPS maydonlari bor — «Примечание», «Экспедитор», «Номер счет-фактуры», «Номер товарно-транспортной накладной» yo'q. Tahrir formasida esa Примечание = QA-SRT-1 (saqlangan).",
+        "bug": "PRD-005",
+        "note": "Bug hisobot: 1_Smoke_2026-09-28/Buglar/…/hisobotlar/PRD-005_vozvrat-view-primechanie-yoq.md."
+      }
+    },
+    {
+      "id": "TC-PRD-RET-013",
+      "section": "Возвраты",
+      "form": "Возврат (создание)",
+      "title": "Штат ro'yxati sarlavhalari tarjima qilingan",
+      "type": "Bug",
+      "priority": "P3",
+      "automation": "Qisman",
+      "tags": [
+        "bug"
+      ],
+      "route": "/xtrade/a2/anor/mdeal/return/return+add",
+      "pre": [
+        "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: filial nomini bosib «Toshkent» ni tanlang)."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Yuqori qora menyuda «Продажа» ni bosing, «Продажа» bo'limidan «Возвраты» ni bosing.",
+          "expected": "«Возвраты» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "«Возврат (создание)», 1-qadam «Основная информация»."
+        },
+        {
+          "n": 3,
+          "action": "select",
+          "target": "Рабочая зона *",
+          "value": "Room - Yashnobod",
+          "description": "«Рабочая зона *» maydonini bosing va ro'yxatdan «Room - Yashnobod» ni tanlang.",
+          "expected": "Maydonda Room - Yashnobod."
+        },
+        {
+          "n": 4,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Штат *» maydonini bosing.",
+          "expected": "Ochilgan ro'yxat ustunlari: «Штат», «Торговый представитель» (yoki «Сотрудник»)."
+        }
+      ],
+      "bug_severity": "Past",
+      "expected_result": "Ochilgan ro'yxat ustunlari: «Штат», «Торговый представитель» (yoki «Сотрудник»).",
+      "api_checks": [],
+      "cleanup": [
+        "Formada «Закрыть»."
+      ],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Fail",
+        "fail_step": 4,
+        "actual": "Ikkinchi ustun sarlavhasi «robot person name» (tarjima kaliti). Qiymatlar: Abdiev Abo, Usmonxo'jayev Mohir, Karim, x8k.",
+        "bug": "PRD-002",
+        "note": "Bug hisobot: 1_Smoke_2026-09-28/Buglar/…/hisobotlar/PRD-002_vozvrat-shtat-robot-person-name.md."
+      }
+    },
+    {
+      "id": "TC-PRD-REP-005",
+      "section": "Отчеты по продажам",
+      "form": "Sana maydoni (smt-date-picker)",
+      "title": "Sana yozib Esc bosilganda ko'rinadigan va ishlatiladigan qiymat bir xil",
+      "type": "Bug",
+      "priority": "P2",
+      "automation": "Qisman",
+      "tags": [
+        "bug"
+      ],
+      "route": "/xtrade/a2/trade/rep/tdeal/sales",
+      "pre": [
+        "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: filial nomini bosib «Toshkent» ni tanlang)."
+      ],
+      "data": [
+        "Начало периода: 01.09.2026 (standart)",
+        "Конец периода: 20.09.2026 → 25.09.2026"
+      ],
+      "steps": [
+        {
+          "n": 1,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Yuqori qora menyuda «Продажа» ni bosing, «Отчеты по продажам» bo'limidan «Общий отчет по продажам (организации)» ni bosing.",
+          "expected": "«Общий отчет по продажам (организации)» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Конец периода *» maydonini uch marta bosib matnni belgilang, 20.09.2026 yozing va Tab bosing.",
+          "expected": "Maydonda 20.09.2026."
+        },
+        {
+          "n": 3,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» ni bosing.",
+          "expected": "Hisobot: «За период с 01.09.2026 по 20.09.2026»."
+        },
+        {
+          "n": 4,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Параметры» tabiga qayting. «Конец периода *» ni uch marta bosib 25.09.2026 yozing va Esc bosing.",
+          "expected": "Maydonda 25.09.2026 ko'rinadi."
+        },
+        {
+          "n": 5,
+          "action": "click",
+          "target": "Сформировать",
+          "value": "",
+          "description": "«Сформировать» ni bosing.",
+          "expected": "Hisobot: «За период с 01.09.2026 по 25.09.2026»."
+        }
+      ],
+      "bug_severity": "O'rta",
+      "expected_result": "Hisobot: «За период с 01.09.2026 по 25.09.2026».",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Fail",
+        "fail_step": 5,
+        "actual": "Hisobot sarlavhasi «За период с 01.09.2026 по 20.09.2026» — maydonda 25.09.2026 ko'rinsa ham eski qiymat ishlatiladi. Xuddi shu yo'l bilan «Начало периода» = 30.09.2026 (Esc) kiritilganda teskari davr ham o'tib ketadi: «За период с 30.09.2026 по 28.09.2026». Tab bilan kiritilganda qiymat to'g'ri qo'llanadi, teskari davr esa jimgina rad etiladi (maydon oldingi qiymatga qaytadi, xabar yo'q).",
+        "bug": "PRD-001",
+        "note": "Bug hisobot: 1_Smoke_2026-09-28/Buglar/…/hisobotlar/PRD-001_sana-maydoni-esc-eski-qiymat.md. Esc kalendar oynasini yopadi, lekin kiritilgan matn modelga yozilmaydi va input qiymati eski model qiymatiga qaytarilmaydi — ko'rinish va model farqlanadi. Komponent umumiy bo'lgani uchun boshqa formalarda ham takrorlanishi mumkin."
+      }
+    },
+    {
+      "id": "TC-PRD-GEN-002",
+      "section": "Umumiy",
+      "form": "Matnlar",
+      "title": "Sarlavha va tugma matnlari bir xil va to'g'ri",
+      "type": "Bug",
+      "priority": "P3",
+      "automation": "Qo'lda",
+      "tags": [
+        "bug"
+      ],
+      "route": "",
+      "pre": [
+        "https://app3.greenwhite.uz/xtrade/login.html sahifasida test foydalanuvchi (mohir@xan) bilan tizimga kiring. Yuqori o'ng burchakda filial «Toshkent» ekanini tekshiring (boshqa bo'lsa: filial nomini bosib «Toshkent» ni tanlang)."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "observe",
+          "target": "",
+          "value": "",
+          "description": "Yuqori qora menyuda «Продажа» ni bosing, «Отчеты по продажам» bo'limidan «Задолженность покупателей по срокам задолженности» ni bosing. Sahifa sarlavhasini qarang.",
+          "expected": "«Задолженность покупателей по срокам задолженности»."
+        },
+        {
+          "n": 2,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Визиты» → «Планирование визитов» → qator → amal nomi; «Планы» → qator → amal nomi; ochilgan sahifa sarlavhasi.",
+          "expected": "Bir xil atama (masalan «Установить план»)."
+        },
+        {
+          "n": 3,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "«Отчеты по визитам» → «Отчет по визитам» → «Сформировать»; tab nomi.",
+          "expected": "«Просмотреть» (boshqa hisobotlardagidek)."
+        },
+        {
+          "n": 4,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Возвраты → «Причины возврата» → istalgan yozuv → «Неактивный».",
+          "expected": "«Изменить статус причины … на \"Неактивный\"?»"
+        },
+        {
+          "n": 5,
+          "action": "manual",
+          "target": "",
+          "value": "",
+          "description": "Возвраты ro'yxatida «Время заказа» ustuni.",
+          "expected": "«28.09.2026 21:43:39» bitta qatorda yoki so'z bo'yicha bo'linadi."
+        }
+      ],
+      "bug_severity": "Past",
+      "expected_result": "«Задолженность покупателей по срокам задолженности».",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Fail",
+        "fail_step": 1,
+        "actual": "1: «…задолженности(FIN00001)» — texnik kod, bo'shliqsiz. 2: «Установка плана» / «Установить план» / «Установка планов». 3: «Просмотр». 4: «Изменить статус с QA-RRS-1e на Неактивный?», tugmalar kichik harf «да/нет». 5: «21:43:3» | «9» — raqam o'rtasidan bo'linadi (Склад BUG-022).",
+        "bug": "PRD-008",
+        "note": "Bug hisobot: 1_Smoke_2026-09-28/Buglar/…/hisobotlar/PRD-008_matn-nomuvofiqliklari.md."
+      }
+    }
+  ]
+}

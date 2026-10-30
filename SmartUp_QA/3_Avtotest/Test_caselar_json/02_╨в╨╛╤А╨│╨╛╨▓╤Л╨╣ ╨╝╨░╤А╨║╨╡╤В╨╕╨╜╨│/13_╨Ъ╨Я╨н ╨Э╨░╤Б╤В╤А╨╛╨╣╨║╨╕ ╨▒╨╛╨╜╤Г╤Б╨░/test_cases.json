@@ -1,0 +1,650 @@
+{
+  "module": "Торговый маркетинг",
+  "module_code": "TM",
+  "generated": "2026-09-28",
+  "environment": {
+    "base_url": "https://app3.greenwhite.uz",
+    "app_prefix": "/xtrade/a2",
+    "old_app_prefix": "/xtrade/#/!<hash>",
+    "api_prefix": "/xtrade/b",
+    "user": "mohir@xan (test)",
+    "filial": "Toshkent",
+    "test_date": "2026-09-28"
+  },
+  "action_vocabulary": {
+    "nav": "Yuqori menyu orqali o'tish. target = \"Menyu > [Bo'lim >] Band\", value = route (bo'sh bo'lsa — menyu orqali).",
+    "open_url": "page.goto(BASE_URL + target).",
+    "menu_plus": "Menyu bandi yonidagi «+»: button[aria-label=\"<value>\"] (menyu ochilgandan keyin ko'rinadi).",
+    "click": "Ko'rinadigan matn bo'yicha tugma/havola. value = \"confirm:<matn>|<tugma>\" bo'lsa, keyin tasdiqlash oynasida <tugma> bosiladi.",
+    "row_click": "Ro'yxatda matni target ga mos .smt-data-row ichidagi .text-start katakni bosish (amal tugmalari chiqadi).",
+    "row_action": "Bosilgan qator ostidagi amal tugmasi (target = tugma matni).",
+    "fill": "Yorlig'i target bo'lgan input/textarea ga value yozish.",
+    "fill_date": "Sana maydoni: bosish, Ctrl+A, value (dd.mm.yyyy) yozish, Escape.",
+    "select": "smt-select / smt-data-select: bosish, value yozish, ArrowDown, Enter (variantlar .cdk-overlay-pane da).",
+    "multiselect": "smt-multi-data-select: har bir value uchun select, oxirida Escape.",
+    "remove_tag": "Teg yonidagi «×».",
+    "toggle": "[role=switch] (yoki label[smt-checkbox] [role=checkbox]) holatini value (on/off) ga keltirish.",
+    "radio": "Guruh target ichida value matnli radio.",
+    "grid_fill": "Jadval: target = \"<qator matni> | <ustun sarlavhasi>\", katakka value yozish (Подбор panelida ham).",
+    "pick": "«Подбор» → panelda target qatori, value = \"ustun=miqdor\" → «Закрыть» → «Выбрать ТМЦ с заполненными данными?» → «Да».",
+    "tab": "[role=tab] yoki wizard qadami, matni target.",
+    "confirm": "[role=dialog] da target matni borligini tekshirib, value tugmasini bosish (odatda «Да»).",
+    "dialog_close": "Ochiq xato/axborot oynasini target tugmasi bilan yopish.",
+    "sequence": "Bir nechta atomar amal ketma-ket: «ops» ro'yxatidagi har bir element — yuqoridagi action'lardan biri.",
+    "assert_text": "target joyida value matni borligini tekshirish.",
+    "assert_row": "Ro'yxatda value ustun qiymatlari (| bilan ajratilgan) bor qator mavjud.",
+    "assert_field": "Ko'rish/tahrir sahifasida target yorlig'i yonidagi qiymat = value.",
+    "assert_columns": "smt-cell-header matnlari value ro'yxatini o'z ichiga oladi.",
+    "assert_buttons": "Ko'rinadigan tugmalar value ro'yxatiga mos.",
+    "assert_api": "page.waitForResponse: URL target ga mos (masalan \"**:save\"), status = value.",
+    "assert_no_request": "Amal paytida target ga mos so'rov yuborilmagan.",
+    "assert_download": "page.waitForEvent('download'); fayl turi = value.",
+    "assert_url": "URL target ni o'z ichiga oladi.",
+    "observe": "Vizual/natijaviy tekshiruv: qadamning «expected» matni bo'yicha assertion yoziladi.",
+    "wait": "Kutish (sekund).",
+    "manual": "Avtomatlashtirish qiyin yoki bir necha sahifadan iborat qadam — description bo'yicha qo'lda yoki alohida helper bilan."
+  },
+  "selectors": {
+    "top_menu_item": "nav a, nav button — matn bo'yicha (masalan «Склад», «Торговый маркетинг»)",
+    "menu_plus_button": "button[aria-label=\"<Band> (создание)\"]",
+    "page_root": "main",
+    "page_title": "main h1, main .page-title (birinchi matn qatori)",
+    "header_button": "main button:has-text(\"<matn>\")",
+    "grid_row": ".smt-data-row",
+    "grid_row_cell": ".smt-data-row .text-start",
+    "grid_header": "smt-cell-header",
+    "grid_counter": "main — «N/M» ko'rinishidagi hisoblagich matni",
+    "select_trigger": "smt-select-trigger, smt-data-select, smt-multi-data-select",
+    "overlay_options": ".cdk-overlay-pane [role=option], .cdk-overlay-pane li",
+    "dropdown_menu_item": "[role=menuitem]",
+    "switch": "[role=switch]",
+    "checkbox": "label[smt-checkbox] [role=checkbox]",
+    "tab": "[role=tab]",
+    "dialog": "[role=dialog]",
+    "dialog_yes": "[role=dialog] button:has-text(\"Да\"), [role=dialog] button:has-text(\"да\")",
+    "invalid_field": ".ng-invalid.ng-touched, [aria-invalid=true]",
+    "toast": "Vaqtinchalik xabar (2–3 s) — matni bo'yicha darhol tekshiring",
+    "report_iframe": "Просмотр tabidagi iframe (Сформировать dan keyin)"
+  },
+  "routes": {
+    "setting_list": "/xtrade/a2/trade/tmcgf/setting_list",
+    "setting_add": "/xtrade/a2/trade/tmcgf/setting+add",
+    "setting_view": "/xtrade/a2/trade/tmcgf/setting_view?setting_id=<ID>",
+    "setting_edit": "/xtrade/a2/trade/tmcgf/setting+edit?setting_id=<ID>",
+    "setting_person": "/xtrade/a2/trade/tmcgf/setting_person_list?setting_id=<ID>&person_type_id=<ID>&mode=attached",
+    "merch_list": "/xtrade/a2/trade/tvt/visit/merchandising_list",
+    "merch_view": "/xtrade/a2/trade/tvt/visit/merchandising_view?merchandising_id=<ID>",
+    "merch_edit": "/xtrade/a2/trade/tvt/visit/merchandising+edit?merchandising_id=<ID>",
+    "robot_list": "/xtrade/a2/anor/mkpi/robot_plan_list",
+    "robot_add": "/xtrade/a2/anor/mkpi/robot_plan+add",
+    "robot_view": "/xtrade/a2/anor/mkpi/robot_plan_view?plan_id=<ID>&…",
+    "room_list": "/xtrade/a2/anor/mkpi/room_plan_list",
+    "room_add": "/xtrade/a2/anor/mkpi/room_plan+add",
+    "room_view": "/xtrade/a2/anor/mkpi/room_plan_view?room_id=<ID>&plan_date=<dd.mm.yyyy>&…",
+    "rp_list": "/xtrade/a2/anor/mkpi/room_product_plan_list",
+    "rp_add": "/xtrade/a2/anor/mkpi/room_product_plan+add",
+    "rpt_list": "/xtrade/a2/anor/mkpi/room_product_type_plan_list",
+    "rpt_add": "/xtrade/a2/anor/mkpi/room_product_type_plan+add",
+    "cl_list": "/xtrade/a2/anor/mkpi/client_plan_list",
+    "cl_add": "/xtrade/a2/anor/mkpi/client_plan+add",
+    "cp_list": "/xtrade/a2/anor/mkpi/client_product_plan_list",
+    "cp_add": "/xtrade/a2/anor/mkpi/client_product_plan+add",
+    "cpt_list": "/xtrade/a2/anor/mkpi/client_product_type_plan_list",
+    "cpt_add": "/xtrade/a2/anor/mkpi/client_product_type_plan+add",
+    "ctpt_list": "/xtrade/a2/anor/mkpi/client_type_product_type_plan_list",
+    "ctpt_add": "/xtrade/a2/anor/mkpi/client_type_product_type_plan+add?group_mode=true&client_type=L",
+    "tpl": "/xtrade/a2/anor/mkpi/plan_template",
+    "tpl_set": "/xtrade/a2/anor/mkpi/plan_template_settings?kpi_kind=R",
+    "bon_list": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+    "bon_add": "/xtrade/a2/trade/tkpi/bonus_setting+add",
+    "bon_view": "/xtrade/a2/trade/tkpi/bonus_setting_view?bonus_setting_id=<ID>",
+    "dash": "/xtrade/a2/anor/mkpi/kpi_dashboard",
+    "pt_list": "/xtrade/a2/trade/tmcg/person_type_list",
+    "pt_add": "/xtrade/a2/anor/mr/person/person_type+add?person_group_id=2383",
+    "pt_edit": "/xtrade/a2/anor/mr/person/person_type+edit?person_group_id=2383&person_type_id=<ID>",
+    "pt_bind": "/xtrade/a2/anor/mr/person/legal_person_type_bind_list?person_group_id=2383&person_type_id=<ID>",
+    "mml_list": "/xtrade/a2/anor/mcg/mml_list",
+    "mml_add": "/xtrade/a2/anor/mcg/mml+add",
+    "mml_pt": "/xtrade/a2/anor/mcg/mml_person_type_list?mml_id=<ID>",
+    "as_list": "/xtrade/a2/trade/tmcg/assortment_list",
+    "as_add": "/xtrade/a2/trade/tmcg/assortment+add",
+    "pg_list": "/xtrade/a2/trade/tmcg/planogram_sample_list",
+    "pg_attach": "/xtrade/a2/trade/tmcg/planogram_sample_list+attach",
+    "pg_view": "/xtrade/a2/trade/tmcg/planogram_sample_view?sample_id=<ID>",
+    "pos_list": "/xtrade/a2/trade/tmcg/display_list",
+    "rr_list": "/xtrade/a2/trade/tmcg/refuse_reason_list",
+    "rr_add": "/xtrade/a2/trade/tmcg/refuse_reason+add",
+    "rr_view": "/xtrade/a2/trade/tmcg/refuse_reason_view?reason_id=<ID>",
+    "cmp_list": "/xtrade/a2/trade/tmcg/competitor_list",
+    "qt_list": "/xtrade/a2/trade/rep/tvt/quiz/template_list",
+    "qt_add": "/xtrade/a2/trade/rep/tvt/quiz/template+add",
+    "qt_report": "/xtrade/a2/trade/rep/tvt/quiz/report?template_id=<ID>",
+    "ci_list": "/xtrade/a2/trade/tmcg/competitor_inventory_list",
+    "st_list": "/xtrade/a2/trade/tmcg/status_list",
+    "rep_shelf_share": "/xtrade/a2/trade/tmcg/rep/shelf_share",
+    "rep_assortment": "/xtrade/a2/trade/tmcg/rep/assortment",
+    "rep_planogram": "/xtrade/a2/trade/tmcg/rep/planogram",
+    "rep_shelf_price": "/xtrade/a2/trade/tmcg/rep/shelf_price",
+    "rep_display": "/xtrade/a2/trade/tmcg/rep/display",
+    "rep_score": "/xtrade/a2/trade/tmcg/rep/score",
+    "rep_unavailable": "/xtrade/a2/trade/tmcg/rep/unavailable_inventories",
+    "rep_price_cmp": "/xtrade/a2/trade/tmcg/rep/price_comparison",
+    "rep_merch": "/xtrade/a2/trade/rep/tmcg/merchandising",
+    "rep_photo": "/xtrade/a2/trade/rep/tvt/photo",
+    "rep_competitors": "/xtrade/a2/trade/tmcg/rep/competitors",
+    "rep_status": "/xtrade/a2/trade/tmcg/rep/status",
+    "rep_mbi": "/xtrade/a2/trade/rep/mbi/tmcg/shelf_share"
+  },
+  "test_cases": [
+    {
+      "id": "TC-TM-BON-001",
+      "section": "КПЭ: Настройки бонуса",
+      "form": "Настройки бонуса",
+      "title": "Ro'yxat ochiladi",
+      "type": "Smoke",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > КПЭ > Настройки бонуса",
+          "value": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «КПЭ» bo'limidan «Настройки бонуса» ni bosing.",
+          "expected": "«Настройки бонуса» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "assert_columns",
+          "target": "grid",
+          "value": "Рабочая зона, Дата, Создал, Дата создания, Изменил, Дата последнего изменения",
+          "description": "Jadval ustunlari sarlavhalarini tekshiring.",
+          "expected": "Ustunlar: Рабочая зона, Дата, Создал, Дата создания, Изменил, Дата последнего изменения."
+        },
+        {
+          "n": 3,
+          "action": "assert_row",
+          "target": "Room - Yashnobod",
+          "value": "Room - Yashnobod | 01.10.2025",
+          "description": "Mavjud qator.",
+          "expected": "«Room - Yashnobod | 01.10.2025 | Usmonxo'jayev Mohir …»."
+        },
+        {
+          "n": 4,
+          "action": "row_click",
+          "target": "«Room - Yashnobod | 01.10.2025»",
+          "value": "",
+          "description": "Ro'yxatda «Room - Yashnobod | 01.10.2025» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Изменить расчет бонуса, Удалить расчет бонуса, Экспорт начисленных бонусов."
+        }
+      ],
+      "expected_result": "Ochiladi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Hisoblanmagan yozuvda amallar: Просмотреть, Изменить, Рассчитать бонус, Удалить."
+      }
+    },
+    {
+      "id": "TC-TM-BON-002",
+      "section": "КПЭ: Настройки бонуса",
+      "form": "Настройки бонуса",
+      "title": "Mavjud sozlamani ko'rish: 3 tab",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "/xtrade/a2/trade/tkpi/bonus_setting_view?bonus_setting_id=<ID>",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > КПЭ > Настройки бонуса",
+          "value": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «КПЭ» bo'limidan «Настройки бонуса» ni bosing.",
+          "expected": "«Настройки бонуса» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«Room - Yashnobod | 01.10.2025»",
+          "value": "",
+          "description": "Ro'yxatda «Room - Yashnobod | 01.10.2025» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Просмотреть",
+          "value": "",
+          "description": "Qator ostidagi «Просмотреть» tugmasini bosing.",
+          "expected": "«Настройки бонуса / Просмотр»: Редактировать, Создать копию, Экспорт рассчитанных бонусов, Закрыть."
+        },
+        {
+          "n": 4,
+          "action": "assert_field",
+          "target": "Месяц",
+          "value": "Октябрь 2025",
+          "description": "«Месяц» maydoni qiymatini tekshiring.",
+          "expected": "«Месяц» = Октябрь 2025."
+        },
+        {
+          "n": 5,
+          "action": "assert_field",
+          "target": "Вид КПЭ",
+          "value": "КПЭ рабочей зоны по характеристикам ТМЦ",
+          "description": "«Вид КПЭ» maydoni qiymatini tekshiring.",
+          "expected": "«Вид КПЭ» = КПЭ рабочей зоны по характеристикам ТМЦ."
+        },
+        {
+          "n": 6,
+          "action": "assert_field",
+          "target": "Сумма бонуса",
+          "value": "100 000",
+          "description": "«Сумма бонуса» maydoni qiymatini tekshiring.",
+          "expected": "«Сумма бонуса» = 100 000."
+        },
+        {
+          "n": 7,
+          "action": "tab",
+          "target": "Рассчитанные бонусы",
+          "value": "",
+          "description": "«Рассчитанные бонусы» tabini bosing.",
+          "expected": "3/3: Main Manager 272 100; TP-Yashnobod 70 000; TP -2 75 000."
+        },
+        {
+          "n": 8,
+          "action": "tab",
+          "target": "История изменений",
+          "value": "",
+          "description": "«История изменений» tabini bosing.",
+          "expected": "1 yozuv «Добавлен»."
+        }
+      ],
+      "expected_result": "Ma'lumotlar to'g'ri.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "«Октябрь  2025» (ikki probel), «От заказа = No» — eski versiyada ham."
+      }
+    },
+    {
+      "id": "TC-TM-BON-003",
+      "section": "КПЭ: Настройки бонуса",
+      "form": "Настройки бонуса",
+      "title": "Hisoblangan bonuslarni Excel ga eksport",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent»."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > КПЭ > Настройки бонуса",
+          "value": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «КПЭ» bo'limidan «Настройки бонуса» ni bosing.",
+          "expected": "«Настройки бонуса» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«Room - Yashnobod | 01.10.2025»",
+          "value": "",
+          "description": "Ro'yxatda «Room - Yashnobod | 01.10.2025» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Просмотреть",
+          "value": "",
+          "description": "Qator ostidagi «Просмотреть» tugmasini bosing.",
+          "expected": "Ko'rish sahifasi ochiladi."
+        },
+        {
+          "n": 4,
+          "action": "click",
+          "target": "Экспорт рассчитанных бонусов",
+          "value": "",
+          "description": "«Экспорт рассчитанных бонусов» tugmasini bosing.",
+          "expected": "xlsx fayl yuklanadi: «Настройки-бонуса-/-Просмотр(<sana vaqt>).xlsx»."
+        },
+        {
+          "n": 5,
+          "action": "assert_download",
+          "target": "bonus_setting_view:run?rt=xlsx",
+          "value": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "description": "Faylni tekshiring.",
+          "expected": "Haqiqiy xlsx (PK), ochiladi."
+        }
+      ],
+      "expected_result": "Fayl yuklanadi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-BON-004",
+      "section": "КПЭ: Настройки бонуса",
+      "form": "Настройки бонуса",
+      "title": "Yaratish: to'g'ri ma'lumot bilan",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Room-Olmazor uchun joriy oyda bonus sozlamasi yo'q."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > КПЭ > Настройки бонуса",
+          "value": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «КПЭ» bo'limidan «Настройки бонуса» ni bosing.",
+          "expected": "«Настройки бонуса» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "click",
+          "target": "Создать",
+          "value": "",
+          "description": "«Создать» tugmasini bosing.",
+          "expected": "«Настройки бонуса (создание)»: Месяц * (Выбрать), Тип КПЭ *, Сумма бонуса *."
+        },
+        {
+          "n": 3,
+          "action": "select",
+          "target": "Месяц *",
+          "value": "<joriy oy>",
+          "description": "«Месяц *» maydonini bosing va ro'yxatdan «<joriy oy>» ni tanlang.",
+          "expected": "Variantlar joriy oydan 12 oy oldinga (masalan Сентябрь 2026 … Август 2027)."
+        },
+        {
+          "n": 4,
+          "action": "multiselect",
+          "target": "Рабочие зоны *",
+          "value": "Room-Olmazor",
+          "description": "«Рабочие зоны *» maydonini bosing, «Room-Olmazor» ni tanlang, Esc bilan ro'yxatni yoping.",
+          "expected": "Maydonda «Room-Olmazor» tegi ko'rinadi."
+        },
+        {
+          "n": 5,
+          "action": "select",
+          "target": "Тип КПЭ *",
+          "value": "Рабочая зона",
+          "description": "«Тип КПЭ *» maydonini bosing va ro'yxatdan «Рабочая зона» ni tanlang.",
+          "expected": "Variantlar: Рабочая зона, КПЭ рабочей зоны по ТМЦ, КПЭ рабочей зоны по характеристикам ТМЦ, КПЭ по визитам, КПЭ по фото, КПЭ по видео; jadvalda Room-Olmazor qatori."
+        },
+        {
+          "n": 6,
+          "action": "select",
+          "target": "Тип плана *",
+          "value": "Сумма",
+          "description": "«Тип плана *» maydonini bosing va ro'yxatdan «Сумма» ni tanlang.",
+          "expected": "Variantlar: Сумма, Кол-во, Вес, Успешный визит, АКБ, Сумма оплат."
+        },
+        {
+          "n": 7,
+          "action": "fill",
+          "target": "Сумма бонуса *",
+          "value": "50000",
+          "description": "«Сумма бонуса *» maydoniga 50000 yozing.",
+          "expected": "Maydonda 50000 ko'rinadi."
+        },
+        {
+          "n": 8,
+          "action": "click",
+          "target": "Сохранить",
+          "value": "",
+          "description": "«Сохранить» ni bosing.",
+          "expected": "Ro'yxatda «Room-Olmazor | 01.<MM>.<YYYY> | …» (tasdiq so'ralmaydi)."
+        }
+      ],
+      "expected_result": "Sozlama saqlanadi.",
+      "api_checks": [
+        "POST /xtrade/b/trade/tkpi/bonus_setting+add$save → 200"
+      ],
+      "cleanup": [
+        "TC-TM-BON-006"
+      ],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-BON-005",
+      "section": "КПЭ: Настройки бонуса",
+      "form": "Настройки бонуса",
+      "title": "Ko'rish va tahrirlash",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "TC-TM-BON-004 bajarilgan."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > КПЭ > Настройки бонуса",
+          "value": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «КПЭ» bo'limidan «Настройки бонуса» ni bosing.",
+          "expected": "«Настройки бонуса» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«Room-Olmazor»",
+          "value": "",
+          "description": "Ro'yxatda «Room-Olmazor» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi: Просмотреть, Изменить, Рассчитать бонус, Удалить."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Просмотреть",
+          "value": "",
+          "description": "Qator ostidagi «Просмотреть» tugmasini bosing.",
+          "expected": "Вид КПЭ = Рабочая зона, Вид плана = Сумма, Сумма бонуса = 50 000."
+        },
+        {
+          "n": 4,
+          "action": "click",
+          "target": "Редактировать",
+          "value": "",
+          "description": "«Редактировать» tugmasini bosing.",
+          "expected": "Amal bajariladi, xato oynasi chiqmaydi."
+        },
+        {
+          "n": 5,
+          "action": "fill",
+          "target": "Сумма бонуса *",
+          "value": "60000",
+          "description": "«Сумма бонуса *» maydoniga 60000 yozing.",
+          "expected": "Maydonda 60000 ko'rinadi."
+        },
+        {
+          "n": 6,
+          "action": "click",
+          "target": "Сохранить",
+          "value": "",
+          "description": "«Сохранить» ni bosing.",
+          "expected": "Ko'rish: Сумма бонуса = 60 000."
+        }
+      ],
+      "expected_result": "Saqlanadi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-BON-006",
+      "section": "КПЭ: Настройки бонуса",
+      "form": "Настройки бонуса",
+      "title": "O'chirish",
+      "type": "Ijobiy",
+      "priority": "P2",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "TC-TM-BON-004 bajarilgan."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > КПЭ > Настройки бонуса",
+          "value": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «КПЭ» bo'limidan «Настройки бонуса» ni bosing.",
+          "expected": "«Настройки бонуса» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "«Room-Olmazor»",
+          "value": "",
+          "description": "Ro'yxatda «Room-Olmazor» qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Удалить",
+          "value": "",
+          "description": "Qator ostidagi «Удалить» tugmasini bosing.",
+          "expected": "«Вы действительно хотите удалить?»"
+        },
+        {
+          "n": 4,
+          "action": "confirm",
+          "target": "удалить",
+          "value": "Да",
+          "description": "«удалить» so'rovida «Да» ni bosing.",
+          "expected": "Qator yo'qoladi."
+        }
+      ],
+      "expected_result": "O'chadi.",
+      "api_checks": [
+        "POST /xtrade/b/trade/tkpi/bonus_setting_list$delete → 200"
+      ],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Pass",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": ""
+      }
+    },
+    {
+      "id": "TC-TM-BON-009",
+      "section": "КПЭ: Настройки бонуса",
+      "form": "Настройки бонуса",
+      "title": "Bonusni hisoblash («Рассчитать бонус»)",
+      "type": "Ijobiy",
+      "priority": "P1",
+      "automation": "Ha",
+      "tags": [],
+      "route": "",
+      "pre": [
+        "Test muhitiga (https://app3.greenwhite.uz/xtrade) test foydalanuvchi bilan kirilgan, filial «Toshkent».",
+        "Test sozlamasi va shu oyda fakt ma'lumoti."
+      ],
+      "data": [],
+      "steps": [
+        {
+          "n": 1,
+          "action": "nav",
+          "target": "Торговый маркетинг > КПЭ > Настройки бонуса",
+          "value": "/xtrade/a2/trade/tkpi/bonus_setting_list",
+          "description": "Yuqori qora menyuda «Торговый маркетинг» ni bosing, ochilgan menyuning «КПЭ» bo'limidan «Настройки бонуса» ni bosing.",
+          "expected": "«Настройки бонуса» sahifasi ochiladi."
+        },
+        {
+          "n": 2,
+          "action": "row_click",
+          "target": "test sozlamasi",
+          "value": "",
+          "description": "Ro'yxatda test sozlamasi qatorini bir marta bosing.",
+          "expected": "Qator ostida amal tugmalari chiqadi."
+        },
+        {
+          "n": 3,
+          "action": "row_action",
+          "target": "Рассчитать бонус",
+          "value": "",
+          "description": "Qator ostidagi «Рассчитать бонус» tugmasini bosing.",
+          "expected": "Hisoblash bajariladi; «Рассчитанные бонусы» tabida xodimlar bo'yicha summa."
+        }
+      ],
+      "expected_result": "Bonus hisoblanadi.",
+      "api_checks": [],
+      "cleanup": [],
+      "last_run": {
+        "date": "2026-09-28",
+        "result": "Not run",
+        "fail_step": null,
+        "actual": "",
+        "bug": "",
+        "note": "Hisoblangan bonuslarga ta'sir qilgani uchun bajarilmadi."
+      }
+    }
+  ]
+}
