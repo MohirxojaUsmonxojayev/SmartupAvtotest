@@ -20,6 +20,9 @@ __pycache__/
 .claude/*
 !.claude/skills/
 
+# Vaqtinchalik QA manba to'plami (kerakli materiallar docs/e2e ga ko'chirilgan; keyin o'chiriladi)
+SmartUp_QA/
+
 # Playwright / test artifacts
 test-results/
 playwright-report/
