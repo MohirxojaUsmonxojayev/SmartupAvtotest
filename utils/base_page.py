@@ -100,13 +100,36 @@ class BasePage:
     # ==================================================================================================================
     # Dropdown (smt-data-select)
     # ==================================================================================================================
-    def select(self, label: str, option: str, *, search: str | None = None, exact: bool = True, timeout: int = 30_000):
-        """
-        smt-data-select dropdown'dan variant tanlaydi: trigger'ni bosadi, (kerak bo'lsa qidiradi),
-        cdk overlay'dagi variantni bosadi.
-        """
-        trigger = self.control(label).locator("smt-select-trigger, smt-data-select").first
+    def _close_overlay(self):
+        """Ochiq cdk dropdown overlay'ni yopadi. a2 multi-select Escape bilan yopilmaydi —
+        neytral joyga (forma sarlavha qatori) bosish ishonchli yopadi."""
+        pane = self.page.locator(".cdk-overlay-pane")
+        try:
+            if pane.count() == 0:
+                return
+            # Escape + Tab (xavfsiz: navigatsiya yo'q). a2 multi-select ba'zan faqat Tab bilan yopiladi.
+            self.page.keyboard.press("Escape")
+            self.page.wait_for_timeout(150)
+            for _ in range(3):
+                if not pane.first.is_visible():
+                    break
+                self.page.keyboard.press("Tab")
+                self.page.wait_for_timeout(200)
+        except Exception:
+            pass
+
+    _OPTION = "[role=option], .cdk-overlay-pane li, .cdk-overlay-pane [class*=option], .cdk-overlay-pane span"
+
+    def _open_select(self, label: str):
+        """Dropdown trigger'ni ochadi: oldingi overlay'ni tozalab, trigger'ni ko'rinishga keltirib bosadi."""
+        self._close_overlay()
+        trigger = self.control(label).locator("smt-select-trigger, smt-data-select, input").first
+        trigger.scroll_into_view_if_needed()
         trigger.click()
+
+    def select(self, label: str, option: str, *, search: str | None = None, exact: bool = True, timeout: int = 30_000):
+        """smt-data-select dropdown'dan variant tanlaydi (trigger → (qidiruv) → variant)."""
+        self._open_select(label)
         overlay = self.page.locator(".cdk-overlay-container")
         if search is not None:
             box = overlay.locator("input").first
@@ -114,17 +137,50 @@ class BasePage:
                 box.fill(search)
         option_el = overlay.get_by_text(option, exact=exact).first
         expect(option_el).to_be_visible(timeout=timeout)
+        option_el.scroll_into_view_if_needed()
         option_el.click()
+        self._close_overlay()
+
+    def multiselect(self, label: str, *options: str, exact: bool = True, timeout: int = 30_000):
+        """smt-multi-data-select: bir yoki bir nechta variant tanlaydi, oxirida yopadi."""
+        self._open_select(label)
+        overlay = self.page.locator(".cdk-overlay-container")
+        for opt in options:
+            el = overlay.get_by_text(opt, exact=exact).first
+            expect(el).to_be_visible(timeout=timeout)
+            el.scroll_into_view_if_needed()
+            el.click()
+        self._close_overlay()
+
+    def multiselect_first(self, label: str, *, timeout: int = 30_000):
+        """smt-multi-data-select: BIRINCHI variantni tanlaydi (matn noma'lum)."""
+        self._open_select(label)
+        opt = self.page.locator(".cdk-overlay-container").locator(self._OPTION).first
+        expect(opt).to_be_visible(timeout=timeout)
+        opt.scroll_into_view_if_needed()
+        opt.click()
+        self._close_overlay()
+
+    def chip(self, text: str, *, exact: bool = True):
+        """Belgilanadigan chip/checkbox'ni matn bo'yicha bosadi (masalan «Типы ТМЦ» → «Товар»).
+        Clickable element — matnli span'ning `cursor-pointer` o'rovchi div'i."""
+        self._close_overlay()
+        span = self.page.locator("main").get_by_text(text, exact=exact).first
+        wrapper = span.locator("xpath=ancestor::div[contains(@class,'cursor-pointer')][1]")
+        (wrapper.first if wrapper.count() > 0 else span).click()
+
+    def expect_field_locked(self, label: str):
+        """Label'li maydon nofaol ekanini tekshiradi (a2'da ko'pincha readonly, ba'zan disabled)."""
+        expect(self.control(label).locator("input").first).not_to_be_editable()
 
     def select_first(self, label: str, *, timeout: int = 30_000):
         """smt-data-select dropdown'dan BIRINCHI variantni tanlaydi (matn noma'lum bo'lganda)."""
-        self.control(label).locator("smt-select-trigger, smt-data-select").first.click()
-        overlay = self.page.locator(".cdk-overlay-container")
-        opt = overlay.locator(
-            "[role=option], .cdk-overlay-pane li, .cdk-overlay-pane [class*=option], .cdk-overlay-pane span"
-        ).first
+        self._open_select(label)
+        opt = self.page.locator(".cdk-overlay-container").locator(self._OPTION).first
         expect(opt).to_be_visible(timeout=timeout)
+        opt.scroll_into_view_if_needed()
         opt.click()
+        self._close_overlay()
 
     # ==================================================================================================================
     # Sana (smt-date-picker)

@@ -1,13 +1,17 @@
 """
-ТМЦ (Товарно-материальные ценности) — a2 forma page object.
-Route: /a2/anor/mr/product/inventory_list  (yangi /a2 UI, smt-* komponentlar).
+ТМЦ (Товарно-материальные ценности) — a2 forma page object (TC-E2E-01).
+Route: /a2/anor/mr/product/inventory_list
 
-Jonli tasdiqlangan maydonlar (mohir@xan, 2026-10-30):
-  Название* (smt-input), Ед. изм.* (smt-data-select), Наборы ТМЦ* (majburiy),
-  Код, Альтернативное название, Штрих-коды, IKPU, Артикул код, ТН ВЭД (smt-input),
-  Производители, Тип кейса (1/2 уровень) (smt-data-select).
-  Tablar: Вес, Характеристики, Штрих-коды, Файлы, Ед. изм. маркированных товаров, GTIN.
+Jonli tasdiqlangan struktura (mohir@xan, 2026-10-30):
+  Main: Статус (smt-switch), Название* (smt-input), Ед. изм.* (smt-data-select),
+    Альтернативное название, Производители (select), Наборы ТМЦ* (multi-select),
+    Типы ТМЦ (chip: Товар/Продукция/Сырье/...), Тип кейса 1/2 (select) + Кол-во в кейсе 1/2,
+    Штрих-коды, Код, Порядковый номер, IKPU, Артикул код, ТН ВЭД, Вес нетто/брутто, Литр.
+  Tablar: Вес, Характеристики, Штрих-коды (Добавить+grid), Файлы (Добавить+grid),
+    Ед. изм. маркированных товаров, GTIN.
 """
+from playwright.sync_api import expect
+
 from utils.base_page import BasePage
 
 
@@ -19,26 +23,88 @@ class TmcPage:
         self.base_url = base_url
         self.b = BasePage(page)
 
-    # ------------------------------------------------------------------------------------------------------------------
+    # ---- navigatsiya ----------------------------------------------------------------------------
     def open_list(self):
         self.page.goto(self.base_url + self.LIST_PATH, wait_until="commit", timeout=60_000)
         self.b.expect_form_open("ТМЦ")
 
     def open_create(self):
+        # a2 list kontenti async yuklanadi — «Создать» tugmasini kutamiz
+        self.page.get_by_role("button", name="Создать", exact=True).first.wait_for(state="visible", timeout=30_000)
         self.b.click_button("Создать", exact=True)
         self.b.expect_form_open("создани")
 
-    # ------------------------------------------------------------------------------------------------------------------
-    def create_minimal(self, *, name: str, unit: str, code: str):
-        """Majburiy maydonlar bilan ТМЦ yaratadi (Название, Ед. изм., Наборы ТМЦ) + Код."""
-        self.b.input(label="Название", value=name)
-        self.b.select(label="Ед. изм.", option=unit)
-        self.b.select_first("Наборы ТМЦ")      # "ro'yxatdagi birinchi to'plam"
-        self.b.input(label="Код", value=code)
+    # ---- UMUMIY tekshiruvlar --------------------------------------------------------------------
+    def check_empty_save_blocked(self):
+        """UMUMIY 1: bo'sh forma «Сохранить» → saqlanmaydi (create formada qoladi)."""
         self.b.save()
+        self.page.wait_for_timeout(1_000)
+        # Saqlanmagan bo'lsa URL hali «add» da yoki title «создание» (ro'yxatga ketmaydi)
+        assert "add" in self.page.url or "создани" in self.page.title().lower(), \
+            f"Bo'sh forma saqlandi? URL={self.page.url}, title={self.page.title()}"
 
-    def verify_in_list(self, name: str):
-        """Saqlangandan keyin ro'yxatda nom bo'yicha topilishini tekshiradi."""
+    def check_case2_disabled_before_case1(self):
+        """UMUMIY/3: «Кол-во в кейсе (2 уровень)» 1-daraja tanlanmasdan nofaol (readonly)."""
+        self.b.expect_field_locked("Кол-во в кейсе (2 уровень)")
+
+    # ---- to'ldirish -----------------------------------------------------------------------------
+    def fill_main(self, d: dict):
+        """Asosiy maydonlarni to'ldiradi (majburiy* + ishonchli optional)."""
+        self.b.input(label="Название", value=d["name"])          # *
+        self.b.select(label="Ед. изм.", option=d["unit"])         # *
+        self.b.multiselect_first("Наборы ТМЦ")                    # *
+        self.b.input(label="Альтернативное название", value=d["alt_name"])
+        self.b.input(label="Штрих-коды", value=d["barcode1"])
+        self.b.input(label="Код", value=d["code"])
+        self.b.input(label="Порядковый номер", value=d["order_no"])
+        self.b.input(label="IKPU", value=d["ikpu"])
+        self.b.input(label="Артикул код", value=d["article"])
+        self.b.input(label="ТН ВЭД", value=d["tnved"])
+        self.b.input(label="Вес нетто (кг)", value=d["weight_net"])
+        self.b.input(label="Вес брутто (кг)", value=d["weight_gross"])
+        self.b.input(label="Литр/Дециметр куб.", value=d["liter"])
+        self.b.chip(d["tip"])                                     # Типы ТМЦ → Товар (OXIRGI — reflow qiladi)
+        # TODO (jonli refine): Производители, Тип кейса (1/2 уровень) + Кол-во —
+        #   Товар tanlangach reflow bo'ladi, dropdown trigger'i o'zgaradi.
+
+    # ---- tablar (TODO: dialog/upload sub-interaksiyalari keyingi tsiklда pishitiladi) -------------
+    def add_second_barcode(self, code: str):
+        """Tab «Штрих-коды» → «Добавить» → 2-shtrix-kod. (dialog strukturasi jonli tasdiqlanadi)"""
+        self.b.open_tab("Штрих-коды")
+        self.b.click_button("Добавить", exact=False)
+        # TODO: dialogda kod kiritish — jonli aniqlanadi
+
+    def open_tabs_smoke(self):
+        """Har tabni ochib ko'rish (xatosiz ochilishini tekshirish)."""
+        for t in ["Вес", "Характеристики", "Штрих-коды", "Файлы",
+                  "Ед. изм. маркированных товаров", "GTIN"]:
+            self.b.open_tab(t)
+            self.page.wait_for_timeout(300)
+
+    # ---- saqlash / tekshirish -------------------------------------------------------------------
+    def save(self):
+        self.b.save()
+        self.page.wait_for_timeout(2_000)
+
+    def find_in_list(self, name: str):
         self.open_list()
         self.b.search_list(name)
         self.b.grid_row(name)
+
+    def open_view(self, name: str):
+        """Ro'yxatda qatorni ochib «Просмотр» ga o'tadi."""
+        self.find_in_list(name)
+        self.b.grid_row(name).click()
+        self.page.wait_for_timeout(500)
+        self.b.click_button("Просмотр", exact=False)
+        self.page.wait_for_timeout(1_500)
+
+    def edit_order_no(self, name: str, new_value: str):
+        """«Изменить» → Порядковый номер o'zgartirib saqlaydi."""
+        self.find_in_list(name)
+        self.b.grid_row(name).click()
+        self.page.wait_for_timeout(500)
+        self.b.click_button("Изменить", exact=False)
+        self.b.expect_form_open()
+        self.b.input(label="Порядковый номер", value=new_value)
+        self.save()

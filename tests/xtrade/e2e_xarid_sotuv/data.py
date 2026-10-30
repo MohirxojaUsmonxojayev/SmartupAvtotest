@@ -24,6 +24,29 @@ def names(d: str) -> dict:
     }
 
 
+def tmc_full(d: str) -> dict:
+    """TC-E2E-01 ТМЦ to'liq ma'lumoti (dropdownlar birinchi variant: muhitga bog'liq emas)."""
+    return {
+        "name":        f"QA-E2E-TMS-{d}",
+        "unit":        "шт",
+        "alt_name":    f"QA-E2E TMS alt {d}",
+        "barcode1":    f"4780000{d}01",
+        "barcode2":    f"4780000{d}02",
+        "code":        f"QA-E2E-{d}",
+        "order_no":    "999",
+        "order_no_edit": "998",
+        "ikpu":        "00000000000000001",
+        "article":     f"QA-ART-{d}",
+        "tnved":       "0000000000",
+        "case1_qty":   "10",
+        "case2_qty":   "5",
+        "weight_net":  "1.2",
+        "weight_gross": "1.5",
+        "liter":       "0.75",
+        "tip":         "Товар",     # Типы ТМЦ chip
+    }
+
+
 # Doimiy qiymatlar (muhit ma'lumotiga tayanadi — kerak bo'lsa moslanadi)
 ENV = {
     "unit":          "шт",                     # Ед. изм.
