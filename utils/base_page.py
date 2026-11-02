@@ -118,7 +118,10 @@ class BasePage:
         except Exception:
             pass
 
-    _OPTION = "[role=option], .cdk-overlay-pane li, .cdk-overlay-pane [class*=option], .cdk-overlay-pane span"
+    # a2 smt-data-select variantlari <ul><li data-option-index> ichida; ustun sarlavhalari
+    # («Название»/«Код») alohida <div>/<span> — shuning uchun generic `span` KIRMAYDI, aks holda
+    # `.first` sarlavhani bosib qoladi (grid-dropdown: qa xyu/Банк/Группа va h.k.).
+    _OPTION = "[role=option], .cdk-overlay-pane li[data-option-index], .cdk-overlay-pane ul li, .cdk-overlay-pane li"
 
     def _open_select(self, label: str):
         """Dropdown trigger'ni ochadi: oldingi overlay'ni tozalab, trigger'ni ko'rinishga keltirib bosadi."""
@@ -181,6 +184,37 @@ class BasePage:
         opt.scroll_into_view_if_needed()
         opt.click()
         self._close_overlay()
+
+    def tree_select(self, label: str, option: str, *, exact: bool = True, timeout: int = 30_000):
+        """smt-tree-select (masalan «Регион»): trigger'ni ochib overlay'dan variantni tanlaydi.
+        DIQQAT: variant matni tizimdagi yozuvga mos bo'lsin (masalan «Toshkent» LOTIN, «Тошкент» EMAS)."""
+        self._close_overlay()
+        self.control(label).locator("smt-tree-select").first.click()
+        opt = self.page.locator(".cdk-overlay-pane").get_by_text(option, exact=exact).first
+        expect(opt).to_be_visible(timeout=timeout)
+        opt.scroll_into_view_if_needed()
+        opt.click()
+        self.page.wait_for_timeout(300)
+        self._close_overlay()
+
+    def checkbox(self, text: str, checked: bool = True, *, exact: bool = True):
+        """a2 smt-checkbox (`<label smt-checkbox>` + yashirin input + `span[aria-checked]`) ni
+        istalgan holatga keltiradi. Clickable = yonidagi matn (`<p>`); holat `aria-labelledby`
+        orqali bog'langan span'dan o'qiladi. Allaqachon kerakli holatda bo'lsa — bosmaydi."""
+        txt = self.page.get_by_text(text, exact=exact).first
+        txt.wait_for(state="visible", timeout=10_000)
+        state = self.page.evaluate(
+            """(t) => {
+                const lab=[...document.querySelectorAll('p,span,label')].find(
+                    e => e.children.length===0 && (e.innerText||'').trim()===t);
+                if(!lab) return null;
+                let box = lab.id ? document.querySelector(`[aria-labelledby="${lab.id}"]`) : null;
+                if(!box){ const r=lab.closest('div'); box = r ? r.parentElement.querySelector('[aria-checked]') : null; }
+                return box ? box.getAttribute('aria-checked') : null;
+            }""", text)
+        if (state == "true") != checked:
+            txt.click()
+            self.page.wait_for_timeout(300)
 
     # ==================================================================================================================
     # Sana (smt-date-picker)

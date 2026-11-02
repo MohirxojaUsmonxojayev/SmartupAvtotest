@@ -47,6 +47,47 @@ def tmc_full(d: str) -> dict:
     }
 
 
+def legal_full(d: str) -> dict:
+    """TC-E2E-03 Юридическое лицо (ta'minotchi) to'liq ma'lumoti. GPS/Файлы — mustasno (spec)."""
+    return {
+        "full_name":  f"QA-E2E Postavshik MChJ {d}",
+        "alt_name":   "QA-E2E Postavshik",
+        "code":       f"QA-E2E-YUR-{d}",
+        "barcode":    f"4780000{d}11",
+        "zip":        "100000",
+        "web":        "qa-e2e.uz",
+        "phone":      f"+99890{d[1:]}",        # UNIQUE, +998+9 raqam (dup_val_on_index oldini oladi)
+        "telegram":   f"@qa_e2e_{d}",          # UNIQUE
+        "email":      f"qa.e2e.{d}@example.com",  # UNIQUE
+        "inn":        f"3{d}",                 # UNIQUE, 9 raqam (ИНН должен быть уникальным!)
+        "oked":       "46900",
+        "vat":        f"326{d}0",              # UNIQUE, 12 raqam (НДС дубликат bo'lmasin)
+        "region":     "Toshkent",
+        "address":    "Toshkent, QA ko'chasi 1",
+        "orientir":   "QA mo'ljal",
+        "post_addr":  "100000, Toshkent",
+        # Расчетный счет (dialog)
+        "bank_acc_name": "QA-E2E hisob",
+        "bank_mfo":      "00014",
+        "bank_name":     "Расчетно-кассовый центр Центрального банка по г. Ташкенту",  # МФО 00014
+        "bank_acc_no":   f"202080009{d}000",   # UNIQUE, 20 raqam
+        "bank_note":     "QA",
+        # Контактные лица (dialog)
+        "contact_fio":   "QA Kontakt",
+        "contact_phone": "+998900000002",
+        "contact_bday":  "01.01.1990",
+        # Договор (dialog)
+        "contract_name": f"QA-E2E shartnoma {d}",
+        "contract_no":   f"QA-E2E-DOG-{d}",
+        "contract_sum":  "10000000",
+        # Примечание
+        "note":          "QA-E2E izoh",
+        # Руководящие должности
+        "dir_first":  "Direktor", "dir_last": "QA", "dir_middle": "Testovich",
+        "acc_first":  "Buxgalter", "acc_last": "QA", "acc_middle": "Testovna",
+    }
+
+
 # Doimiy qiymatlar (muhit ma'lumotiga tayanadi — kerak bo'lsa moslanadi)
 ENV = {
     "unit":          "шт",                     # Ед. изм.
