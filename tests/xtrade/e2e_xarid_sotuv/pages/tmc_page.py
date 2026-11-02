@@ -115,25 +115,37 @@ class TmcPage:
         dlg.get_by_role("button", name="Сохранить и закрыть", exact=False).click()
         self._wait_dialog_closed()
 
-    def add_file(self):
-        """Tab «Файлы» → «Добавить» → dialog: .pdf yuklab «Сохранить и закрыть»."""
+    def add_file(self, note: str = "QA fayl"):
+        """Tab «Файлы» → «Добавить» → dialog: .pdf yuklab, MAJBURIY «Название *» + «Примечание» → «Сохранить и закрыть».
+
+        Jonli aniqlangan (2026-11-02): dialogda majburiy «Название *» (birinchi text input) bor;
+        u bo'sh bo'lsa dialog yopilmaydi — PDF/fayl o'zi muammo emas (208 B qa.pdf 100% yuklanadi).
+        Maydonlar: «Название *» (text), «Примечание» (textarea), «Статус» (checkbox, default faol)."""
         self.b.open_tab("Файлы")
         self.page.wait_for_timeout(500)
         self.page.locator("main").get_by_role("button", name="Добавить").last.click()
         dlg = self.page.locator("[role=dialog][aria-modal]").first
+        dlg.wait_for(state="visible", timeout=10_000)
         dlg.locator("input[type=file]").first.set_input_files(os.path.join(FILES_DIR, "qa.pdf"))
-        self.page.wait_for_timeout(1_000)
+        self.page.wait_for_timeout(1_500)  # upload 100% bo'lishini kutamiz
+        file_title = "QA-E2E fayl"
+        dlg.locator("input[type=text]").first.fill(file_title)  # «Название *» (majburiy)
+        ta = dlg.locator("textarea")
+        if ta.count() > 0:
+            ta.first.fill(note)  # «Примечание»
+        self.page.wait_for_timeout(300)
         dlg.get_by_role("button", name="Сохранить и закрыть", exact=False).click()
         self._wait_dialog_closed()
-        # dialog hali ochiq bo'lsa (fayl rad etilgan bo'lishi mumkin) — «Закрыть» bilan tashlab ketamiz
+        # dialog hali ochiq bo'lsa — majburiy maydon/validatsiya sababli yopilmagan → xatoni ko'rsatib yiqilamiz
         open_dlg = self.page.locator("[role=dialog][aria-modal]")
         if open_dlg.count() > 0 and open_dlg.first.is_visible():
-            print("  [fayl] dialog yopilmadi — «Закрыть» bilan o'tkazildi")
             try:
-                open_dlg.first.get_by_role("button", name="Закрыть").first.click()
+                errs = open_dlg.first.locator("[class*=error],[class*=invalid],.text-red-500").all_inner_texts()
             except Exception:
-                pass
-            self._wait_dialog_closed()
+                errs = []
+            raise AssertionError(f"Файлы dialogi «Сохранить и закрыть» bilan yopilmadi (errs={errs})")
+        # muvaffaqiyat tekshiruvi: Файлы grid'ida qo'shilgan fayl qatori ko'rinadi
+        expect(self.page.locator("main").get_by_text(file_title, exact=False).first).to_be_visible(timeout=10_000)
 
     def _wait_dialog_closed(self, timeout: int = 10_000):
         """Modal dialog yopilishini kutadi (keyingi forma save'i to'silmasligi uchun)."""
@@ -183,32 +195,55 @@ class TmcPage:
         assert name_visible or "inventory_list" not in self.page.url, \
             f"Просмотр ochilmadi (nom ko'rinmadi, URL={self.page.url})"
 
-    def _confirm_if_any(self):
-        """Tasdiqlash oynasi chiqsa «Да» bosadi (bo'lmasa — hech nima)."""
+    def _confirm_yes(self):
+        """«Подтверждение — Изменить статус … Да/Нет» dialogida «Да» bosadi.
+        Status o'zgartirish har doim shu tasdiq oynasini chiqaradi (jonli, 2026-11-02)."""
+        dlg = self.page.locator("[role=dialog], .cdk-dialog-container").last
+        btn = dlg.get_by_role("button", name="Да", exact=False).first
         try:
-            btn = self.page.locator("[role=dialog], .cdk-dialog-container").get_by_role("button", name="Да", exact=False).first
-            if btn.count() > 0 and btn.is_visible():
-                btn.click()
-                self.page.wait_for_timeout(500)
+            btn.wait_for(state="visible", timeout=8_000)
+            btn.click()
+            self.page.wait_for_timeout(600)
         except Exception:
-            pass
+            pass  # tasdiq chiqmagan bo'lsa (ehtimoli past) — davom etamiz
+
+    def _show_all_in_list(self):
+        """Ro'yxat filtri: «Показать все» → nofaol yozuvlar ham ko'rinadi.
+        Jonli (2026-11-02): smt-data-table-filter funnel → panelda «Показать все» BITTA bosish bilan
+        qo'llanadi («Применить» shart emas)."""
+        self.page.locator("smt-data-table-filter button").first.click()
+        self.page.wait_for_timeout(1_000)
+        self.page.get_by_role("button", name="Показать все", exact=False).first.click()
+        self.page.wait_for_timeout(1_500)
 
     def toggle_status_in_list(self, name: str):
-        """Ro'yxatда: «Неактивный» → keyin «Активный» (oxiri Активный — zanjir uchun SHART).
-        Orasida QAYTA-QIDIRUV YO'Q: nofaol qilgач qator faol-ro'yxatdan filtrlanadi, shuning uchun
-        o'sha qatorni darhol qayta bosib aktivlaymiz (reload bo'lmaguncha ko'rinib turadi)."""
+        """Ro'yxatda: «Неактивный» → («Показать все» filtri) → «Активный». Oxiri Активный — zanjir uchun SHART.
+
+        Jonli aniqlangan oqim (2026-11-02):
+          - qator tanlangach amal tugmalari: «Неактивный»/«Активный» (bevosita tugma);
+          - har o'zgartirish «Подтверждение … Да/Нет» tasdiq oynasini chiqaradi → «Да»;
+          - «Неактивный» qilingach qator faol (default) ro'yxatdan DARHOL filtrlanadi → qayta aktivlash
+            uchun «Показать все» filtri yoqilib, qidirib topiladi."""
+        # --- Неактивный (qator hozircha faol, default ro'yxatda) ---
         self.find_in_list(name)
         self.b.grid_row(name).click()
         self.page.wait_for_timeout(800)
         self.b.click_button("Неактивный", exact=False)
-        self._confirm_if_any()
+        self._confirm_yes()
         self.page.wait_for_timeout(1_500)
-        # o'sha qatorni qayta bosib Активный (qayta qidirmaymiz)
+        # --- qayta Активный: «Показать все» bilan nofaolni topib ---
+        self.open_list()
+        self.page.get_by_role("button", name="Создать", exact=True).first.wait_for(state="visible", timeout=30_000)
+        self._show_all_in_list()
+        self.b.search_list(name)
+        self.page.wait_for_timeout(1_500)
         self.b.grid_row(name).click()
         self.page.wait_for_timeout(800)
         self.b.click_button("Активный", exact=False)
-        self._confirm_if_any()
+        self._confirm_yes()
         self.page.wait_for_timeout(1_500)
+        # tasdiq: endi aktiv → DEFAULT (faol) ro'yxatda qayta ko'rinadi (zanjir uchun SHART)
+        self.find_in_list(name)
 
     def edit_order_no(self, name: str, new_value: str):
         """«Изменить» → Порядковый номер o'zgartirib saqlaydi."""

@@ -34,11 +34,9 @@ def test_01_tmc(e2e_page, e2e, rdate):
         tmc.open_tabs_smoke()
         tmc.fill_characteristics()
 
-    with allure.step("5b - 2-shtrix-kod qo'shish (dialog)"):
+    with allure.step("5b - 2-shtrix-kod qo'shish (dialog) + fayl biriktirish"):
         tmc.add_second_barcode(d["barcode2"])
-        # TODO (fayl biriktirish): Файлы «Добавить» dialogi minimal PDF bilan yopilmaydi
-        #   (dialog error holatida qoladi) — haqiqiy/kattaroq PDF yoki dialog preview bilan
-        #   jonli aniqlanadi. tmc.add_file() metodi tayyor, yoqilgach ishlaydi.
+        tmc.add_file()   # Файлы «Добавить» → qa.pdf + majburiy «Название» + «Примечание»
 
     with allure.step("6 - «Сохранить»"):
         tmc.save()
@@ -52,9 +50,8 @@ def test_01_tmc(e2e_page, e2e, rdate):
     with allure.step("9 - «Изменить» → Порядковый номер 998"):
         tmc.edit_order_no(d["name"], d["order_no_edit"])
 
-    # TODO (status toggle): «Неактивный» qilingach qator FAOL-ro'yxatdan DARHOL filtrlanadi
-    #   (qayta-qidiruvsiz ham) — qayta «Активный» uchun list'da "nofaollarни ko'rsat" filtri kerak.
-    #   a2 filtr mexanizmini aniqlagach `tmc.toggle_status_in_list()` yoqiladi (metod tayyor).
+    with allure.step("10 - Status: «Неактивный» → «Активный» (oxiri Активный)"):
+        tmc.toggle_status_in_list(d["name"])
 
     e2e["tmc_name"] = d["name"]
     e2e["tmc_code"] = d["code"]
