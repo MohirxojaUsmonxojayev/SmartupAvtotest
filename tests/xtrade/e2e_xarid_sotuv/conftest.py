@@ -12,7 +12,10 @@ from playwright.sync_api import sync_playwright
 from config.servers import resolve_server
 from flows.auth_flow import login, kill_active_session, dashboard_opened, switch_filial
 
-STATE_PATH = "test-results/e2e_state.json"
+# DIQQAT: test-results/ ni pytest-playwright plugin'i har session boshida TOZALAYDI,
+# shuning uchun resume holati (session oxirida yozilib, keyingi session boshida o'qiladi)
+# shu papkadan TASHQARIDA saqlanishi SHART — aks holda har run'da yo'qoladi.
+STATE_PATH = ".e2e-state/e2e_state.json"
 
 
 def _headless() -> bool:
@@ -33,7 +36,8 @@ def e2e() -> dict:
     if os.path.exists(STATE_PATH):
         try:
             with open(STATE_PATH, encoding="utf-8") as f:
-                data = json.load(f)
+                raw = f.read()
+            data = json.loads(raw) if raw.strip() else {}
         except Exception:
             data = {}
     yield data

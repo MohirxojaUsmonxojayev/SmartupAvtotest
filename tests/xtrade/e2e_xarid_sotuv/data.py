@@ -51,8 +51,10 @@ def tmc_full(d: str) -> dict:
 ENV = {
     "unit":          "шт",                     # Ед. изм.
     "room":          "Room - Yashnobod",        # Рабочая зона (buyurtma uchun shart)
-    "price_sell":    15000,                      # Sotish sum
-    "price_buy":     10000,                      # Olish sum / xarid narxi
+    "price_sell":    15000,                      # Sotish sum (Цена продажи)
+    "price_buy":     10000,                      # Olish sum / xarid narxi (Цена закупа)
+    "price_type_sell": "Sotish sum",             # TC-02: narx turi (Цена продажи, Узбекский сум)
+    "price_type_buy":  "Olish sum",              # TC-02: narx turi (Цена закупа, Узбекский сум)
     "payment_type":  "Наличные деньги",
     "currency":      "Узбекский сум",
 }

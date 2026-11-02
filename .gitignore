@@ -28,6 +28,9 @@ test-results/
 playwright-report/
 .playwright-mcp/
 
+# E2E resume holati (test-results tashqarisida — pytest-playwright uni tozalaydi)
+.e2e-state/
+
 # Allure
 allure-results/
 allure-report/
