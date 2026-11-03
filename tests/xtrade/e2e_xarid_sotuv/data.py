@@ -88,6 +88,42 @@ def legal_full(d: str) -> dict:
     }
 
 
+def natural_full(d: str, legal_person: str = "") -> dict:
+    """TC-E2E-04 Физическое лицо (mijoz) to'liq ma'lumoti. GPS/Файлы — mustasno.
+    legal_person — «Юридическое лицо» ulanishi (TC-03 ta'minotchi); bo'sh bo'lsa select_first."""
+    return {
+        "surname":    "QA-E2E",
+        "first_name": f"Mijoz{d}",             # Имя * (autocomplete, erkin matn)
+        "middle":     "Testovich",
+        "code":       f"QA-E2E-FIZ-{d}",
+        "bday":       "01.01.1995",
+        "passport":   f"AA{d[1:]}",            # 2 harf + 7 raqam (UNIQUE)
+        "region":     "Toshkent",
+        "address":    "Toshkent, QA 2",
+        "post_addr":  "100000",
+        "legal_person": legal_person,
+        "phone":      f"+99891{d[1:]}",        # UNIQUE (legal'dan farqli prefiks)
+        "pnfl":       f"3{d}00000",            # ПНФЛ 14 raqam (UNIQUE)
+        "telegram":   f"@qa_mijoz_{d}",        # UNIQUE
+        "email":      f"qa.mijoz.{d}@example.com",  # UNIQUE
+        "web":        "qa-mijoz.uz",
+        # Расчетный счет (TC-03 kabi)
+        "bank_acc_name": "QA-E2E hisob FIZ",
+        "bank_mfo":      "00014",
+        "bank_name":     "Расчетно-кассовый центр Центрального банка по г. Ташкенту",
+        "bank_acc_no":   f"202080009{d}001",   # UNIQUE 20 raqam
+        "bank_note":     "QA",
+        # Договор
+        "contract_name": f"QA-E2E shartnoma FIZ {d}",
+        "contract_no":   f"QA-E2E-DOGF-{d}",
+        "contract_sum":  "5000000",
+        # Примечание / Адреса доставки
+        "note":          "QA-E2E mijoz izoh",
+        "deliv_short":   f"QA yetkazish {d}",
+        "deliv_full":    "Toshkent, QA yetkazish ko'chasi 2",
+    }
+
+
 # Doimiy qiymatlar (muhit ma'lumotiga tayanadi — kerak bo'lsa moslanadi)
 ENV = {
     "unit":          "шт",                     # Ед. изм.
