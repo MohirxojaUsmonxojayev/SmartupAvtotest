@@ -236,6 +236,16 @@ class BasePage:
         """smt-switch toggle'ini bosadi (holatni o'zgartiradi)."""
         self.control(label).locator("smt-switch").first.click()
 
+    def switch_state(self, label: str) -> bool:
+        """smt-switch holati (True=yoqilgan). `<div role=switch aria-checked>` dan o'qiladi."""
+        return self.control(label).locator("[role=switch]").first.get_attribute("aria-checked") == "true"
+
+    def switch_set(self, label: str, on: bool = True):
+        """smt-switch'ni istalgan holatga keltiradi (allaqachon shunday bo'lsa bosmaydi)."""
+        if self.switch_state(label) != on:
+            self.control(label).locator("smt-switch").first.click()
+            self.page.wait_for_timeout(300)
+
     # ==================================================================================================================
     # Tugmalar / saqlash
     # ==================================================================================================================
