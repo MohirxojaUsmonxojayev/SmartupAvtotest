@@ -124,6 +124,23 @@ def natural_full(d: str, legal_person: str = "") -> dict:
     }
 
 
+def warehouse_full(d: str) -> dict:
+    """TC-E2E-06 Склад to'liq ma'lumoti. GPS — mustasno."""
+    return {
+        "name":      f"QA-E2E Sklad {d}",
+        "code":      f"QA-E2E-WH-{d}",
+        "order_no":  "999",
+        "height":    "3",
+        "width":     "10",
+        "length":    "20",
+        "volume":    "600",          # 3×10×20 (avto hisoblanmaydi — qo'lda)
+        "note":      "QA-E2E ombor",
+        "address":   "Toshkent, QA 3",
+        "orientir":  "mo'ljal",
+        "region":    "Toshkent",
+    }
+
+
 # Doimiy qiymatlar (muhit ma'lumotiga tayanadi — kerak bo'lsa moslanadi)
 ENV = {
     "unit":          "шт",                     # Ед. изм.
