@@ -149,6 +149,24 @@ class PurchaseOrderPage:
         self._confirm_yes_if_any()
         self.page.wait_for_timeout(2_500)
 
+    def set_status_accepted(self, number: str):
+        """Wizard buyurtmani «Новый» holatida saqlaydi — ro'yxatда «Статус» → «Принято» ga o'tkazamiz
+        (Закупка FAQAT Принято buyurtmadan yaratiladi). TC-08 request status-transition kabi."""
+        self.open_list()
+        self.b.search_list(number)
+        self.page.wait_for_timeout(1_500)
+        novy = self.page.locator("smt-data-table").get_by_text("Новый", exact=False)
+        if novy.count() == 0:
+            return  # allaqachon Принято/boshqa holat
+        novy.first.click()
+        self.page.wait_for_timeout(800)
+        self.b.click_button("Статус", exact=False)
+        self.page.wait_for_timeout(800)
+        self.page.locator(".cdk-overlay-pane, [role=menu]").get_by_text("Принято", exact=True).first.click()
+        self.page.wait_for_timeout(800)
+        self._confirm_yes_if_any()
+        self.page.wait_for_timeout(1_500)
+
     # ---- tekshirish -----------------------------------------------------------------------------
     def expect_in_list(self, supplier: str, total: int):
         self.open_list()

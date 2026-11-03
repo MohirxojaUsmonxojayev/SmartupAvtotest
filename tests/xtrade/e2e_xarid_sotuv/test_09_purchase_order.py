@@ -38,10 +38,11 @@ def test_09_purchase_order(e2e_page, e2e, rdate):
         itogo = po.step3_price(price, qty)
         assert itogo == str(total), f"ИТОГО kutilgan {total}, lekin '{itogo}'"
 
-    with allure.step(f"4 - Step4 «Завершение»: Номер {number}, Статус Принято → Завершить"):
-        po.step4_finish(number, status="Принято")
+    with allure.step(f"4 - Step4 «Завершение»: Номер {number} → Завершить"):
+        po.step4_finish(number)
 
-    with allure.step("5 - Ro'yxatda ta'minotchi/jami ko'rinadi"):
+    with allure.step("5 - Ro'yxatда «Статус» → Принято (Закупка uchun SHART)"):
+        po.set_status_accepted(number)
         po.expect_in_list(supplier, total)
 
     e2e["purchase_order"] = number
