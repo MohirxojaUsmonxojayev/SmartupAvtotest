@@ -144,6 +144,34 @@ class BasePage:
         option_el.click()
         self._close_overlay()
 
+    def select_change(self, label: str, option: str, *, search: str | None = None,
+                      exact: bool = True, timeout: int = 30_000):
+        """To'la smt-data-select'ni (default qiymatli) o'zgartiradi: avval «×» bilan tozalab, keyin tanlaydi.
+        To'la select trigger'i oddiy klik bilan OCHILMAYDI — avval tozalash kerak. «×» ba'zan dropdown'ni
+        o'zi ochadi, shuning uchun ochilishini inline boshqaramiz."""
+        ctrl = self.control(label)
+        if (ctrl.locator("input").first.input_value() or "").strip():
+            clr = ctrl.locator("svg-icon[class*=x], [aria-label*=clear], [aria-label*=close]")
+            try:
+                clr.last.click(timeout=3_000)
+                self.page.wait_for_timeout(500)
+            except Exception:
+                pass
+        if self.page.locator(".cdk-overlay-pane").count() == 0:
+            ctrl.locator("smt-data-select, input").first.click()
+            self.page.wait_for_timeout(600)
+        overlay = self.page.locator(".cdk-overlay-container")
+        if search is not None:
+            box = overlay.locator("input").first
+            if box.count() > 0:
+                box.fill(search)
+                self.page.wait_for_timeout(1_200)
+        opt = overlay.get_by_text(option, exact=exact).first
+        expect(opt).to_be_visible(timeout=timeout)
+        opt.scroll_into_view_if_needed()
+        opt.click()
+        self._close_overlay()
+
     def multiselect(self, label: str, *options: str, exact: bool = True, timeout: int = 30_000):
         """smt-multi-data-select: bir yoki bir nechta variant tanlaydi, oxirida yopadi."""
         self._open_select(label)
