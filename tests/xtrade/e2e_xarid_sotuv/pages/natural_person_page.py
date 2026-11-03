@@ -110,7 +110,13 @@ class NaturalPersonPage:
         self.b.input(label="Телеграм", value=d["telegram"])
         self.b.input(label="Email", value=d["email"])
         self.b.input(label="Веб-сайт", value=d["web"])
-        self.b.multiselect_first("Рабочие зоны")                 # Room (buyurtma uchun shart)
+        # Рабочие зоны = «Room - Yashnobod» (sotuv buyurtmasida mijoz shu zona bo'yicha FILTRLANADI — SHART)
+        try:
+            self.b.multiselect("Рабочие зоны", "Room - Yashnobod", exact=False)
+        except Exception:
+            print("  [раб.зоны] «Room - Yashnobod» topilmadi — birinchi variant")
+            self.b._close_overlay()
+            self.b.multiselect_first("Рабочие зоны")
         self.b.select_first("Ответственный")
         # GPS — mustasno (spec)
         # checkboxlar: Клиент=Да (mijoz avto-yaratiladi); Поставщик/Сотрудник — yoqib-o'chirib ko'rish

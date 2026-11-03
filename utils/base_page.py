@@ -133,12 +133,14 @@ class BasePage:
     def select(self, label: str, option: str, *, search: str | None = None, exact: bool = True, timeout: int = 30_000):
         """smt-data-select dropdown'dan variant tanlaydi (trigger → (qidiruv) → variant)."""
         self._open_select(label)
-        overlay = self.page.locator(".cdk-overlay-container")
         if search is not None:
-            box = overlay.locator("input").first
+            box = self.page.locator(".cdk-overlay-container").locator("input").first
             if box.count() > 0:
                 box.fill(search)
-        option_el = overlay.get_by_text(option, exact=exact).first
+                self.page.wait_for_timeout(800)
+        # variant FAQAT ko'rinadigan dropdown'dan (.cdk-overlay-pane) — container'da trigger qiymati
+        # yoki boshqa pane'lar ham bo'lishi mumkin, .first ko'rinmas elementga tushib qoladi.
+        option_el = self.page.locator(".cdk-overlay-pane").get_by_text(option, exact=exact).first
         expect(option_el).to_be_visible(timeout=timeout)
         option_el.scroll_into_view_if_needed()
         option_el.click()
@@ -175,9 +177,9 @@ class BasePage:
     def multiselect(self, label: str, *options: str, exact: bool = True, timeout: int = 30_000):
         """smt-multi-data-select: bir yoki bir nechta variant tanlaydi, oxirida yopadi."""
         self._open_select(label)
-        overlay = self.page.locator(".cdk-overlay-container")
+        pane = self.page.locator(".cdk-overlay-pane")   # faqat ko'rinadigan dropdown
         for opt in options:
-            el = overlay.get_by_text(opt, exact=exact).first
+            el = pane.get_by_text(opt, exact=exact).first
             expect(el).to_be_visible(timeout=timeout)
             el.scroll_into_view_if_needed()
             el.click()
