@@ -18,6 +18,7 @@ def names(d: str) -> dict:
         "purchase_order": f"QA-E2E-ZZ-{d}",
         "purchase":       f"QA-E2E-ZK-{d}",
         "input_doc":      f"QA-E2E-PS-{d}",
+        "sale_order":     f"QA-E2E-SZ-{d}",
         "contract":       f"QA-E2E-DOG-{d}",
         "pay1":           f"QA-E2E-PAY1-{d}",
         "pay2":           f"QA-E2E-PAY2-{d}",
