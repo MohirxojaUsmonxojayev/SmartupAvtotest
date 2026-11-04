@@ -36,20 +36,33 @@ class ClientPaymentPage:
         self.page.wait_for_timeout(2_000)
 
     def _pick(self, label: str, text: str, *, exact: bool = False):
-        """select: trigger → (Загрузка bo'lsa matn yozilgach yuklanadi) → ko'rinadigan pane'dan tanlash."""
+        """select: (shartли maydon bo'lsa — control ko'rinishini kutadi) → trigger → matn → variant
+        KO'RINISHINI KUTIB tanlaydi. «Тип оплаты»/«Касса» «Загрузка…» sekin bo'lsa ham barqaror:
+        fiks kutish o'rniga variant visible bo'lguncha (15s) kutamiz."""
+        expect(self.b.control(label)).to_be_visible(timeout=15_000)  # shartли maydon paydo bo'lishi
         self.b._open_select(label)
-        self.page.wait_for_timeout(1_200)
+        self.page.wait_for_timeout(1_000)
         box = self.page.locator(".cdk-overlay-container input").first
         if box.count() > 0:
             box.fill(text)
-            self.page.wait_for_timeout(2_000)   # «Загрузка…» tugashi uchun
-        self.page.locator(".cdk-overlay-pane").get_by_text(text, exact=exact).first.click()
+        opt = self.page.locator(".cdk-overlay-pane").get_by_text(text, exact=exact).first
+        expect(opt).to_be_visible(timeout=15_000)   # «Загрузка…» tugashini kutadi
+        opt.scroll_into_view_if_needed()
+        opt.click()
         self.page.wait_for_timeout(500)
         self.b._close_overlay()
 
-    def _balance(self) -> str:
+    def _balance(self, *, wait: bool = False) -> str:
+        """«Баланс» (RO) qiymatini o'qiydi. wait=True → maydon to'lguncha (bo'sh bo'lmaguncha, ~8s)
+        kutadi — Клиент tanlangач Баланс async to'lgani uchun (eski/bo'sh qiymatni o'qib qolmaslik)."""
         c = self.page.locator("smt-control").filter(has_text="Баланс").first
-        return re.sub(r"[^\d-]", "", c.locator("input").first.input_value() or "")
+        inp = c.locator("input").first
+        if wait:
+            for _ in range(20):   # ~8s
+                if (inp.input_value() or "").strip():
+                    break
+                self.page.wait_for_timeout(400)
+        return re.sub(r"[^\d-]", "", inp.input_value() or "")
 
     def create_payment(self, number: str, amount: int, client: str,
                        kassa: str = "Основная касса", with_offset: bool = True) -> str:
@@ -60,11 +73,9 @@ class ClientPaymentPage:
         self.b.input(label="Номер оплаты", value=number)
         self.b.input(label="Сумма", value=str(amount))
         self._pick("Тип оплаты", "Наличные деньги", exact=True)
-        self.page.wait_for_timeout(1_000)
-        self._pick("Касса", kassa, exact=False)
+        self._pick("Касса", kassa, exact=False)   # _pick Касса control paydo bo'lishini kutadi
         self._pick("Клиент", client, exact=False)
-        self.page.wait_for_timeout(1_500)
-        balance_before = self._balance()
+        balance_before = self._balance(wait=True)   # Баланс async to'lishini kutadi
         if with_offset:
             self.b.checkbox("Провести взаимозачёт", True, exact=False)
             self.page.wait_for_timeout(800)
@@ -89,8 +100,7 @@ class ClientPaymentPage:
         """Yangi forma ochib, mijozni tanlab «Баланс» qiymatini o'qiydi (saqlamaydi). Raqam (manfiy)."""
         self.open_create()
         self._pick("Клиент", client, exact=False)
-        self.page.wait_for_timeout(1_500)
-        bal = self._balance()
+        bal = self._balance(wait=True)
         self.page.get_by_role("button", name="Закрыть", exact=True).first.click()
         self.page.wait_for_timeout(800)
         return bal
