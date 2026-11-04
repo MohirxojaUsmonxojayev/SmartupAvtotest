@@ -9,9 +9,15 @@ Jonli tasdiqlangan struktura (mohir@xan, 2026-11-02):
     Qator amallari: Просмотр, Изменить, Ценник, «Установка цен», Прикрепление, Настройка.
   Tablar (breadcrumb-link): Цены / Типы оплат / Скидки/наценки.
   «Установка цен»: grid (ustunlar №/Код/ТМЦ/Группа/Категория/Торговая марка/Средняя Приходная цена/
-    «Цена с НДС и акцизом»=tahrirlanadigan input). Tepada «Сохранить»/«Закрыть», ТМЦ/Услуга toggle,
-    «Поиск...» (grid filtri). Narx yozib «Сохранить» → «Подтверждение — Сохранить? Да/Нет» → «Да» →
-    Цены ro'yxatiga qaytadi. Qiymat «15 000» ko'rinishida (probel bilan guruhlanadi) saqlanadi.
+    «Цена с НДС и акцизом»=tahrirlanadigan YAGONA input). Tepada «Сохранить»/«Закрыть», ТМЦ/Услуга
+    toggle, «Поиск...» (grid filtri). Narx yozib «Сохранить» → «Подтверждение — Сохранить? Да/Нет» →
+    «Да» → Цены ro'yxatiga qaytadi. Qiymat «15 000» ko'rinishida (probel bilan guruhlanadi) saqlanadi.
+
+  SOTUVGA TAYYORLIK (2026-11-04 topildi): ТМЦ sotuv buyurtmasining «Подбор» grid'ида ko'rinishi uchun
+    «Sotish sum» narx turining AYNAN «Цена с НДС и акцизом» ustuni to'ldirilган bo'lishi SHART — stok
+    bo'lsa ham, bu ustun bo'sh bo'lsa ТМЦ Подбор'да umuman chiqmaydi. set_price() shu ustunga yozadi va
+    saqlangach bo'sh emasligini tekshiradi. (Jonli tasdiq: narx+stok birga bo'lган ТМЦ «100/100» bilan
+    Подбор'да chiqdi.)
 """
 import re
 
@@ -64,11 +70,23 @@ class PricePage:
         self.page.wait_for_selector("smt-data-table", timeout=30_000)
         self.page.wait_for_timeout(1_500)
 
-    def _price_input(self, product: str):
-        """«Установка цен» grid'ida mahsulotni qidirib, aniq SHU qatorning narx input'ini qaytaradi.
+    # «Установка цен» grid'ida tahrirlanadigan yagona ustun — AYNAN shu. Mahsulot sotuvда (buyurtma
+    # «Подбор») chiqishi uchun shu ustun to'ldirilgan bo'lishi SHART (narx + stok birga). Qarang:
+    # test_12 sotuv — narx shu ustunda bo'lmasa, ТМЦ Подбор grid'ida umuman ko'rinmaydi.
+    PRICE_COLUMN = "Цена с НДС и акцизом"
 
-        Grid ichida 2 xil input: «Поиск...» (type=search) va narx (type=text). Qidiruv bitta qatorга
-        filtrlangach `smt-data-table input[type=text]` aynan bitta narx input bo'ladi."""
+    def _price_input(self, product: str):
+        """«Установка цен» grid'ida mahsulotni qidirib, aniq SHU qatorning «Цена с НДС и акцизом»
+        narx input'ini qaytaradi.
+
+        Grid ichida 2 xil input: «Поиск...» (type=search) va narx (type=text). Grid'да yagona
+        tahrirlanadigan ustun «Цена с НДС и акцизом» — qidiruv bitta qatorга filtrlangach
+        `smt-data-table input[type=text]` aynan shu bitta narx input bo'ladi. Ustun sarlavhasini ham
+        tekshiramiz: forma o'zgarib boshqa tahrirlanadigan ustun qo'shilsa, test jim xato yozmasdan
+        baland ovozда yiqilsin."""
+        # tahrirlanadigan ustun haqiqatan «Цена с НДС и акцизом» ekanini tasdiqlaymiz (intent + guard)
+        expect(self.page.locator("smt-cell-header").get_by_text(self.PRICE_COLUMN, exact=False).first
+               ).to_be_visible(timeout=15_000)
         self.b.search_list(product)
         inp = self.page.locator("smt-data-table input[type=text]")
         for _ in range(20):  # filtr joylashishini kutamiz (~10s)
@@ -90,7 +108,11 @@ class PricePage:
 
     def set_price(self, price_type: str, product: str, amount: int):
         """Narx turi × ТМЦ uchun «Цена с НДС и акцизом» ni o'rnatadi va saqlaydi.
-        «Сохранить» → «Да» → Цены ro'yxatiga qaytadi."""
+        «Сохранить» → «Да» → Цены ro'yxatiga qaytadi.
+
+        MUHIM: Sotish narxi (price_type=«Sotish sum») shu ustunga yozilmasa, ТМЦ sotuv buyurtmasining
+        «Подбор» grid'ida umuman ko'rinmaydi (stok bo'lsa ham). Shu sabab saqlashdan so'ng qiymat
+        haqiqatan yozilganini (bo'sh emasligini) darhol tekshiramiz."""
         self.open_ustanovka(price_type)
         inp = self._price_input(product)
         inp.click()
@@ -102,6 +124,12 @@ class PricePage:
         self.b.save()          # «Сохранить»
         self._confirm_yes()    # «Сохранить?» → «Да»
         self.page.wait_for_timeout(2_000)
+        # sotuvga tayyorlik kafolati: «Цена с НДС и акцизом» bo'sh qolmaganiga ishonch hosil qilamiz
+        self.open_ustanovka(price_type)
+        saved = re.sub(r"\D", "", self._price_input(product).input_value())
+        assert saved == str(amount), (
+            f"«{self.PRICE_COLUMN}» saqlanmadi: {price_type} × {product} — kutilgan {amount}, "
+            f"maydonda raqamlar '{saved}'. Bu ustun bo'sh bo'lsa ТМЦ sotuvда (Подбор) chiqmaydi.")
 
     def expect_price(self, price_type: str, product: str, amount: int):
         """Narx turi «Установка цен» ni qayta ochib, saqlangan narxni tekshiradi (probel/format tolerant)."""
