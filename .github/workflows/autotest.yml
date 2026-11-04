@@ -113,7 +113,8 @@ jobs:
           XTRADE_PASSWORD: ${{ secrets.XTRADE_PASSWORD }}
         run: |
           set +e
-          ARGS=("tests/${IN_SERVER}" "--server" "${IN_SERVER}" "--alluredir=allure-results" "-v")
+          # E2E zanjiri (~15 daqiqa, tartibli) bu login/smoke run'ga KIRMAYDI — alohida `e2e.yml` da.
+          ARGS=("tests/${IN_SERVER}" "-m" "not e2e" "--server" "${IN_SERVER}" "--alluredir=allure-results" "-v")
           [ -n "$IN_LOGIN" ]    && ARGS+=("--email" "$IN_LOGIN")
           [ -n "$IN_PASSWORD" ] && ARGS+=("--password" "$IN_PASSWORD")
           python -m pytest "${ARGS[@]}"
