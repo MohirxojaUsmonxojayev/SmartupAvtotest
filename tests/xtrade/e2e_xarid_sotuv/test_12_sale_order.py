@@ -42,14 +42,17 @@ def test_12_sale_order(e2e_page, e2e):
     with allure.step(f"3 - Step3 «Завершение»: Тип оплаты «{ENV['payment_type']}», Статус Новый → Сохранить"):
         so.step3_finish(ENV["payment_type"], status="Новый")
 
-    with allure.step("4 - Ro'yxatда buyurtma mavjud + Статус «Новый»"):
+    with allure.step("4 - Ro'yxatда buyurtma mavjud + Статус «Новый» + ИД olish"):
         so.expect_in_list(client)
         status = so.latest_status(client)
         assert status == "Новый", f"Buyurtma holati kutilgan «Новый», lekin «{status}»"
+        order_id = so.capture_id(client)
 
-    # Zanjir identifikatori: sotuv ro'yxatida matnli номер yo'q → klient + «Новый» holat
+    # Zanjir identifikatori: matnli номер yo'q → «ИД заказа» (TC-13 status-transition uchun) + klient
+    e2e["sale_order_id"] = order_id
     e2e["sale_order_client"] = client
     e2e["sale_order_status"] = status
     e2e["order_qty"] = qty
     e2e["order_sum"] = total
-    print(f"[E2E-12] Sotuv buyurtmasi yaratildi — {client}, {tmc} × {qty}, ИТОГО {total}, Статус {status}")
+    print(f"[E2E-12] Sotuv buyurtmasi yaratildi — ИД {order_id}, {client}, {tmc} × {qty}, "
+          f"ИТОГО {total}, Статус {status}")

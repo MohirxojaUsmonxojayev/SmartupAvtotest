@@ -181,6 +181,16 @@ class SaleOrderPage:
         expect(self.page.locator("smt-data-table").get_by_text(client, exact=False).first
                ).to_be_visible(timeout=10_000)
 
+    _STATUSES = ("Черновик", "Новый", "В обработке", "В ожидании", "Отгружен", "Доставлен", "Архив", "Отменен")
+
+    def _row_status(self, row) -> str:
+        """Qator matnidan joriy Статусni ajratadi."""
+        txt = row.inner_text() or ""
+        for st in self._STATUSES:
+            if re.search(rf"(?<!\w){re.escape(st)}(?!\w)", txt):
+                return st
+        return ""
+
     def latest_status(self, client: str) -> str:
         """Klient bo'yicha qidirib, eng yangi buyurtma qatorining Статус hujayrasini qaytaradi."""
         self.open_list()
@@ -188,8 +198,49 @@ class SaleOrderPage:
         self.page.wait_for_timeout(2_000)
         row = self.page.locator("smt-data-table .smt-data-row").first
         expect(row).to_be_visible(timeout=10_000)
-        for status in ("Новый", "Завершено", "Принято", "В обработке", "Отгружен", "Доставлен"):
-            if row.get_by_text(status, exact=True).count() > 0:
-                return status
-        cells = [c.strip() for c in (row.inner_text() or "").splitlines() if c.strip()]
-        return cells[-1] if cells else ""
+        return self._row_status(row)
+
+    def capture_id(self, client: str) -> str:
+        """Klient bo'yicha eng yangi buyurtma qatoridan «ИД заказа» (5+ xonali raqam) ni qaytaradi.
+        Статус-o'zgartirishда buyurtmani aniq nishonlash uchun (bir klientда bir necha buyurtma bo'lsa)."""
+        self.open_list()
+        self.b.search_list(client)
+        self.page.wait_for_timeout(2_000)
+        row = self.page.locator("smt-data-table .smt-data-row").first
+        expect(row).to_be_visible(timeout=10_000)
+        m = re.search(r"\d{5,}", (row.inner_text() or "").replace(" ", "").replace(" ", ""))
+        # DIQQAT: Сумма (450000) probel bilan render bo'ladi; ИД ustuni Сумма'dan oldin keladi va
+        # probelsiz raqam — probellarni olib tashlab birinchi 5+ xonali ketma-ketlikni olamiz.
+        row_raw = row.inner_text() or ""
+        m2 = re.search(r"(?<!\d)\d{5,7}(?!\d)", row_raw)
+        return (m2.group(0) if m2 else (m.group(0) if m else ""))
+
+    def _find_row(self, client: str, order_id: str):
+        """Klient bo'yicha qidirib (ro'yxat qidiruvi ИД заказа BO'YICHA ishlamaydi!), qatorni
+        «ИД заказа» matni bilan filtrlab topadi."""
+        self.open_list()
+        self.b.search_list(client)
+        self.page.wait_for_timeout(2_000)
+        row = self.page.locator("smt-data-table .smt-data-row").filter(has_text=order_id).first
+        expect(row).to_be_visible(timeout=10_000)
+        return row
+
+    def change_status(self, client: str, order_id: str, to_status: str):
+        """Buyurtmani (ИД заказа bo'yicha) `to_status` ga o'tkazadi: Статус hujayra dropdown →
+        menuitem → «Изменить статус на …?» → «Да». Joriy status = to_status bo'lsa — o'tkazmaydi."""
+        row = self._find_row(client, order_id)
+        cur = self._row_status(row)
+        if cur == to_status:
+            return
+        # Статус hujayra dropdown trigger = qatorда joriy status matni
+        row.get_by_text(cur, exact=True).first.click()
+        self.page.wait_for_timeout(1_500)
+        self.page.locator(".cdk-overlay-pane").get_by_text(to_status, exact=True).first.click()
+        self.page.wait_for_timeout(1_200)
+        self._confirm_yes_if_any()   # «Изменить статус на …?» → Да
+        self.page.wait_for_timeout(2_500)
+
+    def expect_status(self, client: str, order_id: str, status: str):
+        """ИД заказа bo'yicha qatorда kutilgan status borligini tekshiradi."""
+        got = self._row_status(self._find_row(client, order_id))
+        assert got == status, f"Buyurtma {order_id} holati kutilgan «{status}», lekin «{got}»"
