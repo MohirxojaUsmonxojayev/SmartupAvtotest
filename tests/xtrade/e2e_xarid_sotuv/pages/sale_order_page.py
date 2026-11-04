@@ -27,6 +27,7 @@ from utils.base_page import BasePage
 
 class SaleOrderPage:
     LIST_PATH = "/a2/trade/tdeal/order/order_list"
+    RETURN_PATH = "/a2/anor/mdeal/order/return"   # «Возврат/Отказ» — deal_id bo'yicha
 
     def __init__(self, page, base_url: str):
         self.page = page
@@ -244,3 +245,50 @@ class SaleOrderPage:
         """ИД заказа bo'yicha qatorда kutilgan status borligini tekshiradi."""
         got = self._row_status(self._find_row(client, order_id))
         assert got == status, f"Buyurtma {order_id} holati kutilgan «{status}», lekin «{got}»"
+
+    # ---- Qisman qaytarish («Отказ»/«Возврат») ---------------------------------------------------
+    # Доставлен buyurtmadan qisman qaytarish — forma: /a2/anor/mdeal/order/return?deal_id=<ИД>.
+    # a2 UI'да «Отказ» qator-amali to'g'ridan-to'g'ri ko'rinmaydi (Отказы ro'yxatida «Создать» yo'q,
+    # order_view/toolbar'да ham yo'q) → forma deal_id (= «ИД заказа») bilan URL orqали ochiladi.
+    # DIQQAT: a2 chuqur route'ni to'g'ridан goto qilish ba'zan bo'sh sahifa beradi — avval order_list
+    # bilan SPA isitiladi, keyin return URL'ga o'tiladi.
+    def _order_sum(self) -> str:
+        """«Сумма заказа» (RO) maydon qiymati — raqamlar."""
+        c = self.page.locator("smt-control").filter(has_text="Сумма заказа").first
+        return re.sub(r"\D", "", c.locator("input").first.input_value() or "")
+
+    def open_return(self, order_id: str):
+        self.open_list()  # SPA'ni isitadi
+        self.page.goto(f"{self.base_url}{self.RETURN_PATH}?deal_id={order_id}",
+                       wait_until="commit", timeout=60_000)
+        self.page.get_by_text("Причина возврата", exact=False).first.wait_for(state="visible", timeout=30_000)
+        self.page.wait_for_timeout(2_000)
+        expect(self.page.get_by_text("Возврат", exact=True).first).to_be_visible(timeout=10_000)
+
+    def partial_return(self, order_id: str, return_qty: int, reason: str = "Обмен") -> str:
+        """Доставлен buyurtmadan `return_qty` dona qaytaradi: grid «Возврат» ustunига qty yoziladi,
+        Причина возврата tanlanadi, «Сохранить» → «Сохранить?» да. Qaytarishдан keyingi «Сумма
+        заказа» (raqamlar) qaytaradi (kutilgan: dastlabki − return_qty×narx)."""
+        self.open_return(order_id)
+        # Возврат input = qatorдаgi yagona text input (search type=search chiqib ketadi)
+        vinp = self.page.locator(".smt-data-row input[type=text], smt-data-table input[type=text]").first
+        vinp.click(); vinp.press("ControlOrMeta+A"); vinp.press("Backspace")
+        vinp.fill(str(return_qty)); vinp.press("Tab")
+        self.page.wait_for_timeout(1_500)
+        sum_after = self._order_sum()
+        self._pick("Причина возврата", reason, exact=True)
+        self.b.save()
+        self.page.wait_for_timeout(1_000)
+        self._confirm_yes_if_any()   # «Сохранить?» → Да
+        self.page.wait_for_timeout(2_500)
+        return sum_after
+
+    def expect_return_persisted(self, order_id: str, expected_sum: int):
+        """Qaytarish SAQLANGANini mustaqil tasdiqlaydi: return formани QAYTA ochib (yangi yuklash),
+        «Сумма заказа» kutilgan (qaytarishдан keyingi) qiymatда ekanini tekshiradi — partial_return
+        qiymatni saqlashдан OLDIN o'qigani uchun bu false-positivedan himoya qiladi."""
+        self.open_return(order_id)
+        got = self._order_sum()
+        assert got == str(expected_sum), (
+            f"Qaytarish saqlanmagan ko'rinadi: buyurtma {order_id} «Сумма заказа» yangi yuklashда "
+            f"kutilgan {expected_sum}, lekin '{got}'.")
