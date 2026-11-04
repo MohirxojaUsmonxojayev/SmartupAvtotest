@@ -41,10 +41,18 @@ class ClientPaymentPage:
         fiks kutish o'rniga variant visible bo'lguncha (15s) kutamiz."""
         expect(self.b.control(label)).to_be_visible(timeout=15_000)  # shartли maydon paydo bo'lishi
         self.b._open_select(label)
-        self.page.wait_for_timeout(1_000)
-        box = self.page.locator(".cdk-overlay-container input").first
-        if box.count() > 0:
-            box.fill(text)
+        self.page.wait_for_timeout(800)
+        # QIDIRUV a2 data-select TRIGGER-INPUT'ида (control ichida), overlay'да EMAS. Overlay input'ini
+        # to'ldirish ro'yxatni FILTRLAMAYDI → yangi element (masalan birinchi 10 talikda bo'lmagan
+        # mijoz) topilmay qoladi. Shuning uchun control'ning o'z input'iga yozamiz.
+        ci = self.b.control(label).locator("input").first
+        if ci.count() > 0 and ci.is_visible():
+            ci.fill(text)
+        else:
+            ov = self.page.locator(".cdk-overlay-container input").first
+            if ov.count() > 0:
+                ov.fill(text)
+        self.page.wait_for_timeout(1_000)   # typeahead filtr/«Загрузка…»
         opt = self.page.locator(".cdk-overlay-pane").get_by_text(text, exact=exact).first
         expect(opt).to_be_visible(timeout=15_000)   # «Загрузка…» tugashini kutadi
         opt.scroll_into_view_if_needed()
