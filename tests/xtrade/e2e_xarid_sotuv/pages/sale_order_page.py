@@ -27,7 +27,8 @@ from utils.base_page import BasePage
 
 class SaleOrderPage:
     LIST_PATH = "/a2/trade/tdeal/order/order_list"
-    RETURN_PATH = "/a2/anor/mdeal/order/return"   # «Возврат/Отказ» — deal_id bo'yicha
+    RETURN_PATH = "/a2/anor/mdeal/order/return"             # «Возврат/Отказ» — deal_id bo'yicha
+    ARCHIVE_PATH = "/a2/trade/tdeal/order/order_history_list"  # «Архив заказов»
 
     def __init__(self, page, base_url: str):
         self.page = page
@@ -282,6 +283,31 @@ class SaleOrderPage:
         self._confirm_yes_if_any()   # «Сохранить?» → Да
         self.page.wait_for_timeout(2_500)
         return sum_after
+
+    # ---- Arxiv («Архив») ------------------------------------------------------------------------
+    def expect_not_in_main_list(self, client: str, order_id: str):
+        """Arxivlangandan keyин buyurtma ASOSIY ro'yxatда (order_list) KO'RINMASLIGINI tekshiradi."""
+        self.open_list()
+        self.b.search_list(client)
+        self.page.wait_for_timeout(2_000)
+        rows = self.page.locator("smt-data-table .smt-data-row").filter(has_text=order_id)
+        assert rows.count() == 0, f"Buyurtma {order_id} arxivдан keyин ham asosiy ro'yxatда ko'rinmoqda"
+
+    def expect_in_archive(self, client: str, order_id: str, expected_sum: int):
+        """«Архив заказов» (order_history_list) da buyurtma ИД bilan + Сумма kutilgan ekanini tekshiradi."""
+        self.page.goto(f"{self.base_url}{self.ARCHIVE_PATH}", wait_until="commit", timeout=60_000)
+        self.page.wait_for_selector("smt-data-table", timeout=30_000)
+        self.page.wait_for_timeout(1_500)
+        try:
+            self.b.search_list(client)
+            self.page.wait_for_timeout(2_000)
+        except Exception:
+            pass
+        row = self.page.locator("smt-data-table .smt-data-row").filter(has_text=order_id).first
+        expect(row).to_be_visible(timeout=10_000)
+        norm = re.sub(r"\s", "", row.inner_text() or "")
+        assert str(expected_sum) in norm, \
+            f"Архив'да buyurtma {order_id} Сумма {expected_sum} topilmadi (qator: {row.inner_text()!r})"
 
     def expect_return_persisted(self, order_id: str, expected_sum: int):
         """Qaytarish SAQLANGANini mustaqil tasdiqlaydi: return formани QAYTA ochib (yangi yuklash),
