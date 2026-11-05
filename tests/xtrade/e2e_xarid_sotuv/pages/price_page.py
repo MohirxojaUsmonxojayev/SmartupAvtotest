@@ -66,7 +66,8 @@ class PricePage:
         self.page.locator("smt-data-table").get_by_text(price_type, exact=True).first.click()
         self.page.wait_for_timeout(800)
         self.b.click_button("Установка цен", exact=False)
-        self.b.expect_form_open("установка")
+        # Sarlavha «Установка цен: <narx turi>» — katta harf bilan, shuning uchun registrga qaramaymiz.
+        expect(self.page).to_have_title(re.compile("установка", re.IGNORECASE), timeout=60_000)
         self.page.wait_for_selector("smt-data-table", timeout=30_000)
         self.page.wait_for_timeout(1_500)
 
