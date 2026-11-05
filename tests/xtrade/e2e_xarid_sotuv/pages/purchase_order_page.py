@@ -76,9 +76,9 @@ class PurchaseOrderPage:
         ov = self.page.locator(".cdk-overlay-container")
         if value:
             self.b.filter_dropdown(sel, value)
-        (ov.get_by_text(value, exact=False).first if value
-         else ov.locator("li[data-option-index], ul li, li").first).click()
-        self.page.wait_for_timeout(900)
+        self.b.click_option(ov.get_by_text(value, exact=False).first if value
+                            else ov.locator("li[data-option-index], ul li, li").first)
+        self.b.expect_selected(sel, value)
         self.b._close_overlay()
 
     def step2_select_request(self, zr: str, supplier: str):

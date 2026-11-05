@@ -121,8 +121,7 @@ class LegalPersonPage:
         dlg.locator("smt-control").filter(has_text=label).locator("smt-data-select, input").first.click()
         opt = self.page.locator(".cdk-overlay-container").locator(self.b._OPTION).first
         expect(opt).to_be_visible(timeout=timeout)
-        opt.scroll_into_view_if_needed()
-        opt.click()
+        self.b.click_option(opt)
         self.b._close_overlay()
 
     def _d_select(self, dlg, label: str, option: str, *, exact: bool = True, timeout: int = 15_000):
@@ -130,8 +129,7 @@ class LegalPersonPage:
         dlg.locator("smt-control").filter(has_text=label).locator("smt-data-select, input").first.click()
         opt = self.page.locator(".cdk-overlay-container").get_by_text(option, exact=exact).first
         expect(opt).to_be_visible(timeout=timeout)
-        opt.scroll_into_view_if_needed()
-        opt.click()
+        self.b.click_option(opt)
         self.b._close_overlay()
 
     def _d_select_if_empty(self, dlg, label: str, option: str, *, exact: bool = False):

@@ -6,6 +6,8 @@ DIQQAT: bu a2 (smt-*), ESKI UI EMAS. Faqat o'qish/tekshirish.
 """
 import re
 
+import zipfile
+
 from playwright.sync_api import expect
 
 from utils.base_page import BasePage
@@ -44,12 +46,20 @@ class ReportsPage:
         }
 
     def is_debtor(self, client: str) -> bool:
-        """Отчет по должникам da mijoz bor-yo'qligini qaytaradi (qarz 0 bo'lsa — yo'q)."""
+        """Отчет по должникам da mijoz bor-yo'qligini qaytaradi (qarz 0 bo'lsa — yo'q).
+        Sahifada natija jadvali yo'q: «Сформировать» xlsx yuklaydi, shuning uchun faylning o'zi o'qiladi."""
         self.page.goto(self.base_url + self.DEBTOR_PATH, wait_until="commit", timeout=60_000)
-        self.page.wait_for_timeout(4_000)
-        try:
-            self.page.wait_for_selector("smt-data-table", timeout=15_000)
-        except Exception:
-            pass
-        self.page.wait_for_timeout(1_000)
-        return self.page.get_by_text(client, exact=False).count() > 0
+        button = self.page.get_by_role("button", name="Сформировать").first
+        button.wait_for(state="visible", timeout=30_000)
+        self.page.wait_for_timeout(2_000)
+        with self.page.expect_download(timeout=120_000) as download_info:
+            button.click()
+        path = download_info.value.path()
+        with zipfile.ZipFile(path) as book:
+            text = "".join(book.read(name).decode("utf-8", "ignore")
+                           for name in book.namelist() if name.endswith(".xml"))
+        # Hisobot yangi bo'sh tab ham ochadi; keyingi qadamlar shu sahifada davom etishi kerak.
+        for extra in self.page.context.pages:
+            if extra != self.page:
+                extra.close()
+        return client in text

@@ -55,10 +55,16 @@ class ClientPaymentPage:
         self.page.wait_for_timeout(1_000)   # typeahead filtr/«Загрузка…»
         opt = self.page.locator(".cdk-overlay-pane").get_by_text(text, exact=exact).first
         expect(opt).to_be_visible(timeout=15_000)   # «Загрузка…» tugashini kutadi
-        opt.scroll_into_view_if_needed()
-        opt.click()
-        self.page.wait_for_timeout(500)
+        self.b.click_option(opt)
+        self.b.expect_selected(self.b.control(label), text)
         self.b._close_overlay()
+
+    def _pick_client(self, client: str):
+        """Mijozni tanlab, «Баланс» yangilanishini kutadi: tanlangan zahoti maydonda hali «0» turadi,
+        haqiqiy qiymat get_person_balance javobidan keyin chiqadi (so'rov ikki marta ketadi)."""
+        with self.page.expect_response(lambda r: "get_person_balance" in r.url, timeout=15_000):
+            self._pick("Клиент", client, exact=False)
+        self.page.wait_for_timeout(800)
 
     def _balance(self, *, wait: bool = False) -> str:
         """«Баланс» (RO) qiymatini o'qiydi. wait=True → maydon to'lguncha (bo'sh bo'lmaguncha, ~8s)
@@ -82,8 +88,8 @@ class ClientPaymentPage:
         self.b.input(label="Сумма", value=str(amount))
         self._pick("Тип оплаты", "Наличные деньги", exact=True)
         self._pick("Касса", kassa, exact=False)   # _pick Касса control paydo bo'lishini kutadi
-        self._pick("Клиент", client, exact=False)
-        balance_before = self._balance(wait=True)   # Баланс async to'lishini kutadi
+        self._pick_client(client)
+        balance_before = self._balance(wait=True)
         if with_offset:
             self.b.checkbox("Провести взаимозачёт", True, exact=False)
             self.page.wait_for_timeout(800)
@@ -107,7 +113,7 @@ class ClientPaymentPage:
     def read_client_balance(self, client: str) -> str:
         """Yangi forma ochib, mijozni tanlab «Баланс» qiymatini o'qiydi (saqlamaydi). Raqam (manfiy)."""
         self.open_create()
-        self._pick("Клиент", client, exact=False)
+        self._pick_client(client)
         bal = self._balance(wait=True)
         self.page.get_by_role("button", name="Закрыть", exact=True).first.click()
         self.page.wait_for_timeout(800)

@@ -56,8 +56,8 @@ class SaleOrderPage:
         self.b._open_select(label)
         self.page.wait_for_timeout(1_000)
         self.b.filter_dropdown(self.b.control(label), text, wait_ms=1_800)
-        self.page.locator(".cdk-overlay-pane").get_by_text(text, exact=exact).first.click()
-        self.page.wait_for_timeout(400)
+        self.b.click_option(self.page.locator(".cdk-overlay-pane").get_by_text(text, exact=exact).first)
+        self.b.expect_selected(self.b.control(label), text)
         self.b._close_overlay()
 
     # ---- Step 1 «Основное» ----------------------------------------------------------------------
@@ -84,8 +84,9 @@ class SaleOrderPage:
         self.page.wait_for_timeout(1_200)
         pane = self.page.locator(".cdk-overlay-pane").last
         self.b.filter_dropdown(self.b.control(label), text, wait_ms=1_800)
-        pane.get_by_text(text, exact=exact).first.click()
-        self.page.wait_for_timeout(1_500)
+        self.b.click_option(pane.get_by_text(text, exact=exact).first)
+        self.b.expect_selected(self.b.control(label), text)
+        self.page.wait_for_timeout(1_000)
 
     def step2_podbor(self, sklad: str, price_type: str, product: str, qty: int) -> str:
         """«Подбор» drawer: Склад + Тип цены → qatorда Кол-во → «+» → X-close. ИТОГО (raqam) qaytaradi."""

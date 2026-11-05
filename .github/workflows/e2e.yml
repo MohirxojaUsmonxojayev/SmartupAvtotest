@@ -89,7 +89,8 @@ jobs:
             --server xtrade --alluredir=allure-results -p no:cacheprovider -v
           code=$?
           if [ "$code" -eq 0 ]; then echo "result=success" >> "$GITHUB_OUTPUT"; else echo "result=failure" >> "$GITHUB_OUTPUT"; fi
-          exit 0
+          # Yiqilgan run qizil ko'rinsin. Keyingi qadamlar always() bilan baribir ishlaydi.
+          exit "$code"
 
       - name: Progress — hisobot
         if: ${{ always() }}

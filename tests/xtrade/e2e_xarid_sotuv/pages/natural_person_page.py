@@ -97,12 +97,8 @@ class NaturalPersonPage:
         self.b.input(label="Адрес", value=d["address"])
         self.b.input(label="Почтовый адрес", value=d["post_addr"])
         if d.get("legal_person"):
-            try:
-                self.b.select(label="Юридическое лицо", option=d["legal_person"], exact=False, timeout=8_000)
-            except Exception:
-                print(f"  [юр.лицо] '{d['legal_person']}' topilmadi — birinchi variant")
-                self.b._close_overlay()
-                self.b.select_first("Юридическое лицо")
+            # Boshqa yuridik shaxsga jim o'tish noto'g'ri ma'lumot yaratadi, shuning uchun fallback yo'q.
+            self.b.select(label="Юридическое лицо", option=d["legal_person"], exact=False, timeout=15_000)
         else:
             self.b.select_first("Юридическое лицо")
         self.b.input(label="Телефон", value=d["phone"])
@@ -111,12 +107,7 @@ class NaturalPersonPage:
         self.b.input(label="Email", value=d["email"])
         self.b.input(label="Веб-сайт", value=d["web"])
         # Рабочие зоны = «Room - Yashnobod» (sotuv buyurtmasida mijoz shu zona bo'yicha FILTRLANADI — SHART)
-        try:
-            self.b.multiselect("Рабочие зоны", "Room - Yashnobod", exact=False)
-        except Exception:
-            print("  [раб.зоны] «Room - Yashnobod» topilmadi — birinchi variant")
-            self.b._close_overlay()
-            self.b.multiselect_first("Рабочие зоны")
+        self.b.multiselect("Рабочие зоны", "Room - Yashnobod", exact=False)
         self.b.select_first("Ответственный")
         # GPS — mustasno (spec)
         # checkboxlar: Клиент=Да (mijoz avto-yaratiladi); Поставщик/Сотрудник — yoqib-o'chirib ko'rish
@@ -161,8 +152,7 @@ class NaturalPersonPage:
         dlg.locator("smt-control").filter(has_text=label).locator("smt-data-select, input").first.click()
         opt = self.page.locator(".cdk-overlay-container").get_by_text(option, exact=exact).first
         expect(opt).to_be_visible(timeout=timeout)
-        opt.scroll_into_view_if_needed()
-        opt.click()
+        self.b.click_option(opt)
         self.b._close_overlay()
 
     def _d_select_if_empty(self, dlg, label: str, option: str):

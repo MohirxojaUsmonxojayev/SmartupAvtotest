@@ -22,6 +22,7 @@ Eslatma: murakkab holatlar (tree-select, switch holati, confirm dialog) test yoz
 jonli tasdiqlanadi — pastdagi izohlarга qarang.
 """
 import re
+import time
 
 from playwright.sync_api import Page, Locator, expect
 
@@ -141,17 +142,60 @@ class BasePage:
             box.fill(text)
             self.page.wait_for_timeout(wait_ms)
 
+    def _settle_options(self, timeout_ms: int = 5_000):
+        """Ochiq ro'yxat o'zgarishdan to'xtaguncha kutadi: keyingi sahifa kelib qator qayta chizilayotgan
+        paytdagi bosish xatosiz o'tadi-yu, tanlovni yozmaydi."""
+        items = self.page.locator(".cdk-overlay-pane li")
+        last, stable = None, 0
+        deadline = time.monotonic() + timeout_ms / 1000
+        while stable < 3 and time.monotonic() < deadline:
+            cur = items.evaluate_all("els => els.map(e => e.textContent).join('|')")
+            stable = stable + 1 if cur == last else 0
+            last = cur
+            self.page.wait_for_timeout(150)
+
+    def click_option(self, option: Locator):
+        """Dropdown variantini xavfsiz bosadi: ro'yxat tingach aylantiradi, yana tingach bosadi."""
+        self._settle_options()
+        option.scroll_into_view_if_needed()
+        self._settle_options()
+        option.click()
+
+    def expect_selected(self, field: Locator, text: str | None = None, timeout: int = 10_000):
+        """Tanlov formaga haqiqatan yozilganini tasdiqlaydi. Input qiymati yetarli emas: tanlanmagan
+        qidiruv matni ham unda qoladi. Multi-select'da smt-tag, oddiy select'da tozalash («x») ikonkasi chiqadi."""
+        if field.locator("smt-multi-data-select").count() > 0:
+            tag = field.locator("smt-tag")
+            expect((tag.filter(has_text=text) if text else tag).first).to_be_visible(timeout=timeout)
+            return
+        expect(field.locator('svg-icon[aria-label="x-01-icon"], svg-icon[class*="x-01"]').first
+               ).to_be_visible(timeout=timeout)
+        if text:
+            # Tanlangan matn ba'zi maydonda input'da, ba'zisida (masalan «Статус») alohida elementda turadi.
+            wanted = text.casefold()
+            shown = ""
+            inputs = field.locator("input")
+            deadline = time.monotonic() + timeout / 1000
+            while time.monotonic() < deadline:
+                value = inputs.first.input_value() if inputs.count() > 0 else ""
+                shown = f"{value} {field.inner_text()}"
+                if wanted in shown.casefold():
+                    return
+                self.page.wait_for_timeout(200)
+            raise AssertionError(f"Tanlovda «{text}» ko'rinmadi, maydonda: {shown!r}")
+
     def select(self, label: str, option: str, *, search: str | None = None, exact: bool = True, timeout: int = 30_000):
-        """smt-data-select dropdown'dan variant tanlaydi (trigger → (qidiruv) → variant)."""
+        """smt-data-select dropdown'dan variant tanlaydi (trigger → qidiruv → variant → tekshiruv).
+        Qidiruv doim ishlaydi: yangi yozuv to'la ro'yxatda pastda yoki keyingi sahifada bo'lishi mumkin."""
         self._open_select(label)
-        if search is not None:
-            self.filter_dropdown(self.control(label), search)
+        field = self.control(label)
+        self.filter_dropdown(field, search or option)
         # variant FAQAT ko'rinadigan dropdown'dan (.cdk-overlay-pane) — container'da trigger qiymati
         # yoki boshqa pane'lar ham bo'lishi mumkin, .first ko'rinmas elementga tushib qoladi.
         option_el = self.page.locator(".cdk-overlay-pane").get_by_text(option, exact=exact).first
         expect(option_el).to_be_visible(timeout=timeout)
-        option_el.scroll_into_view_if_needed()
-        option_el.click()
+        self.click_option(option_el)
+        self.expect_selected(field, option)
         self._close_overlay()
 
     def select_change(self, label: str, option: str, *, search: str | None = None,
@@ -171,23 +215,24 @@ class BasePage:
             ctrl.locator("smt-data-select, input").first.click()
             self.page.wait_for_timeout(600)
         overlay = self.page.locator(".cdk-overlay-container")
-        if search is not None:
-            self.filter_dropdown(ctrl, search)
+        self.filter_dropdown(ctrl, search or option)
         opt = overlay.get_by_text(option, exact=exact).first
         expect(opt).to_be_visible(timeout=timeout)
-        opt.scroll_into_view_if_needed()
-        opt.click()
+        self.click_option(opt)
+        self.expect_selected(ctrl, option)
         self._close_overlay()
 
     def multiselect(self, label: str, *options: str, exact: bool = True, timeout: int = 30_000):
         """smt-multi-data-select: bir yoki bir nechta variant tanlaydi, oxirida yopadi."""
         self._open_select(label)
         pane = self.page.locator(".cdk-overlay-pane")   # faqat ko'rinadigan dropdown
+        field = self.control(label)
         for opt in options:
+            self.filter_dropdown(field, opt)
             el = pane.get_by_text(opt, exact=exact).first
             expect(el).to_be_visible(timeout=timeout)
-            el.scroll_into_view_if_needed()
-            el.click()
+            self.click_option(el)
+            self.expect_selected(field, opt)
         self._close_overlay()
 
     def multiselect_first(self, label: str, *, timeout: int = 30_000):
@@ -195,8 +240,8 @@ class BasePage:
         self._open_select(label)
         opt = self.page.locator(".cdk-overlay-container").locator(self._OPTION).first
         expect(opt).to_be_visible(timeout=timeout)
-        opt.scroll_into_view_if_needed()
-        opt.click()
+        self.click_option(opt)
+        self.expect_selected(self.control(label))
         self._close_overlay()
 
     def chip(self, text: str, *, exact: bool = True):
@@ -216,8 +261,8 @@ class BasePage:
         self._open_select(label)
         opt = self.page.locator(".cdk-overlay-container").locator(self._OPTION).first
         expect(opt).to_be_visible(timeout=timeout)
-        opt.scroll_into_view_if_needed()
-        opt.click()
+        self.click_option(opt)
+        self.expect_selected(self.control(label))
         self._close_overlay()
 
     def tree_select(self, label: str, option: str, *, exact: bool = True, timeout: int = 30_000):
@@ -227,8 +272,7 @@ class BasePage:
         self.control(label).locator("smt-tree-select").first.click()
         opt = self.page.locator(".cdk-overlay-pane").get_by_text(option, exact=exact).first
         expect(opt).to_be_visible(timeout=timeout)
-        opt.scroll_into_view_if_needed()
-        opt.click()
+        self.click_option(opt)
         self.page.wait_for_timeout(300)
         self._close_overlay()
 

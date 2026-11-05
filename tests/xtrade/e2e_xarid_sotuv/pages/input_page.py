@@ -60,7 +60,6 @@ class InputPage:
         # To'liq nom bilan qidiramiz: umumiy prefiks ro'yxatni toraytirmaydi, pastdagi variant esa
         # aylantirib bosilganda tanlanmay qoladi (maydonda yozilgan matn qolib ketadi).
         self.b.select_change("Склад", warehouse, search=warehouse, exact=False)
-        expect(self.b.control("Склад").locator("input").first).to_have_value(warehouse, timeout=10_000)
         self.page.wait_for_timeout(500)
         self.b.select_change("Валюта для учета остатков", "Узбекский сум", exact=False)
         self.page.wait_for_timeout(500)
@@ -72,7 +71,7 @@ class InputPage:
         sb = self.page.get_by_placeholder("Поиск закупки").first
         sb.click()
         self.page.wait_for_timeout(2_000)  # yozmaymiz — qidiruv filtrlamaydi
-        self.page.locator(".cdk-overlay-pane").get_by_text(invoice, exact=False).first.click()
+        self.b.click_option(self.page.locator(".cdk-overlay-pane").get_by_text(invoice, exact=False).first)
         self.page.wait_for_timeout(3_000)
         # Кол-во = grid birinchi text input (placeholder «100 / 100» = max)
         qinp = self.page.locator("smt-data-table input[type=text]").first

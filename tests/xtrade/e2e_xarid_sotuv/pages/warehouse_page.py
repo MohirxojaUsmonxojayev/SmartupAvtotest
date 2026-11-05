@@ -81,12 +81,7 @@ class WarehousePage:
         self._ensure_select("Тип склада")                           # * (default «Main» — o'tkaziladi)
         self._ensure_select("Материально ответственное лицо")
         # Рабочие зоны = «Room - Yashnobod» (sotuvda ТМЦ shu zona bo'yicha FILTRLANADI — ombor shu zonaga bog'lansin)
-        try:
-            self.b.multiselect("Рабочие зоны", "Room - Yashnobod", exact=False)
-        except Exception:
-            print("  [раб.зоны] «Room - Yashnobod» topilmadi — birinchi variant")
-            self.b._close_overlay()
-            self.b.multiselect_first("Рабочие зоны")
+        self.b.multiselect("Рабочие зоны", "Room - Yashnobod", exact=False)
         # «Автотранспорт» default «Весь автотранспорт» — o'tkazamiz
         self.b.input(label="Примечание", value=d["note"])
         # Параметры объема: Прямые углы → o'lchamlar; Округленные углы ga o'tib qaytaramiz
