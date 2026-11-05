@@ -172,8 +172,16 @@ class TmcPage:
             except Exception:
                 pass
             self.page.wait_for_timeout(500)
-        self.b.save()
-        self.page.wait_for_timeout(2_000)
+        # Qat'iy kutish yetmaydi: fayl yuklash + saqlash 3 s dan oshishi mumkin, shu payt qilingan goto
+        # ilovaning o'z navigatsiyasi bilan to'qnashib ERR_ABORTED beradi. Javob va ro'yxatni kutamiz.
+        with self.page.expect_response(
+            lambda r: r.request.method == "POST" and "/product/inventory+" in r.url and "$save" in r.url,
+            timeout=60_000,
+        ) as save_info:
+            self.b.save()
+        response = save_info.value
+        assert response.ok, f"ТМЦ saqlanmadi: HTTP {response.status} ({response.url})"
+        self.page.get_by_role("button", name="Создать", exact=True).first.wait_for(state="visible", timeout=30_000)
 
     def find_in_list(self, name: str):
         self.open_list()

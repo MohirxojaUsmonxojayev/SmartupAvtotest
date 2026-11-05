@@ -55,10 +55,7 @@ class SaleOrderPage:
         base.select ba'zi to'la-select'larда ishonchsiz; shu proven pattern'ни ishlatamiz."""
         self.b._open_select(label)
         self.page.wait_for_timeout(1_000)
-        box = self.page.locator(".cdk-overlay-container input").first
-        if box.count() > 0:
-            box.fill(text)
-            self.page.wait_for_timeout(1_800)
+        self.b.filter_dropdown(self.b.control(label), text, wait_ms=1_800)
         self.page.locator(".cdk-overlay-pane").get_by_text(text, exact=exact).first.click()
         self.page.wait_for_timeout(400)
         self.b._close_overlay()
@@ -86,10 +83,7 @@ class SaleOrderPage:
         self.b.control(label).locator("smt-select-trigger, smt-data-select, input").first.click()
         self.page.wait_for_timeout(1_200)
         pane = self.page.locator(".cdk-overlay-pane").last
-        box = pane.locator("input").first
-        if box.count() > 0:
-            box.fill(text)
-            self.page.wait_for_timeout(1_800)
+        self.b.filter_dropdown(self.b.control(label), text, wait_ms=1_800)
         pane.get_by_text(text, exact=exact).first.click()
         self.page.wait_for_timeout(1_500)
 

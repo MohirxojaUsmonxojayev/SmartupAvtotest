@@ -57,7 +57,10 @@ class InputPage:
             self.b.input(label="Номер", value=number)
         except Exception:
             print("  [поступление] «Номер» o'zgarmas")
-        self.b.select_change("Склад", warehouse, search="QA-E2E Sklad", exact=False)
+        # To'liq nom bilan qidiramiz: umumiy prefiks ro'yxatni toraytirmaydi, pastdagi variant esa
+        # aylantirib bosilganda tanlanmay qoladi (maydonda yozilgan matn qolib ketadi).
+        self.b.select_change("Склад", warehouse, search=warehouse, exact=False)
+        expect(self.b.control("Склад").locator("input").first).to_have_value(warehouse, timeout=10_000)
         self.page.wait_for_timeout(500)
         self.b.select_change("Валюта для учета остатков", "Узбекский сум", exact=False)
         self.page.wait_for_timeout(500)

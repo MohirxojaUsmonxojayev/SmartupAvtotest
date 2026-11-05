@@ -74,10 +74,8 @@ class PurchaseOrderPage:
         sel.click()
         self.page.wait_for_timeout(900)
         ov = self.page.locator(".cdk-overlay-container")
-        box = ov.locator("input").first
-        if value and box.count() > 0:
-            box.fill(value)
-            self.page.wait_for_timeout(1_300)
+        if value:
+            self.b.filter_dropdown(sel, value)
         (ov.get_by_text(value, exact=False).first if value
          else ov.locator("li[data-option-index], ul li, li").first).click()
         self.page.wait_for_timeout(900)

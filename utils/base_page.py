@@ -130,14 +130,22 @@ class BasePage:
         trigger.scroll_into_view_if_needed()
         trigger.click()
 
+    def filter_dropdown(self, field: Locator, text: str, wait_ms: int = 1_300):
+        """Ochiq dropdown ro'yxatini qidiruv bilan toraytiradi.
+        a2'da qidiruv input'i overlay'da emas, maydonning o'zida; faqat overlay'ni tekshirsak
+        qidiruv jim o'tib ketadi va variant to'la ro'yxatdan (10 tadan sahifalangan) izlanadi."""
+        box = field.locator("input").first
+        if box.count() == 0:
+            box = self.page.locator(".cdk-overlay-pane").last.locator("input").first
+        if box.count() > 0 and box.is_editable():
+            box.fill(text)
+            self.page.wait_for_timeout(wait_ms)
+
     def select(self, label: str, option: str, *, search: str | None = None, exact: bool = True, timeout: int = 30_000):
         """smt-data-select dropdown'dan variant tanlaydi (trigger → (qidiruv) → variant)."""
         self._open_select(label)
         if search is not None:
-            box = self.page.locator(".cdk-overlay-container").locator("input").first
-            if box.count() > 0:
-                box.fill(search)
-                self.page.wait_for_timeout(800)
+            self.filter_dropdown(self.control(label), search)
         # variant FAQAT ko'rinadigan dropdown'dan (.cdk-overlay-pane) — container'da trigger qiymati
         # yoki boshqa pane'lar ham bo'lishi mumkin, .first ko'rinmas elementga tushib qoladi.
         option_el = self.page.locator(".cdk-overlay-pane").get_by_text(option, exact=exact).first
@@ -164,10 +172,7 @@ class BasePage:
             self.page.wait_for_timeout(600)
         overlay = self.page.locator(".cdk-overlay-container")
         if search is not None:
-            box = overlay.locator("input").first
-            if box.count() > 0:
-                box.fill(search)
-                self.page.wait_for_timeout(1_200)
+            self.filter_dropdown(ctrl, search)
         opt = overlay.get_by_text(option, exact=exact).first
         expect(opt).to_be_visible(timeout=timeout)
         opt.scroll_into_view_if_needed()

@@ -101,19 +101,23 @@ class SupplierPage:
         self.b.click_button("Изменить", exact=False)
         self.b.expect_form_open("изменени")
         self.page.wait_for_timeout(1_500)
-        # «Поставщики» multiselect: trigger → qidiruv → variant
+        # «Поставщики» multiselect: trigger → qidiruv → variant.
+        # Har run yangi ta'minotchi qo'shadi va u to'la ro'yxatda pastga tushadi; aylantirib darhol
+        # bosish tanlovni yozmaydi (supplier_id bo'sh saqlanadi). Shuning uchun filtrlab bosamiz.
         self.b._close_overlay()
         pos = self.b.control("Поставщики")
         pos.locator("smt-multi-data-select, smt-data-select, input").first.click()
-        overlay = self.page.locator(".cdk-overlay-container")
-        box = overlay.locator("input").first
-        if box.count() > 0:
-            box.fill(supplier)
-            self.page.wait_for_timeout(1_200)
-        opt = overlay.get_by_text(supplier, exact=False).first
+        with self.page.expect_response(
+            lambda r: "inventory+edit:suppliers" in r.url and "esearch" in (r.request.post_data or ""),
+            timeout=15_000,
+        ):
+            pos.locator("input").first.fill(supplier)
+        opt = self.page.locator(".cdk-overlay-pane li").filter(has_text=supplier).first
         expect(opt).to_be_visible(timeout=15_000)
-        opt.scroll_into_view_if_needed()
+        self.page.wait_for_timeout(200)
         opt.click()
+        # Saqlashdan oldin tanlov formaga yozilganini tasdiqlaymiz
+        expect(pos.locator("smt-tag").filter(has_text=supplier).first).to_be_visible(timeout=10_000)
         self.b._close_overlay()
         self._save()
 
