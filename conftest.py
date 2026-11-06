@@ -14,7 +14,7 @@ from typing import Any, Generator
 import allure
 import pytest
 from dotenv import load_dotenv
-from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page
+from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page, Playwright
 
 from config.servers import resolve_server
 from flows.auth_flow import authorize, logout, Session
@@ -76,13 +76,25 @@ def server(request) -> dict:
 # ======================================================================================================================
 
 @pytest.fixture(scope="session")
-def browser() -> Generator[Browser, Any, None]:
+def playwright() -> Generator[Playwright, Any, None]:
+    """Butun pytest sessiyasi uchun YAGONA Playwright instance.
+
+    Sync API bir jarayonda ikkinchi `sync_playwright()` ni birinchisi ochiq turganda ocholmaydi
+    ("Sync API inside the asyncio loop" xatosi). Shu sabab barcha brauzerlar (shu jumladan
+    E2E'ning `e2e_page`) shu fixture orqali ishga tushiriladi. pytest-playwright plugin'ining
+    xuddi shu nomli fixture'ini ham almashtiradi — plugin ham shu instance'ni ishlatadi.
+    """
+    with sync_playwright() as p:
+        yield p
+
+
+@pytest.fixture(scope="session")
+def browser(playwright: Playwright) -> Generator[Browser, Any, None]:
     headless = _is_headless()
     args = [] if headless else ["--start-maximized"]
-    with sync_playwright() as p:
-        browser_obj = p.chromium.launch(headless=headless, args=args)
-        yield browser_obj
-        browser_obj.close()
+    browser_obj = playwright.chromium.launch(headless=headless, args=args)
+    yield browser_obj
+    browser_obj.close()
 
 
 @pytest.fixture

@@ -7,7 +7,7 @@ import json
 import os
 
 import pytest
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import Playwright
 
 from config.servers import resolve_server
 from flows.auth_flow import login, kill_active_session, dashboard_opened, switch_filial
@@ -47,33 +47,36 @@ def e2e() -> dict:
 
 
 @pytest.fixture(scope="session")
-def e2e_page():
-    """Bitta brauzer sessiyasi: login + operatsion filial. Barcha E2E testlar birga ishlatadi."""
+def e2e_page(playwright: Playwright):
+    """Bitta brauzer sessiyasi: login + operatsion filial. Barcha E2E testlar birga ishlatadi.
+
+    Brauzer root conftest'dagi yagona `playwright` instance'dan ochiladi — o'zining
+    `sync_playwright()` i login testlari bilan bitta run'da to'qnashardi.
+    """
     server = resolve_server("xtrade")
     headless = _headless()
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless, args=[] if headless else ["--start-maximized"])
-        if headless:
-            ctx = browser.new_context(viewport={"width": 1920, "height": 1080})
-        else:
-            ctx = browser.new_context(no_viewport=True)
-        ctx.tracing.start(screenshots=True, snapshots=True, sources=True)
-        page = ctx.new_page()
+    browser = playwright.chromium.launch(headless=headless, args=[] if headless else ["--start-maximized"])
+    if headless:
+        ctx = browser.new_context(viewport={"width": 1920, "height": 1080})
+    else:
+        ctx = browser.new_context(no_viewport=True)
+    ctx.tracing.start(screenshots=True, snapshots=True, sources=True)
+    page = ctx.new_page()
 
-        login(page, server)
-        kill_active_session(page, server)
-        dashboard_opened(page, server)
-        switch_filial(page, server, server["default_filial"])
+    login(page, server)
+    kill_active_session(page, server)
+    dashboard_opened(page, server)
+    switch_filial(page, server, server["default_filial"])
 
-        yield page
+    yield page
 
-        os.makedirs("test-results/traces", exist_ok=True)
-        try:
-            ctx.tracing.stop(path="test-results/traces/e2e_xarid_sotuv.zip")
-        except Exception:
-            pass
-        try:
-            ctx.close()
-            browser.close()
-        except Exception:
-            pass
+    os.makedirs("test-results/traces", exist_ok=True)
+    try:
+        ctx.tracing.stop(path="test-results/traces/e2e_xarid_sotuv.zip")
+    except Exception:
+        pass
+    try:
+        ctx.close()
+        browser.close()
+    except Exception:
+        pass
