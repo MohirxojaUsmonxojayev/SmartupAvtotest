@@ -2,6 +2,7 @@
 Oldindan: TC-06 (Склад), TC-10 (Закупка, Завершено). Natija: ombor qoldig'i 100.
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -12,6 +13,7 @@ from .pages.input_page import InputPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(12)  # TC-E2E-11
 @allure.title("TC-E2E-11: Поступление ТМЦ на склад — zakupkadan, Кол-во 100, Завершено")
 def test_11_input(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")

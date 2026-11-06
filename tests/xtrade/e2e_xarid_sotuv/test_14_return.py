@@ -5,6 +5,7 @@ DIQQAT: a2 — qaytarish formasi /a2/anor/mdeal/order/return?deal_id=<ИД> (URL
 qator-amali a2 UI'да to'g'ridан ko'rinmaydi). Foydalanuvchi: TC-14 «Отказ» EMAS, aslida «Возврат».
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -15,6 +16,7 @@ from .pages.sale_order_page import SaleOrderPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(15)  # TC-E2E-14
 @allure.title("TC-E2E-14: Qisman qaytarish — Возврат 5, Причина «Обмен» → Сумма заказа 375 000")
 def test_14_return(e2e_page, e2e):
     server = resolve_server("xtrade")

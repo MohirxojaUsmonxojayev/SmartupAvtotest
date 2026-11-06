@@ -2,6 +2,7 @@
 docs/e2e/E2E_test_cases.md ga qarang. Oldindan: TC-E2E-01.
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -12,6 +13,7 @@ from .pages.legal_person_page import LegalPersonPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(4)  # TC-E2E-03
 @allure.title("TC-E2E-03: Юридическое лицо — maydonlar, 8 tab, dialoglar, saqlash, Просмотр, ta'minotchi")
 def test_03_legal_person(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")

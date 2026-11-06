@@ -2,6 +2,7 @@
 docs/e2e/E2E_test_cases.md ga qarang. Oldindan: TC-E2E-03 (Юр.лицо — «Юридическое лицо» ulanishi uchun).
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -12,6 +13,7 @@ from .pages.natural_person_page import NaturalPersonPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(5)  # TC-E2E-04
 @allure.title("TC-E2E-04: Физическое лицо — maydonlar, tablar, dialoglar, saqlash, Просмотр, mijoz")
 def test_04_natural_person(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")

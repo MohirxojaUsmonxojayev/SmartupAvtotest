@@ -1,5 +1,6 @@
 """TC-E2E-06 — Склад yaratish (barcha maydonlar, Объем hisobi). docs/e2e/E2E_test_cases.md ga qarang."""
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -10,6 +11,7 @@ from .pages.warehouse_page import WarehousePage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(7)  # TC-E2E-06
 @allure.title("TC-E2E-06: Склад yaratish — maydonlar, Объем 600, saqlash, Просмотр")
 def test_06_warehouse(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")

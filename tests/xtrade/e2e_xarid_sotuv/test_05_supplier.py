@@ -2,6 +2,7 @@
 docs/e2e/E2E_test_cases.md ga qarang. Oldindan: TC-E2E-01 (ТМЦ), TC-E2E-03 (ta'minotchi avto-yaratildi).
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -11,6 +12,7 @@ from .pages.supplier_page import SupplierPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(6)  # TC-E2E-05
 @allure.title("TC-E2E-05: Поставщик — Изменить (НДС/Акциз=Нет) + ТМЦ «Поставщики» ga bog'lash")
 def test_05_supplier(e2e_page, e2e):
     server = resolve_server("xtrade")

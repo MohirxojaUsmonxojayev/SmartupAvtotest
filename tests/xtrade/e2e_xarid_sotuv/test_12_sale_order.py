@@ -6,6 +6,7 @@ Oldindan:
 DIQQAT: bu a2 forma (ESKI UI EMAS — «Старый интерфейс» test uchun, tegilmaydi).
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -16,6 +17,7 @@ from .pages.sale_order_page import SaleOrderPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(13)  # TC-E2E-12
 @allure.title("TC-E2E-12: Заказ (sotuv) — 3 qadam; Подбор Кол-во 30 → ИТОГО 450 000, Статус Новый")
 def test_12_sale_order(e2e_page, e2e):
     server = resolve_server("xtrade")
