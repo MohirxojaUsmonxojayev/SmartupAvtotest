@@ -3,6 +3,7 @@ Oldindan: TC-09 (Заказ на закупку, ПРИНЯТО).
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -25,18 +26,18 @@ def test_10_purchase(e2e_page, e2e, rdate):
     total = EXPECTED["purchase_sum"]        # 1 000 000
     pur = PurchasePage(e2e_page, server["base_url"])
 
-    with allure.step(f"1 - Закупки → «Создать»; Step1: «Заказ на закупку» {order}, Номер СФ {invoice} → Далее"):
+    with step(f"1 - Закупки → «Создать»; Step1: «Заказ на закупку» {order}, Номер СФ {invoice} → Далее"):
         pur.open_list()
         pur.open_create()
         pur.step1_from_order(order, invoice)
 
-    with allure.step(f"2 - Step2: ТМЦ Сумма = {total}"):
+    with step(f"2 - Step2: ТМЦ Сумма = {total}"):
         pur.step2_expect_sum(total)
 
-    with allure.step("3 - Step3: Статус Завершено → «Провести»"):
+    with step("3 - Step3: Статус Завершено → «Провести»"):
         pur.step3_finish("Завершено")
 
-    with allure.step(f"4 - Ro'yxatda: {supplier}, {total}, Завершено"):
+    with step(f"4 - Ro'yxatda: {supplier}, {total}, Завершено"):
         pur.expect_in_list(supplier, total, "Завершено")
 
     e2e["purchase"] = order

@@ -7,6 +7,7 @@ DIQQAT: a2 — status «Архив» Статус-ustun dropdown orqали (TC-1
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -27,11 +28,11 @@ def test_15_archive(e2e_page, e2e):
     archived_sum = e2e.get("order_sum_after_return", EXPECTED["order_sum"] - EXPECTED["return_sum"])  # 375 000
     so = SaleOrderPage(e2e_page, server["base_url"])
 
-    with allure.step(f"1 - Buyurtma {order_id}: Статус → «Архив» → Да (asosiy ro'yxatdan chiqadi)"):
+    with step(f"1 - Buyurtma {order_id}: Статус → «Архив» → Да (asosiy ro'yxatdan chiqadi)"):
         so.change_status(client, order_id, "Архив")
         so.expect_not_in_main_list(client, order_id)
 
-    with allure.step(f"2 - «Архив заказов» (order_history_list) da buyurtma {order_id}, Сумма {archived_sum}"):
+    with step(f"2 - «Архив заказов» (order_history_list) da buyurtma {order_id}, Сумма {archived_sum}"):
         so.expect_in_archive(client, order_id, archived_sum)
 
     e2e["sale_order_status"] = "Архив"

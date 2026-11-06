@@ -4,6 +4,7 @@ Oldindan: TC-E2E-01 (ТМЦ yaratilgan). ТМЦ nomi `e2e["tmc_name"]` da (testl
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -22,17 +23,17 @@ def test_02_price(e2e_page, e2e):
     assert tmc, "TC-01 ishlamagan — e2e['tmc_name'] yo'q (avval test_01_tmc ni ishga tushiring)"
     price = PricePage(e2e_page, server["base_url"])
 
-    with allure.step("1 - Цены ro'yxati + tablar (Цены/Типы оплат/Скидки) xatosiz ochiladi"):
+    with step("1 - Цены ro'yxati + tablar (Цены/Типы оплат/Скидки) xatosiz ochiladi"):
         price.open_list()
         price.open_tabs_smoke()
 
-    with allure.step(f"2-3 - «{ENV['price_type_sell']}» → Установка цен → {tmc} = {ENV['price_sell']}"):
+    with step(f"2-3 - «{ENV['price_type_sell']}» → Установка цен → {tmc} = {ENV['price_sell']}"):
         price.set_price(ENV["price_type_sell"], tmc, ENV["price_sell"])
 
-    with allure.step(f"4 - «{ENV['price_type_buy']}» → Установка цен → {tmc} = {ENV['price_buy']}"):
+    with step(f"4 - «{ENV['price_type_buy']}» → Установка цен → {tmc} = {ENV['price_buy']}"):
         price.set_price(ENV["price_type_buy"], tmc, ENV["price_buy"])
 
-    with allure.step(f"5 - Tekshiruv: «{ENV['price_type_sell']}» narxi {ENV['price_sell']}"):
+    with step(f"5 - Tekshiruv: «{ENV['price_type_sell']}» narxi {ENV['price_sell']}"):
         price.expect_price(ENV["price_type_sell"], tmc, ENV["price_sell"])
         price.expect_price(ENV["price_type_buy"], tmc, ENV["price_buy"])
 

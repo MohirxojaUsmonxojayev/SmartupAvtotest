@@ -4,6 +4,7 @@ DIQQAT: bu a2 forma (ESKI UI EMAS — «Старый интерфейс» test u
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -28,22 +29,22 @@ def test_09_purchase_order(e2e_page, e2e, rdate):
     total = EXPECTED["purchase_sum"]              # 1 000 000
     po = PurchaseOrderPage(e2e_page, server["base_url"])
 
-    with allure.step("1 - Заказы на закупку → «Создать»; Step1 «Основное» (Дата поставки +7) → Далее"):
+    with step("1 - Заказы на закупку → «Создать»; Step1 «Основное» (Дата поставки +7) → Далее"):
         po.open_list()
         po.open_create()
         po.step1_main()
 
-    with allure.step(f"2 - Step2 «ТМЦ»: «{zr}» tanlash; qatorda Поставщик «{supplier}» + Договор → Далее"):
+    with step(f"2 - Step2 «ТМЦ»: «{zr}» tanlash; qatorda Поставщик «{supplier}» + Договор → Далее"):
         po.step2_select_request(zr, supplier)
 
-    with allure.step(f"3 - Step3 «Поставщик»: Цена {price} → ИТОГО {total}"):
+    with step(f"3 - Step3 «Поставщик»: Цена {price} → ИТОГО {total}"):
         itogo = po.step3_price(price, qty)
         assert itogo == str(total), f"ИТОГО kutilgan {total}, lekin '{itogo}'"
 
-    with allure.step(f"4 - Step4 «Завершение»: Номер {number} → Завершить"):
+    with step(f"4 - Step4 «Завершение»: Номер {number} → Завершить"):
         po.step4_finish(number)
 
-    with allure.step("5 - Ro'yxatда «Статус» → Принято (Закупка uchun SHART)"):
+    with step("5 - Ro'yxatда «Статус» → Принято (Закупка uchun SHART)"):
         po.set_status_accepted(number)
         po.expect_in_list(supplier, total)
 

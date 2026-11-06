@@ -12,6 +12,7 @@ QO'LDA/alohida (murakkab parametrli hisobotlar — bu testга kiritilmagan): В
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -34,18 +35,18 @@ def test_17_reconciliation(e2e_page, e2e):
     expected_stock = EXPECTED["stock_after_return"]   # 75
     rp = ReportsPage(e2e_page, server["base_url"])
 
-    with allure.step(f"1 - Остатки ТМЦ: «{tmc}» В наличии = {expected_stock}"):
+    with step(f"1 - Остатки ТМЦ: «{tmc}» В наличии = {expected_stock}"):
         st = rp.stock(tmc)
         assert st["on_hand"] == expected_stock, \
             f"В наличии kutilgan {expected_stock}, lekin {st['on_hand']} (to'liq: {st})"
         print(f"  [E2E-17] Остаток: В наличии {st['on_hand']}, Забронировано {st['reserved']}, "
               f"Доступно {st['available']}")
 
-    with allure.step("2 - Отчет по должникам: mijoz YO'Q (qarz 0)"):
+    with step("2 - Отчет по должникам: mijoz YO'Q (qarz 0)"):
         assert not rp.is_debtor(client), \
             f"Mijoz «{client}» hali Отчет по должникам'да bor — qarz yopilmagan"
 
-    with allure.step("3 - Mijoz balansi = 0 (to'lov formasi «Баланс»)"):
+    with step("3 - Mijoz balansi = 0 (to'lov formasi «Баланс»)"):
         pp = ClientPaymentPage(e2e_page, server["base_url"])
         bal = pp.read_client_balance(client)
         assert bal in ("0", "-0", ""), f"Mijoz balansi 0 bo'lishi kerak, lekin '{bal}'"

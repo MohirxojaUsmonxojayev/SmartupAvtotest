@@ -3,6 +3,7 @@ docs/e2e/E2E_test_cases.md ga qarang. Oldindan: TC-E2E-03 (Юр.лицо — «�
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -21,33 +22,33 @@ def test_04_natural_person(e2e_page, e2e, rdate):
     np = NaturalPersonPage(e2e_page, server["base_url"])
     ident = d["first_name"]   # «Mijoz<DDMM>» — unikal, ro'yxat/view qidiruvi uchun
 
-    with allure.step("1 - Физ.лицо ro'yxati → «Создать»; UMUMIY 1 (bo'sh save bloklanadi)"):
+    with step("1 - Физ.лицо ro'yxati → «Создать»; UMUMIY 1 (bo'sh save bloklanadi)"):
         np.open_list()
         np.open_create()
         np.check_empty_save_blocked()
 
-    with allure.step("2 - Asosiy maydonlar (Пол, Имя autocomplete, Регион, Юр.лицо, checkboxlar)"):
+    with step("2 - Asosiy maydonlar (Пол, Имя autocomplete, Регион, Юр.лицо, checkboxlar)"):
         np.fill_main(d)
 
-    with allure.step("3a - Характеристики (Группа*/Категория* majburiy)"):
+    with step("3a - Характеристики (Группа*/Категория* majburiy)"):
         np.fill_characteristics()
 
-    with allure.step("3b - Расчетный счет / Договор (dialoglar)"):
+    with step("3b - Расчетный счет / Договор (dialoglar)"):
         np.add_bank_account(d)
         np.add_contract(d)
 
-    with allure.step("3c - Адреса доставки (Клиент tufayli) + Примечание + График доставки"):
+    with step("3c - Адреса доставки (Клиент tufayli) + Примечание + График доставки"):
         np.add_delivery_address(d)
         np.fill_note(d)
         np.fill_delivery_schedule()
 
-    with allure.step("4 - «Сохранить» (confirm «Да»)"):
+    with step("4 - «Сохранить» (confirm «Да»)"):
         np.save()
 
-    with allure.step("5 - Ro'yxatda «Просмотр»: grid qatorida kalit qiymatlar (Код, Пол)"):
+    with step("5 - Ro'yxatda «Просмотр»: grid qatorida kalit qiymatlar (Код, Пол)"):
         np.verify_in_list(ident, code=d["code"], gender="Мужской")
 
-    with allure.step("6 - Справочники → Клиенты: mijoz avtomatik yaratilgan"):
+    with step("6 - Справочники → Клиенты: mijoz avtomatik yaratilgan"):
         np.expect_client_created(ident)
 
     e2e["natural_person"] = d["first_name"]
