@@ -3,9 +3,8 @@ docs/e2e/E2E_test_cases.md (TC-E2E-13) ga qarang.
 Oldindan: TC-12 (sotuv buyurtmasi «Новый» yaratilgan — e2e['sale_order_id']).
 DIQQAT: bu a2 forma (spec «eski UI» deydi, LEKIN hamma a2 — status Статус-ustun dropdown orqali).
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -16,7 +15,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(14)  # TC-E2E-13
-@allure.title("TC-E2E-13: Yetkazish — Новый → В обработке → Отгружен → Доставлен")
+@title("TC-E2E-13: Yetkazish — Новый → В обработке → Отгружен → Доставлен")
 def test_13_delivery(e2e_page, e2e):
     server = resolve_server("xtrade")
     client = e2e.get("sale_order_client") or e2e.get("natural_person")

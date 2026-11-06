@@ -2,9 +2,8 @@
 
 Oldindan: TC-E2E-01 (ТМЦ yaratilgan). ТМЦ nomi `e2e["tmc_name"]` da (testlar orasida JSON).
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -16,7 +15,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(3)  # TC-E2E-02
-@allure.title("TC-E2E-02: ТМЦ ga narx — «Sotish sum» 15 000, «Olish sum» 10 000, Просмотр tekshiruvi")
+@title("TC-E2E-02: ТМЦ ga narx — «Sotish sum» 15 000, «Olish sum» 10 000, Просмотр tekshiruvi")
 def test_02_price(e2e_page, e2e):
     server = resolve_server("xtrade")
     tmc = e2e.get("tmc_name")

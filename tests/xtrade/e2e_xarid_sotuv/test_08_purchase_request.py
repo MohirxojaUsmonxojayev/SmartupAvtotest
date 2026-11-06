@@ -1,9 +1,8 @@
 """TC-E2E-08 — Запрос на закупку (xujjat): Подбор ТМЦ 100, Новый → Принято, Просмотр.
 docs/e2e/E2E_test_cases.md ga qarang. Oldindan: TC-E2E-01 (ТМЦ).
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -15,7 +14,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(9)  # TC-E2E-08
-@allure.title("TC-E2E-08: Запрос на закупку — Подбор ТМЦ 100, Новый→Принято, Просмотр")
+@title("TC-E2E-08: Запрос на закупку — Подбор ТМЦ 100, Новый→Принято, Просмотр")
 def test_08_purchase_request(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")
     tmc = e2e.get("tmc_name")
