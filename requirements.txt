@@ -14,6 +14,7 @@ selenium==4.46.0
 
 # --- Reporting ---
 allure-pytest==2.16.0
+qase-pytest==9.0.1          # Qase TestOps (XTRADE loyihasi) — faqat CI'da QASE_MODE=testops bilan yoqiladi
 
 # --- Flaky testlarni qayta urinish ---
 pytest-rerunfailures==16.7

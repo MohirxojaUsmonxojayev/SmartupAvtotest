@@ -83,6 +83,13 @@ jobs:
           HEADLESS: "1"
           XTRADE_LOGIN: ${{ secrets.XTRADE_LOGIN }}
           XTRADE_PASSWORD: ${{ secrets.XTRADE_PASSWORD }}
+          # Qase TestOps — natijalar XTRADE loyihasiga avtomatik Test Run sifatida yuboriladi.
+          # Token faqat GitHub Secret'da (repo public — hech qaysi faylga yozilmaydi).
+          QASE_MODE: ${{ secrets.QASE_TESTOPS_API_TOKEN != '' && 'testops' || 'off' }}
+          QASE_TESTOPS_PROJECT: XTRADE
+          QASE_TESTOPS_API_TOKEN: ${{ secrets.QASE_TESTOPS_API_TOKEN }}
+          QASE_TESTOPS_RUN_TITLE: "E2E · ${{ github.event_name == 'schedule' && 'nightly' || 'manual' }} · #${{ github.run_number }}"
+          QASE_TESTOPS_RUN_DESCRIPTION: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           set +e
           python -m pytest tests/xtrade/e2e_xarid_sotuv/ \

@@ -111,6 +111,12 @@ jobs:
           ONLINE_PASSWORD: ${{ secrets.ONLINE_PASSWORD }}
           XTRADE_LOGIN: ${{ secrets.XTRADE_LOGIN }}
           XTRADE_PASSWORD: ${{ secrets.XTRADE_PASSWORD }}
+          # Qase TestOps — faqat xtrade run'lari (XTRADE loyihasi). Online run'da o'chiq.
+          QASE_MODE: ${{ (github.event.inputs.server || github.event.client_payload.server) == 'xtrade' && secrets.QASE_TESTOPS_API_TOKEN != '' && 'testops' || 'off' }}
+          QASE_TESTOPS_PROJECT: XTRADE
+          QASE_TESTOPS_API_TOKEN: ${{ secrets.QASE_TESTOPS_API_TOKEN }}
+          QASE_TESTOPS_RUN_TITLE: "Autotest · xtrade · ${{ github.event.client_payload.login || 'default' }} · #${{ github.run_number }}"
+          QASE_TESTOPS_RUN_DESCRIPTION: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           set +e
           # E2E zanjiri (~15 daqiqa, tartibli) bu login/smoke run'ga KIRMAYDI — alohida `e2e.yml` da.

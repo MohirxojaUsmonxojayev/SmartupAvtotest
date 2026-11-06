@@ -1,5 +1,6 @@
 """TC-E2E-01 — ТМЦ yaratish (a2, chuqurlashtirilgan). docs/e2e/E2E_test_cases.md ga qarang."""
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -10,6 +11,7 @@ from .pages.tmc_page import TmcPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(2)  # TC-E2E-01
 @allure.title("TC-E2E-01: ТМЦ yaratish — maydonlar, tablar, validatsiya, Просмотр, Изменить")
 def test_01_tmc(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")

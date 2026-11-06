@@ -3,6 +3,7 @@ Oldindan: TC-08 (Запрос на закупку, Принято), TC-03 (ta'mi
 DIQQAT: bu a2 forma (ESKI UI EMAS — «Старый интерфейс» test uchun, tegilmaydi).
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -13,6 +14,7 @@ from .pages.purchase_order_page import PurchaseOrderPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(10)  # TC-E2E-09
 @allure.title("TC-E2E-09: Заказ на закупку — 4 qadam (zaprosdan, Цена 10000, ИТОГО 1 000 000)")
 def test_09_purchase_order(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")

@@ -2,6 +2,7 @@
 Oldindan: TC-09 (Заказ на закупку, ПРИНЯТО).
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -12,6 +13,7 @@ from .pages.purchase_page import PurchasePage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(11)  # TC-E2E-10
 @allure.title("TC-E2E-10: Закупка (zakazdan) — Сумма 1 000 000, Завершено, Провести")
 def test_10_purchase(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")

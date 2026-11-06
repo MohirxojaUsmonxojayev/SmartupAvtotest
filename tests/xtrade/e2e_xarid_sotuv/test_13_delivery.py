@@ -4,6 +4,7 @@ Oldindan: TC-12 (sotuv buyurtmasi «Новый» yaratilgan — e2e['sale_order_
 DIQQAT: bu a2 forma (spec «eski UI» deydi, LEKIN hamma a2 — status Статус-ustun dropdown orqali).
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -13,6 +14,7 @@ from .pages.sale_order_page import SaleOrderPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(14)  # TC-E2E-13
 @allure.title("TC-E2E-13: Yetkazish — Новый → В обработке → Отгружен → Доставлен")
 def test_13_delivery(e2e_page, e2e):
     server = resolve_server("xtrade")

@@ -14,6 +14,7 @@ Eslatma: active-session (concurrent_session_list) dashboard'dan OLDIN chiqadi,
 shuning uchun u dashboard tekshiruvidan oldin hal qilinadi.
 """
 import allure
+from qase.pytest import qase
 from playwright.sync_api import Page
 
 from flows.auth_flow import login, kill_active_session, dashboard_opened, switch_filial, logout
@@ -25,6 +26,7 @@ pytestmark = [
 ]
 
 
+@qase.id(1)  # TC-LOGIN-01
 @allure.title("Xtrade: login → active session → dashboard → filial → logout")
 def test_login(page: Page, server: dict):
     with allure.step("1 - Login (default: moxir@novatrade / 1)"):

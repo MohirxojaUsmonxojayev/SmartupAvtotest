@@ -5,6 +5,7 @@ DIQQAT: a2 — Финансы → Оплаты от клиентов → «Со�
 Ikki to'lov: PAY1=200 000 → balans −175 000; PAY2=175 000 → balans 0.
 """
 import allure
+from qase.pytest import qase
 import pytest
 
 from config.servers import resolve_server
@@ -15,6 +16,7 @@ from .pages.client_payment_page import ClientPaymentPage
 pytestmark = [pytest.mark.e2e]
 
 
+@qase.id(17)  # TC-E2E-16
 @allure.title("TC-E2E-16: Mijozdan to'lov — PAY1 200 000 → −175 000; PAY2 175 000 → 0")
 def test_16_payment(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")
