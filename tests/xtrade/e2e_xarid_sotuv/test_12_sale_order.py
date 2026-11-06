@@ -5,9 +5,8 @@ Oldindan:
   - TC-08..11 xarid→kirim (omborда stok > 0).
 DIQQAT: bu a2 forma (ESKI UI EMAS — «Старый интерфейс» test uchun, tegilmaydi).
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -19,7 +18,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(13)  # TC-E2E-12
-@allure.title("TC-E2E-12: Заказ (sotuv) — 3 qadam; Подбор Кол-во 30 → ИТОГО 450 000, Статус Новый")
+@title("TC-E2E-12: Заказ (sotuv) — 3 qadam; Подбор Кол-во 30 → ИТОГО 450 000, Статус Новый")
 def test_12_sale_order(e2e_page, e2e):
     server = resolve_server("xtrade")
     tmc = e2e.get("tmc_name")

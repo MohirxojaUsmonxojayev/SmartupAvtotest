@@ -4,9 +4,8 @@ Oldindan: TC-13 (buyurtma «Доставлен» — e2e['sale_order_id']).
 DIQQAT: a2 — qaytarish formasi /a2/anor/mdeal/order/return?deal_id=<ИД> (URL orqali; «Отказ»
 qator-amali a2 UI'да to'g'ridан ko'rinmaydi). Foydalanuvchi: TC-14 «Отказ» EMAS, aslida «Возврат».
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -18,7 +17,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(15)  # TC-E2E-14
-@allure.title("TC-E2E-14: Qisman qaytarish — Возврат 5, Причина «Обмен» → Сумма заказа 375 000")
+@title("TC-E2E-14: Qisman qaytarish — Возврат 5, Причина «Обмен» → Сумма заказа 375 000")
 def test_14_return(e2e_page, e2e):
     server = resolve_server("xtrade")
     client = e2e.get("sale_order_client") or e2e.get("natural_person")

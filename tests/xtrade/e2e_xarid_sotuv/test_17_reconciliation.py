@@ -10,9 +10,8 @@ QO'LDA/alohida (murakkab parametrli hisobotlar — bu testга kiritilmagan): В
   поставщиками (1 000 000 — xarid TC-10/11 da ИТОГО 1M bilan tasdiqlanган, ta'minotchiga to'lov
   qilinmagan), Материальный отчет, Проводки счетов (debet=kredit).
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -25,7 +24,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(18)  # TC-E2E-17
-@allure.title("TC-E2E-17: Yakuniy solishtiruv — Остаток В наличии 75, mijoz qarzi 0")
+@title("TC-E2E-17: Yakuniy solishtiruv — Остаток В наличии 75, mijoz qarzi 0")
 def test_17_reconciliation(e2e_page, e2e):
     server = resolve_server("xtrade")
     tmc = e2e.get("tmc_name")

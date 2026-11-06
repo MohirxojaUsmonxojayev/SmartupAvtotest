@@ -4,9 +4,8 @@ Oldindan: TC-15 (buyurtma arxivlanган, mijoz qarzi 375 000 — e2e['sale_orde
 DIQQAT: a2 — Финансы → Оплаты от клиентов → «Создать» (/a2/trade/tcs/cashin+add).
 Ikki to'lov: PAY1=200 000 → balans −175 000; PAY2=175 000 → balans 0.
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -18,7 +17,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(17)  # TC-E2E-16
-@allure.title("TC-E2E-16: Mijozdan to'lov — PAY1 200 000 → −175 000; PAY2 175 000 → 0")
+@title("TC-E2E-16: Mijozdan to'lov — PAY1 200 000 → −175 000; PAY2 175 000 → 0")
 def test_16_payment(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")
     client = e2e.get("sale_order_client") or e2e.get("natural_person")

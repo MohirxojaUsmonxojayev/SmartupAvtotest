@@ -1,9 +1,8 @@
 """TC-E2E-03 — Юридическое лицо (ta'minotchi): barcha maydonlar + 8 tab (GPS/Файлы mustasno).
 docs/e2e/E2E_test_cases.md ga qarang. Oldindan: TC-E2E-01.
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -15,7 +14,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(4)  # TC-E2E-03
-@allure.title("TC-E2E-03: Юридическое лицо — maydonlar, 8 tab, dialoglar, saqlash, Просмотр, ta'minotchi")
+@title("TC-E2E-03: Юридическое лицо — maydonlar, 8 tab, dialoglar, saqlash, Просмотр, ta'minotchi")
 def test_03_legal_person(e2e_page, e2e, rdate):
     server = resolve_server("xtrade")
     d = legal_full(rdate)

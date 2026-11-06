@@ -1,9 +1,8 @@
 """TC-E2E-05 — Поставщик (ta'minotchi): Изменить (НДС/Акциз) + ТМЦ ga ta'minotchini bog'lash (MAJBURIY).
 docs/e2e/E2E_test_cases.md ga qarang. Oldindan: TC-E2E-01 (ТМЦ), TC-E2E-03 (ta'minotchi avto-yaratildi).
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -14,7 +13,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(6)  # TC-E2E-05
-@allure.title("TC-E2E-05: Поставщик — Изменить (НДС/Акциз=Нет) + ТМЦ «Поставщики» ga bog'lash")
+@title("TC-E2E-05: Поставщик — Изменить (НДС/Акциз=Нет) + ТМЦ «Поставщики» ga bog'lash")
 def test_05_supplier(e2e_page, e2e):
     server = resolve_server("xtrade")
     supplier = e2e.get("legal_person")

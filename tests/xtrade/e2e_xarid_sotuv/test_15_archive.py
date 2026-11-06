@@ -5,9 +5,8 @@ DIQQAT: a2 — status «Архив» Статус-ustun dropdown orqали (TC-1
 /a2/trade/tdeal/order/order_history_list. Дата отгрузки bugun bo'lgani uchun «A02-16-049 Дата
 доставки больше системного» xatosi chiqmasligi kerak.
 """
-import allure
 from qase.pytest import qase
-from utils.step import step
+from utils.step import step, title
 import pytest
 
 from config.servers import resolve_server
@@ -19,7 +18,7 @@ pytestmark = [pytest.mark.e2e]
 
 
 @qase.id(16)  # TC-E2E-15
-@allure.title("TC-E2E-15: Arxivga o'tkazish — Статус «Архив»; Архив заказов'да Сумма 375 000")
+@title("TC-E2E-15: Arxivga o'tkazish — Статус «Архив»; Архив заказов'да Сумма 375 000")
 def test_15_archive(e2e_page, e2e):
     server = resolve_server("xtrade")
     client = e2e.get("sale_order_client") or e2e.get("natural_person")
