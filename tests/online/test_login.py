@@ -15,6 +15,7 @@ shuning uchun u dashboard tekshiruvidan oldin hal qilinadi.
 """
 import allure
 from qase.pytest import qase
+from utils.step import step, title
 from playwright.sync_api import Page
 
 from flows.auth_flow import login, kill_active_session, dashboard_opened, switch_filial, logout
@@ -26,22 +27,22 @@ pytestmark = [
 ]
 
 
-@qase.ignore()  # Qase XTRADE loyihasi faqat xtrade testlari uchun
-@allure.title("Online: login → active session → dashboard → filial → logout")
+@qase.id(1)  # ONLINE-1 · TC-LOGIN-01 (Qase ONLINE loyihasi)
+@title("Online: login → active session → dashboard → filial → logout")
 def test_login(page: Page, server: dict):
-    with allure.step("1 - Login (default: alibe@test / 111111)"):
+    with step("1 - Login (default: alibe@test / 111111)"):
         email, _ = login(page, server)
         print(f"[LOGIN] {email} @ {server['base_url']}")
 
-    with allure.step("2 - Active session oynasini/sahifasini tekshirish, bo'lsa bitta sessiyani kill qilish"):
+    with step("2 - Active session oynasini/sahifasini tekshirish, bo'lsa bitta sessiyani kill qilish"):
         killed = kill_active_session(page, server)
         print("[SESSION]", "chiqdi — bitta sessiya kill qilindi" if killed else "chiqmadi")
 
-    with allure.step("3 - Dashboard ochilganini tekshirish"):
+    with step("3 - Dashboard ochilganini tekshirish"):
         dashboard_opened(page, server)
 
-    with allure.step(f"4 - Filial tanlash: {server['default_filial']}"):
+    with step(f"4 - Filial tanlash: {server['default_filial']}"):
         switch_filial(page, server, server["default_filial"])
 
-    with allure.step("5 - Logout"):
+    with step("5 - Logout"):
         logout(page, server)

@@ -111,11 +111,12 @@ jobs:
           ONLINE_PASSWORD: ${{ secrets.ONLINE_PASSWORD }}
           XTRADE_LOGIN: ${{ secrets.XTRADE_LOGIN }}
           XTRADE_PASSWORD: ${{ secrets.XTRADE_PASSWORD }}
-          # Qase TestOps — faqat xtrade run'lari (XTRADE loyihasi). Online run'da o'chiq.
-          QASE_MODE: ${{ (github.event.inputs.server || github.event.client_payload.server) == 'xtrade' && secrets.QASE_TESTOPS_API_TOKEN != '' && 'testops' || 'off' }}
-          QASE_TESTOPS_PROJECT: XTRADE
+          # Qase TestOps — har server o'z loyihasiga: xtrade → XTRADE, online → ONLINE.
+          # Boshqa server qiymati kelsa (yoki token yo'q bo'lsa) Qase o'chiq.
+          QASE_MODE: ${{ contains(fromJSON('["online","xtrade"]'), github.event.inputs.server || github.event.client_payload.server) && secrets.QASE_TESTOPS_API_TOKEN != '' && 'testops' || 'off' }}
+          QASE_TESTOPS_PROJECT: ${{ (github.event.inputs.server || github.event.client_payload.server) == 'online' && 'ONLINE' || 'XTRADE' }}
           QASE_TESTOPS_API_TOKEN: ${{ secrets.QASE_TESTOPS_API_TOKEN }}
-          QASE_TESTOPS_RUN_TITLE: "Autotest · xtrade · ${{ github.event.client_payload.login || 'default' }} · #${{ github.run_number }}"
+          QASE_TESTOPS_RUN_TITLE: "Autotest · ${{ github.event.inputs.server || github.event.client_payload.server }} · ${{ github.event.client_payload.login || 'default' }} · #${{ github.run_number }}"
           QASE_TESTOPS_RUN_DESCRIPTION: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           set +e
