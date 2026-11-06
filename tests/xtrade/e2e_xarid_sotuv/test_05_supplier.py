@@ -3,6 +3,7 @@ docs/e2e/E2E_test_cases.md ga qarang. Oldindan: TC-E2E-01 (ТМЦ), TC-E2E-03 (t
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -22,13 +23,13 @@ def test_05_supplier(e2e_page, e2e):
     assert tmc, "TC-01 ishlamagan — e2e['tmc_name'] yo'q"
     sp = SupplierPage(e2e_page, server["base_url"])
 
-    with allure.step(f"1-4 - «{supplier}» ta'minotchi Изменить: НДС/Акциз yoqib-o'chirish + Умный поиск → Сохранить"):
+    with step(f"1-4 - «{supplier}» ta'minotchi Изменить: НДС/Акциз yoqib-o'chirish + Умный поиск → Сохранить"):
         sp.edit_toggles_save(supplier)
 
-    with allure.step("5 - Tekshiruv: НДС = Нет, Акциз = Нет"):
+    with step("5 - Tekshiruv: НДС = Нет, Акциз = Нет"):
         sp.expect_vat_off(supplier)
 
-    with allure.step(f"6 (MAJBURIY) - ТМЦ «{tmc}» → Изменить → «Поставщики» ga «{supplier}» qo'shish"):
+    with step(f"6 (MAJBURIY) - ТМЦ «{tmc}» → Изменить → «Поставщики» ga «{supplier}» qo'shish"):
         sp.link_supplier_to_tmc(tmc, supplier)
         sp.expect_tmc_has_supplier(tmc, supplier)
 

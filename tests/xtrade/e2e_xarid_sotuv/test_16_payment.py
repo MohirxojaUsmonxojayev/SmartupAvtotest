@@ -6,6 +6,7 @@ Ikki to'lov: PAY1=200 000 → balans −175 000; PAY2=175 000 → balans 0.
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -28,22 +29,22 @@ def test_16_payment(e2e_page, e2e, rdate):
     n = names(rdate)
     pp = ClientPaymentPage(e2e_page, server["base_url"])
 
-    with allure.step(f"1 - To'lovдан oldin mijoz balansi −{debt}"):
+    with step(f"1 - To'lovдан oldin mijoz balansi −{debt}"):
         bal0 = pp.read_client_balance(client)
         assert bal0 == f"-{debt}", f"Boshlang'ich balans kutilgan -{debt}, lekin '{bal0}'"
 
-    with allure.step(f"2 - PAY1 «{n['pay1']}» = {pay1}, «Провести взаимозачёт» → Провести → Да"):
+    with step(f"2 - PAY1 «{n['pay1']}» = {pay1}, «Провести взаимозачёт» → Провести → Да"):
         before1 = pp.create_payment(n["pay1"], pay1, client, kassa="Основная касса")
         assert before1 == f"-{debt}", f"PAY1 oldidan balans -{debt} bo'lishi kerak, lekin '{before1}'"
 
-    with allure.step(f"3 - PAY1'dан keyin balans −{debt - pay1}"):
+    with step(f"3 - PAY1'dан keyin balans −{debt - pay1}"):
         bal1 = pp.read_client_balance(client)
         assert bal1 == f"-{debt - pay1}", f"PAY1'dан keyin balans kutilgan -{debt - pay1}, lekin '{bal1}'"
 
-    with allure.step(f"4 - PAY2 «{n['pay2']}» = {pay2} → Провести → Да"):
+    with step(f"4 - PAY2 «{n['pay2']}» = {pay2} → Провести → Да"):
         pp.create_payment(n["pay2"], pay2, client, kassa="Основная касса")
 
-    with allure.step("5 - PAY2'dан keyin balans 0 (qarz yopildi)"):
+    with step("5 - PAY2'dан keyin balans 0 (qarz yopildi)"):
         bal2 = pp.read_client_balance(client)
         assert bal2 in ("0", "-0", ""), f"PAY2'dан keyin balans 0 bo'lishi kerak, lekin '{bal2}'"
 

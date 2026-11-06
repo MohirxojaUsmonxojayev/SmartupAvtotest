@@ -3,6 +3,7 @@ docs/e2e/E2E_test_cases.md ga qarang. Oldindan: TC-E2E-01 (ТМЦ).
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -23,29 +24,29 @@ def test_08_purchase_request(e2e_page, e2e, rdate):
     qty = EXPECTED["req_qty"]                     # 100
     pr = PurchaseRequestPage(e2e_page, server["base_url"])
 
-    with allure.step("1 - Запрос ro'yxati → «Создать»; UMUMIY 1 (ТМЦ siz saqlanmaydi)"):
+    with step("1 - Запрос ro'yxati → «Создать»; UMUMIY 1 (ТМЦ siz saqlanmaydi)"):
         pr.open_list()
         pr.open_create()
         pr.check_empty_save_blocked()
 
-    with allure.step(f"2 - Header: Номер {number}, Дата bugun, Крайний срок +7, Примечание"):
+    with step(f"2 - Header: Номер {number}, Дата bugun, Крайний срок +7, Примечание"):
         pr.fill_header(number)
 
-    with allure.step(f"3-4 - «Подбор» → {tmc}, Кол-во {qty}"):
+    with step(f"3-4 - «Подбор» → {tmc}, Кол-во {qty}"):
         pr.add_tmc(tmc, qty)
 
-    with allure.step("5 - «Импорт» oynasi smoke"):
+    with step("5 - «Импорт» oynasi smoke"):
         pr.import_smoke()
 
-    with allure.step("6a - «Сохранить» (Статус Новый)"):
+    with step("6a - «Сохранить» (Статус Новый)"):
         pr.save()
         pr.expect_in_list(number)
 
-    with allure.step("6b - «Статус» → Принято"):
+    with step("6b - «Статус» → Принято"):
         pr.set_status_accepted(number)
         pr.expect_in_list(number, status_text="Принят")
 
-    with allure.step(f"7 - «Просмотр»: {tmc} {qty} шт"):
+    with step(f"7 - «Просмотр»: {tmc} {qty} шт"):
         pr.open_view(number, tmc, qty)
 
     e2e["purchase_req"] = number

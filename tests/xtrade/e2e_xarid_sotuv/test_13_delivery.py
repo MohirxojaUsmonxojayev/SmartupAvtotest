@@ -5,6 +5,7 @@ DIQQAT: bu a2 forma (spec «eski UI» deydi, LEKIN hamma a2 — status Стат�
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -26,15 +27,15 @@ def test_13_delivery(e2e_page, e2e):
     order_id = e2e.get("sale_order_id") or so.capture_id(client)
     assert order_id, "Sotuv buyurtmasi ИД topilmadi (TC-12 tekshiring)"
 
-    with allure.step(f"1 - Buyurtma {order_id}: Статус → «В обработке» → Да"):
+    with step(f"1 - Buyurtma {order_id}: Статус → «В обработке» → Да"):
         so.change_status(client, order_id, "В обработке")
         so.expect_status(client, order_id, "В обработке")
 
-    with allure.step(f"2 - Buyurtma {order_id}: Статус → «Отгружен» → Да"):
+    with step(f"2 - Buyurtma {order_id}: Статус → «Отгружен» → Да"):
         so.change_status(client, order_id, "Отгружен")
         so.expect_status(client, order_id, "Отгружен")
 
-    with allure.step(f"3 - Buyurtma {order_id}: Статус → «Доставлен» → Да"):
+    with step(f"3 - Buyurtma {order_id}: Статус → «Доставлен» → Да"):
         so.change_status(client, order_id, "Доставлен")
         so.expect_status(client, order_id, "Доставлен")
 

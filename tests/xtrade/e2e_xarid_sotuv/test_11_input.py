@@ -3,6 +3,7 @@ Oldindan: TC-06 (Склад), TC-10 (Закупка, Завершено). Natija
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -25,18 +26,18 @@ def test_11_input(e2e_page, e2e, rdate):
     qty = EXPECTED["stock_after_input"]       # 100
     inp = InputPage(e2e_page, server["base_url"])
 
-    with allure.step(f"1 - Поступления → «Создать»; Step1: Номер {number}, Склад {warehouse}, Валюта Узбекский сум → Далее"):
+    with step(f"1 - Поступления → «Создать»; Step1: Номер {number}, Склад {warehouse}, Валюта Узбекский сум → Далее"):
         inp.open_list()
         inp.open_create()
         inp.step1_main(number, warehouse)
 
-    with allure.step(f"2 - Step2 «Закупки»: {invoice} tanlash, Кол-во {qty} → Далее"):
+    with step(f"2 - Step2 «Закупки»: {invoice} tanlash, Кол-во {qty} → Далее"):
         inp.step2_from_purchase(invoice, qty)
 
-    with allure.step("3 - Step3: Завершить (Новое holatda saqlanadi)"):
+    with step("3 - Step3: Завершить (Новое holatda saqlanadi)"):
         inp.step3_finish("Завершено")
 
-    with allure.step("4 - Ro'yxatда «Статус» → Завершено (qoldiq posted)"):
+    with step("4 - Ro'yxatда «Статус» → Завершено (qoldiq posted)"):
         inp.set_status_completed(number)
         inp.expect_in_list(number, "Завершено")
 

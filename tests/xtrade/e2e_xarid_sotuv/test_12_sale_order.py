@@ -7,6 +7,7 @@ DIQQAT: bu a2 forma (ESKI UI EMAS — «Старый интерфейс» test u
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -31,20 +32,20 @@ def test_12_sale_order(e2e_page, e2e):
     total = EXPECTED["order_sum"]          # 450 000
     so = SaleOrderPage(e2e_page, server["base_url"])
 
-    with allure.step(f"1 - Заказы → «Создать»; Step1 «Основное»: зона «{ENV['room']}», Клиент «{client}» → Далее"):
+    with step(f"1 - Заказы → «Создать»; Step1 «Основное»: зона «{ENV['room']}», Клиент «{client}» → Далее"):
         so.open_list()
         so.open_create()
         so.step1_main(ENV["room"], "Main Manager", client)
 
-    with allure.step(f"2 - Step2 «ТМЦ»: Подбор (Склад «{sklad}», Тип цены «{ENV['price_type_sell']}»), "
+    with step(f"2 - Step2 «ТМЦ»: Подбор (Склад «{sklad}», Тип цены «{ENV['price_type_sell']}»), "
                      f"{tmc} × {qty} → ИТОГО {total}"):
         itogo = so.step2_podbor(sklad, ENV["price_type_sell"], tmc, qty)
         assert itogo == str(total), f"ИТОГО kutilgan {total}, lekin '{itogo}'"
 
-    with allure.step(f"3 - Step3 «Завершение»: Тип оплаты «{ENV['payment_type']}», Статус Новый → Сохранить"):
+    with step(f"3 - Step3 «Завершение»: Тип оплаты «{ENV['payment_type']}», Статус Новый → Сохранить"):
         so.step3_finish(ENV["payment_type"], status="Новый")
 
-    with allure.step("4 - Ro'yxatда buyurtma mavjud + Статус «Новый» + ИД olish"):
+    with step("4 - Ro'yxatда buyurtma mavjud + Статус «Новый» + ИД olish"):
         so.expect_in_list(client)
         status = so.latest_status(client)
         assert status == "Новый", f"Buyurtma holati kutilgan «Новый», lekin «{status}»"

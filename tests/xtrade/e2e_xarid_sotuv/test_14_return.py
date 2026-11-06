@@ -6,6 +6,7 @@ qator-amali a2 UI'да to'g'ridан ko'rinmaydi). Foydalanuvchi: TC-14 «Отк�
 """
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -28,17 +29,17 @@ def test_14_return(e2e_page, e2e):
     sum_after_expected = EXPECTED["order_sum"] - ret_sum          # 450 000 − 75 000 = 375 000
     so = SaleOrderPage(e2e_page, server["base_url"])
 
-    with allure.step(f"1 - Buyurtma {order_id} «Доставлен» ekanini tekshirish"):
+    with step(f"1 - Buyurtma {order_id} «Доставлен» ekanini tekshirish"):
         so.expect_status(client, order_id, "Доставлен")
 
-    with allure.step(f"2-4 - Возврат формаси: Возврат={ret_qty}, Причина «Обмен» → Сохранить → Да; "
+    with step(f"2-4 - Возврат формаси: Возврат={ret_qty}, Причина «Обмен» → Сохранить → Да; "
                      f"Сумма заказа {EXPECTED['order_sum']} → {sum_after_expected}"):
         sum_after = so.partial_return(order_id, ret_qty, reason="Обмен")
         assert sum_after == str(sum_after_expected), \
             f"Qaytarishдан keyин Сумма заказа kutilgan {sum_after_expected}, lekin '{sum_after}' " \
             f"(qaytarilган summa {ret_sum} bo'lishi kerak)"
 
-    with allure.step(f"5 - Saqlanganini mustaqil tasdiqlash: Сумма заказа = {sum_after_expected} (qayta yuklash)"):
+    with step(f"5 - Saqlanganini mustaqil tasdiqlash: Сумма заказа = {sum_after_expected} (qayta yuklash)"):
         so.expect_return_persisted(order_id, sum_after_expected)
 
     e2e["return_qty"] = ret_qty

@@ -1,6 +1,7 @@
 """TC-E2E-07 — Клиент (TC-04 da avto-yaratilgan): Изменить + Просмотр. docs/e2e/E2E_test_cases.md ga qarang."""
 import allure
 from qase.pytest import qase
+from utils.step import step
 import pytest
 
 from config.servers import resolve_server
@@ -18,10 +19,10 @@ def test_07_client(e2e_page, e2e):
     assert mijoz, "TC-04 ishlamagan — e2e['natural_person'] yo'q"
     cp = ClientPage(e2e_page, server["base_url"])
 
-    with allure.step(f"1-3 - «{mijoz}» client «Изменить»: Тип клиента/Название to'la → Сохранить"):
+    with step(f"1-3 - «{mijoz}» client «Изменить»: Тип клиента/Название to'la → Сохранить"):
         cp.edit_and_save(mijoz)
 
-    with allure.step("4 - «Просмотреть»: Основная/Задачи/История tablar + nom"):
+    with step("4 - «Просмотреть»: Основная/Задачи/История tablar + nom"):
         cp.view_and_verify(mijoz)
 
     e2e["client"] = mijoz
