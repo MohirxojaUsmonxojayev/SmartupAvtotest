@@ -34,3 +34,11 @@ playwright-report/
 # Allure
 allure-results/
 allure-report/
+_to_delete/
+
+# macOS
+.DS_Store
+
+# Lokal fayllar (repoga tushmasligi kerak)
+oqyol/
+qase.lock
