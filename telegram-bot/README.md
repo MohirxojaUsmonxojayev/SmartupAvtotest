@@ -24,6 +24,7 @@ buyruqni qabul qilib GitHub'ga `repository_dispatch` yuboradi (stateless, doim o
    | `GITHUB_TOKEN` | fine-grained PAT — **Contents: Read and write** + **Actions: Read and write** (shu repo uchun) |
    | `GITHUB_REPO` | `egasi/repo` (masalan `MohirxojaUsmonxojayev/SmartupAvtotest`) |
    | `WEBHOOK_SECRET` | ixtiyoriy tasodifiy satr (webhook himoyasi) |
+   | `LOCAL_AGENT_SECRET` | «🖥 Local run»: Mac agenti kaliti (uzun tasodifiy satr; Mac'dagi `.env` da ham shu) |
 
 3. Deploy bo'lgach URL olasiz: `https://<project>.deno.dev`
 
@@ -33,8 +34,16 @@ buyruqni qabul qilib GitHub'ga `repository_dispatch` yuboradi (stateless, doim o
    ```
    (brauzerda ochsangiz ham bo'ladi — `{"ok":true}` qaytishi kerak)
 
+## 🖥 Local run (Mac'dagi testlar)
+Pastki menyuda «🚀 Run test» yonida **«🖥 Local run»**: Hammasi (kz + xs) · Кадры · Xarid-sotuv · Smoke · Holat ·
+Oxirgi natija · To'xtatish. Buyruq Deno KV navbatiga yoziladi; Mac'dagi agent (`scripts/localagent.py`, repo `main`)
+`GET /local/next` (long poll ≤ 25 s) bilan oladi va `POST /local/ack` bilan javob beradi — ikkalasi
+`Authorization: Bearer <LOCAL_AGENT_SECRET>` (noto'g'ri kalit → 401). Agent 60 s ulanmagan bo'lsa bot
+«Mac hozir oflayn — yoqilganda boshlanadi» deydi; 12 soatdan eski buyruq bekor qilinadi. Qo'llanma: `docs/local_run.md`.
+
 ## Buyruqlar
 - `/run` — test ishga tushirish
+- `/local` — Mac'dagi testlar menyusi
 - `/id` — chat id (ruxsat ro'yxatiga qo'shish uchun)
 - `/help`
 
