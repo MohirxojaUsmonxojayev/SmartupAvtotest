@@ -20,6 +20,12 @@
 //   GITHUB_TOKEN              — PAT (fine-grained: Contents RW + Actions RW)
 //   GITHUB_REPO               — "egasi/repo" (masalan MohirxojaUsmonxojayev/SmartupAvtotest)
 //   WEBHOOK_SECRET            — (ixtiyoriy) Telegram webhook secret_token
+//   LOCAL_AGENT_SECRET        — «🖥 Local run»: Mac agenti (scripts/localagent.py) kaliti (Bearer)
+//
+// «🖥 Local run» (CODE-028): Mac'dagi testlarni yurgizish. Server Mac'ga ulana olmaydi, shuning uchun Mac agenti
+// GET /local/next ni kutib turadi (long poll ≤ 25 s); tugma bosilsa buyruq Deno KV navbatidan shu so'rovga qaytadi.
+// Agent POST /local/ack bilan qabul qilganini (va javob matnini) bildiradi. Buyruqlar — qat'iy ro'yxat (LOCAL_CMDS).
+// Faqat lokal sinov uchun (Deploy'da qo'yilmaydi): TELEGRAM_API_BASE, LOCAL_KV_PATH.
 // =====================================================================================================================
 
 const TG_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
@@ -30,6 +36,8 @@ const ALLOWED = new Set(
 const GH_TOKEN = Deno.env.get("GITHUB_TOKEN") ?? "";
 const GH_REPO = Deno.env.get("GITHUB_REPO") ?? "";
 const WEBHOOK_SECRET = Deno.env.get("WEBHOOK_SECRET") ?? "";
+const LOCAL_SECRET = Deno.env.get("LOCAL_AGENT_SECRET") ?? "";
+const TG_API = (Deno.env.get("TELEGRAM_API_BASE") ?? "https://api.telegram.org").replace(/\/+$/, "");
 
 const SERVERS: Record<string, string> = {
   online: "smartup.online",
@@ -46,7 +54,7 @@ const ACTIVE_STATUSES = new Set(["queued", "in_progress", "waiting", "requested"
 // Telegram API
 // ---------------------------------------------------------------------------------------------------------------------
 async function tg(method: string, payload: unknown): Promise<any> {
-  const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/${method}`, {
+  const r = await fetch(`${TG_API}/bot${TG_TOKEN}/${method}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(payload),
@@ -115,7 +123,7 @@ const runsUrl = () => `https://github.com/${GH_REPO}/actions`;
 // ---------------------------------------------------------------------------------------------------------------------
 // Doimiy (persistent) tugma — har safar /run yozmaslik uchun. Chat ostida turadi.
 const runKeyboard = () => ({
-  keyboard: [[{ text: "🚀 Run test" }]],
+  keyboard: [[{ text: "🚀 Run test" }, { text: "🖥 Local run" }]],
   resize_keyboard: true,
   is_persistent: true,
 });
@@ -140,6 +148,168 @@ const conflictKeyboard = (server: string, login: string, runId: number) => ({
     { text: "✖️ Bekor", callback_data: "cxl" },
   ]],
 });
+
+const localKeyboard = () => ({
+  inline_keyboard: [
+    [{ text: "▶️ Hammasi (kz + xs)", callback_data: "loc:all" }],
+    [
+      { text: "Кадры (kz)", callback_data: "loc:kz" },
+      { text: "Xarid-sotuv (xs)", callback_data: "loc:xs" },
+      { text: "Smoke", callback_data: "loc:smoke" },
+    ],
+    [
+      { text: "📊 Holat", callback_data: "loc:status" },
+      { text: "📄 Oxirgi natija", callback_data: "loc:natija" },
+    ],
+    [{ text: "⏹ To'xtatish", callback_data: "loc:stop?" }],
+  ],
+});
+
+const stopConfirmKeyboard = () => ({
+  inline_keyboard: [[
+    { text: "⏹ Ha, to'xtat", callback_data: "loc:stop" },
+    { text: "✖️ Bekor", callback_data: "cxl" },
+  ]],
+});
+
+// ---------------------------------------------------------------------------------------------------------------------
+// «🖥 Local run» — Mac agenti uchun buyruq navbati (Deno KV)
+// ---------------------------------------------------------------------------------------------------------------------
+// Qat'iy ro'yxat: agent ham faqat shularni qabul qiladi (boshqasi — rad). Matn hech qachon shell'ga berilmaydi.
+const LOCAL_CMDS: Record<string, string> = {
+  all: "▶️ Hammasi (kz + xs)",
+  kz: "Кадры (kz)",
+  xs: "Xarid-sotuv (xs)",
+  smoke: "Smoke",
+  status: "📊 Holat",
+  natija: "📄 Oxirgi natija",
+  stop: "⏹ To'xtatish",
+};
+const LOCAL_POLL_MS = 25_000;             // long poll davomiyligi
+const LOCAL_OFFLINE_MS = 60_000;          // agent shuncha vaqt ulanmasa — «oflayn»
+const LOCAL_TTL_MS = 12 * 60 * 60 * 1000; // eski buyruq bekor qilinadi
+const LOCAL_REDELIVER_MS = 60_000;        // ack kelmasa qayta beriladi
+const Q_PREFIX = ["local", "q"];
+const SIGNAL_KEY = ["local", "signal"];
+const AGENT_KEY = ["local", "agent"];
+
+interface LocalItem { id: string; cmd: string; chat: string; ts: number; delivered?: number }
+
+let _kv: Deno.Kv | null = null;
+async function kv(): Promise<Deno.Kv> {
+  return _kv ??= await Deno.openKv(Deno.env.get("LOCAL_KV_PATH") || undefined);
+}
+
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+async function agentOnline(): Promise<boolean> {
+  const seen = (await (await kv()).get<{ seen: number }>(AGENT_KEY)).value?.seen ?? 0;
+  return Date.now() - seen <= LOCAL_OFFLINE_MS;
+}
+
+async function touchAgent(): Promise<void> {
+  await (await kv()).set(AGENT_KEY, { seen: Date.now() });
+}
+
+async function enqueueLocal(cmd: string, chat: string): Promise<void> {
+  const db = await kv();
+  const ts = Date.now();
+  const id = `${ts}-${crypto.randomUUID().slice(0, 8)}`;
+  const item: LocalItem = { id, cmd, chat, ts };
+  await db.set([...Q_PREFIX, ts, id], item);
+  await db.set(SIGNAL_KEY, ts);           // kutib turgan /local/next ni uyg'otadi
+}
+
+/** Navbatdagi (eng eski, berilmagan yoki ack'siz qolgan) buyruq. 12 soatdan eskisi bekor qilinadi. */
+async function takeNextLocal(): Promise<LocalItem | null> {
+  const db = await kv();
+  const now = Date.now();
+  for await (const e of db.list<LocalItem>({ prefix: Q_PREFIX })) {
+    const item = e.value;
+    if (now - item.ts > LOCAL_TTL_MS) {
+      await db.delete(e.key);
+      await send(item.chat, `⌛ Local run buyrug'i bekor qilindi (12 soat ichida Mac ulanmadi): <b>${esc(LOCAL_CMDS[item.cmd] ?? item.cmd)}</b>`);
+      continue;
+    }
+    if (item.delivered && now - item.delivered < LOCAL_REDELIVER_MS) continue;
+    await db.set(e.key, { ...item, delivered: now });
+    return item;
+  }
+  return null;
+}
+
+async function ackLocal(id: string, text: string): Promise<boolean> {
+  const db = await kv();
+  for await (const e of db.list<LocalItem>({ prefix: Q_PREFIX })) {
+    if (e.value.id !== id) continue;
+    await db.delete(e.key);
+    if (text) await send(e.value.chat, `🖥 ${esc(text.slice(0, 3500))}`, runKeyboard());
+    return true;
+  }
+  return false;
+}
+
+function agentAuthorized(req: Request): boolean {
+  if (!LOCAL_SECRET) return false;         // kalit sozlanmagan — hech kim kira olmaydi
+  const got = new TextEncoder().encode(req.headers.get("authorization") ?? "");
+  const want = new TextEncoder().encode(`Bearer ${LOCAL_SECRET}`);
+  let diff = got.length ^ want.length;     // doimiy vaqtli solishtirish
+  for (let i = 0; i < want.length; i++) diff |= (got[i] ?? 0) ^ want[i];
+  return diff === 0;
+}
+
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+
+/** GET /local/next — buyruq bo'lsa darhol, bo'lmasa ≤ 25 s kutib bo'sh javob ({}). */
+async function localNext(): Promise<Response> {
+  await touchAgent();
+  const reader = (await kv()).watch([SIGNAL_KEY]).getReader();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await reader.read();                   // birinchi o'qish — joriy qiymat (darhol)
+    let item = await takeNextLocal();
+    if (!item) {
+      await Promise.race([
+        reader.read(),                     // enqueueLocal signal'ni o'zgartirsa uyg'onadi
+        new Promise((resolve) => { timer = setTimeout(resolve, LOCAL_POLL_MS); }),
+      ]);
+      await touchAgent();
+      item = await takeNextLocal();
+    }
+    return json(item ? { id: item.id, cmd: item.cmd } : {});
+  } finally {
+    clearTimeout(timer);
+    reader.cancel().catch(() => {});
+  }
+}
+
+/** POST /local/ack {id, text?} — agent buyruqni oldi; text bo'lsa buyruq bergan chatga yuboriladi. */
+async function localAck(req: Request): Promise<Response> {
+  let body: any;
+  try { body = await req.json(); } catch { return json({ error: "bad json" }, 400); }
+  const id = typeof body?.id === "string" ? body.id : "";
+  const text = typeof body?.text === "string" ? body.text : "";
+  if (!id) return json({ error: "id kerak" }, 400);
+  return json({ ok: await ackLocal(id, text) });
+}
+
+async function onLocalCommand(chat: string, cmd: string) {
+  if (!LOCAL_CMDS[cmd]) { console.warn("local: noma'lum buyruq", cmd); return; }
+  if (!LOCAL_SECRET) {
+    await send(chat, "❌ Local run sozlanmagan (LOCAL_AGENT_SECRET yo'q).");
+    return;
+  }
+  const online = await agentOnline();
+  await enqueueLocal(cmd, chat);
+  await send(
+    chat,
+    online
+      ? `📨 <b>${esc(LOCAL_CMDS[cmd])}</b> — Mac'ga yuborildi.`
+      : `💤 Mac hozir oflayn — yoqilganda boshlanadi.\n<b>${esc(LOCAL_CMDS[cmd])}</b> navbatda (12 soatgacha).`,
+    runKeyboard(),
+  );
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Biznes-mantiq
@@ -203,15 +373,18 @@ async function onMessage(msg: any) {
     // Doimiy "🚀 Run test" tugmasini o'rnatamiz (bir marta — keyin chat ostida turaveradi).
     await send(
       chat,
-      "🧪 <b>Smartup Autotest bot</b>\n\nTest ishga tushirish: pastdagi <b>🚀 Run test</b> tugmasi (yoki /run).",
+      "🧪 <b>Smartup Autotest bot</b>\n\nTest ishga tushirish: pastdagi <b>🚀 Run test</b> tugmasi (yoki /run).\n" +
+        "Mac'dagi testlar: <b>🖥 Local run</b> (yoki /local).",
       runKeyboard(),
     );
   } else if (cmd === "/run" || text === "🚀 Run test") {
     await send(chat, "🧪 Qaysi serverda test run qilamiz?", serverKeyboard());
+  } else if (cmd === "/local" || text === "🖥 Local run") {
+    await send(chat, "🖥 <b>Local run</b> — Mac'dagi testlar. Nima qilamiz?", localKeyboard());
   } else if (cmd === "/id") {
     await send(chat, `Chat ID: <code>${chat}</code>`);
   } else if (cmd === "/help") {
-    await send(chat, "🚀 Run test (yoki /run) — test ishga tushirish\n/id — chat id\nTestlar GitHub Actions'da ishlaydi, natija + Allure link shu yerga keladi.");
+    await send(chat, "🚀 Run test (yoki /run) — test ishga tushirish\n🖥 Local run (yoki /local) — Mac'dagi testlar\n/id — chat id\nTestlar GitHub Actions'da ishlaydi, natija + Allure link shu yerga keladi.");
   }
 }
 
@@ -224,6 +397,17 @@ async function onCallback(cb: any) {
 
   if (data === "cxl") {
     await send(chat, "✖️ Bekor qilindi.");
+    return;
+  }
+
+  // «🖥 Local run» menyusi
+  if (data.startsWith("loc:")) {
+    const cmd = data.slice(4);
+    if (cmd === "stop?") {
+      await send(chat, "⏹ Mac'dagi joriy run to'xtatilsinmi? (navbatdagi run'lar ham bekor bo'ladi)", stopConfirmKeyboard());
+    } else {
+      await onLocalCommand(chat, cmd);
+    }
     return;
   }
 
@@ -287,6 +471,20 @@ async function onCallback(cb: any) {
 // HTTP (Telegram webhook)
 // ---------------------------------------------------------------------------------------------------------------------
 Deno.serve(async (req) => {
+  // Mac agenti (Bearer LOCAL_AGENT_SECRET) — Telegram webhook'idan oldin
+  const path = new URL(req.url).pathname;
+  if (path === "/local/next" || path === "/local/ack") {
+    if (!agentAuthorized(req)) return json({ error: "unauthorized" }, 401);
+    try {
+      if (path === "/local/next" && req.method === "GET") return await localNext();
+      if (path === "/local/ack" && req.method === "POST") return await localAck(req);
+    } catch (e) {
+      console.error("local endpoint error:", e);
+      return json({ error: "internal" }, 500);
+    }
+    return json({ error: "method not allowed" }, 405);
+  }
+
   if (req.method !== "POST") return new Response("Smartup Autotest bot", { status: 200 });
 
   if (WEBHOOK_SECRET && req.headers.get("X-Telegram-Bot-Api-Secret-Token") !== WEBHOOK_SECRET) {
